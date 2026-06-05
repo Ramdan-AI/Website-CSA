@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Admin\DashboardController;
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DivisionController;
 use App\Http\Controllers\Admin\PositionController;
 use App\Http\Controllers\Admin\MemberController;
@@ -11,13 +11,13 @@ use App\Http\Controllers\Admin\NewsCategoryController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\Admin\AlbumController;
 use App\Http\Controllers\Admin\GalleryController;
-use App\Http\Controllers\Admin\GalleryController as AdminGalleryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventRegistrationController;
 use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\IncomeController;
 use App\Http\Controllers\Admin\ExpenseController;
+use App\Http\Controllers\Admin\SettingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -25,79 +25,149 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::middleware([
-    'auth',
-    'superadmin'
-])
-    ->prefix('admin')
+Route::prefix('admin')
     ->name('admin.')
+    ->middleware(['auth'])
     ->group(function () {
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dashboard
+        |--------------------------------------------------------------------------
+        */
 
         Route::get(
             '/dashboard',
             [DashboardController::class, 'index']
         )->name('dashboard');
 
-        Route::resource(
-            'divisions',
-            DivisionController::class
-        );
-        Route::resource(
-            'positions',
-            PositionController::class
-        );
+        /*
+        |--------------------------------------------------------------------------
+        | Super Admin Only
+        |--------------------------------------------------------------------------
+        */
 
-        Route::resource(
-            'members',
-            MemberController::class
-        );
+        Route::middleware([
+            'role:super-admin'
+        ])->group(function () {
 
-        Route::resource(
-            'news-categories',
-            NewsCategoryController::class
-        );
+            Route::resource(
+                'divisions',
+                DivisionController::class
+            );
 
-        Route::resource(
-            'news',
-            NewsController::class
-        );
+            Route::resource(
+                'positions',
+                PositionController::class
+            );
 
-        Route::resource(
-            'albums',
-            AlbumController::class
-        );
+            Route::get(
+                'settings',
+                [SettingController::class, 'edit']
+            )->name('settings.edit');
 
-        Route::resource(
-            'galleries',
-            GalleryController::class
-        );
+            Route::put(
+                'settings',
+                [SettingController::class, 'update']
+            )->name('settings.update');
+        });
 
-        Route::resource(
-            'events',
-            EventController::class
-        );
+        /*
+        |--------------------------------------------------------------------------
+        | Super Admin + Sekretaris
+        |--------------------------------------------------------------------------
+        */
 
-        Route::resource(
-            'event-registrations',
-            EventRegistrationController::class
-        );
-        Route::resource(
-            'attendances',
-            AttendanceController::class
-        );
+        Route::middleware([
+            'role:super-admin,sekretaris'
+        ])->group(function () {
 
-        Route::resource(
-            'documents',
-            DocumentController::class
-        );
+            Route::resource(
+                'news-categories',
+                NewsCategoryController::class
+            );
 
-        Route::resource(
-            'incomes',
-            IncomeController::class
-        );
+            Route::resource(
+                'news',
+                NewsController::class
+            );
 
-        Route::resource(
-            'expenses',
-            ExpenseController::class
-        );
+            Route::resource(
+                'documents',
+                DocumentController::class
+            );
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Super Admin + Bendahara
+        |--------------------------------------------------------------------------
+        */
+
+        Route::middleware([
+            'role:super-admin,bendahara'
+        ])->group(function () {
+
+            Route::resource(
+                'incomes',
+                IncomeController::class
+            );
+
+            Route::resource(
+                'expenses',
+                ExpenseController::class
+            );
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Super Admin + Kepala Divisi
+        |--------------------------------------------------------------------------
+        */
+
+        Route::middleware([
+            'role:super-admin,kepala-divisi'
+        ])->group(function () {
+
+            Route::resource(
+                'members',
+                MemberController::class
+            );
+
+            Route::resource(
+                'events',
+                EventController::class
+            );
+
+            Route::resource(
+                'event-registrations',
+                EventRegistrationController::class
+            );
+
+            Route::resource(
+                'attendances',
+                AttendanceController::class
+            );
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Semua Pengurus
+        |--------------------------------------------------------------------------
+        */
+
+        Route::middleware([
+            'role:super-admin,ketua,sekretaris,bendahara,kepala-divisi'
+        ])->group(function () {
+
+            Route::resource(
+                'albums',
+                AlbumController::class
+            );
+
+            Route::resource(
+                'galleries',
+                GalleryController::class
+            );
+        });
     });

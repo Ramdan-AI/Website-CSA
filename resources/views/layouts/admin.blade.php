@@ -5,27 +5,51 @@
 
     <title>CSA Admin</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
 </head>
 
 <body>
 
 <nav class="navbar navbar-dark bg-dark">
+
     <div class="container-fluid">
 
         <span class="navbar-brand">
+
             CSA ADMIN PANEL
+
         </span>
 
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
+        <div class="d-flex align-items-center gap-3">
 
-            <button class="btn btn-danger btn-sm">
-                Logout
-            </button>
-        </form>
+            <span class="text-white">
+
+                {{ auth()->user()->name }}
+                ({{ auth()->user()->role->name }})
+
+            </span>
+
+            <form
+                action="{{ route('logout') }}"
+                method="POST">
+
+                @csrf
+
+                <button
+                    class="btn btn-danger btn-sm">
+
+                    Logout
+
+                </button>
+
+            </form>
+
+        </div>
 
     </div>
+
 </nav>
 
 <div class="container-fluid">
@@ -38,152 +62,253 @@
 
             <ul class="nav flex-column">
 
+                {{-- Dashboard (Semua Role) --}}
+
                 <li class="nav-item">
-                    <a href="{{ route('admin.dashboard') }}" class="nav-link">
+
+                    <a
+                        href="{{ route('admin.dashboard') }}"
+                        class="nav-link">
+
                         Dashboard
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a href="{{ route('admin.divisions.index') }}" class="nav-link">
-                        Divisions
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a
-                        href="{{ route('admin.positions.index') }}"
-                        class="nav-link">
-                                
-                        Positions
-                                
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a
-                        href="{{ route('admin.members.index') }}"
-                        class="nav-link">
-                
-                        Members
-                
-                    </a>
-                </li>
-
-                <li class="nav-item">
-
-                    <a
-                        href="{{ route('admin.news-categories.index') }}"
-                        class="nav-link">
-                                
-                        News Categories
-                                
-                    </a>
-                
-                </li>
-
-                <li class="nav-item">
-
-                    <a
-                        href="{{ route('admin.news.index') }}"
-                        class="nav-link">
-
-                        News
 
                     </a>
-                
+
                 </li>
 
-                <li class="nav-item">
+                {{-- Super Admin Only --}}
 
-                    <a
-                        href="{{ route('admin.albums.index') }}"
-                        class="nav-link">
+                @if(
+                    auth()->user()->role->slug
+                    === 'super-admin'
+                )
 
-                        Albums
+                    <li class="nav-item">
 
-                    </a>
-                
-                </li>
+                        <a
+                            href="{{ route('admin.divisions.index') }}"
+                            class="nav-link">
 
-                <li class="nav-item">
+                            Divisions
 
-                    <a
-                        href="{{ route('admin.galleries.index') }}"
-                        class="nav-link">
+                        </a>
 
-                        Galleries
+                    </li>
 
-                    </a>
-                </li>
+                    <li class="nav-item">
 
-                <li class="nav-item">
+                        <a
+                            href="{{ route('admin.positions.index') }}"
+                            class="nav-link">
 
-                    <a
-                        href="{{ route('admin.events.index') }}"
-                        class="nav-link">
+                            Positions
 
-                        Events
+                        </a>
 
-                    </a>
-                </li>
+                    </li>
 
-                <li class="nav-item">
+                    <li class="nav-item">
 
-                    <a
-                        href="{{ route('admin.event-registrations.index') }}"
-                        class="nav-link">
-                                
-                        Event Registrations
-                                
-                    </a>
-                
-                </li>
+                        <a
+                            href="{{ route('admin.settings.edit') }}"
+                            class="nav-link">
 
-                <li class="nav-item">
+                            Settings
 
-                    <a
-                        href="{{ route('admin.attendances.index') }}"
-                        class="nav-link">
+                        </a>
 
-                        Attendances
+                    </li>
 
-                    </a>
-                
-                </li>
+                @endif
 
-                <li class="nav-item">
+                {{-- Sekretaris + Super Admin --}}
 
-                    <a
-                        href="{{ route('admin.documents.index') }}"
-                        class="nav-link">
+                @if(
+                    in_array(
+                        auth()->user()->role->slug,
+                        [
+                            'super-admin',
+                            'sekretaris'
+                        ]
+                    )
+                )
 
-                        Documents
+                    <li class="nav-item">
 
-                    </a>
-                </li>
-                
-                <li class="nav-item">
+                        <a
+                            href="{{ route('admin.news-categories.index') }}"
+                            class="nav-link">
 
-                    <a
-                        href="{{ route('admin.incomes.index') }}"
-                        class="nav-link">
+                            News Categories
 
-                        Incomes
+                        </a>
 
-                    </a>
-                </li>
+                    </li>
 
-                <li class="nav-item">
+                    <li class="nav-item">
 
-                    <a
-                        href="{{ route('admin.expenses.index') }}"
-                        class="nav-link">
+                        <a
+                            href="{{ route('admin.news.index') }}"
+                            class="nav-link">
 
-                        Expenses
+                            News
 
-                    </a>
-                </li>
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.documents.index') }}"
+                            class="nav-link">
+
+                            Documents
+
+                        </a>
+
+                    </li>
+
+                @endif
+
+                {{-- Bendahara + Super Admin --}}
+
+                @if(
+                    in_array(
+                        auth()->user()->role->slug,
+                        [
+                            'super-admin',
+                            'bendahara'
+                        ]
+                    )
+                )
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.incomes.index') }}"
+                            class="nav-link">
+
+                            Incomes
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.expenses.index') }}"
+                            class="nav-link">
+
+                            Expenses
+
+                        </a>
+
+                    </li>
+
+                @endif
+
+                {{-- Kepala Divisi + Super Admin --}}
+
+                @if(
+                    in_array(
+                        auth()->user()->role->slug,
+                        [
+                            'super-admin',
+                            'kepala-divisi'
+                        ]
+                    )
+                )
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.members.index') }}"
+                            class="nav-link">
+
+                            Members
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.events.index') }}"
+                            class="nav-link">
+
+                            Events
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.event-registrations.index') }}"
+                            class="nav-link">
+
+                            Event Registrations
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.attendances.index') }}"
+                            class="nav-link">
+
+                            Attendances
+
+                        </a>
+
+                    </li>
+
+                @endif
+
+                {{-- Ketua + Super Admin --}}
+
+                @if(
+                    in_array(
+                        auth()->user()->role->slug,
+                        [
+                            'super-admin',
+                            'ketua'
+                        ]
+                    )
+                )
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.albums.index') }}"
+                            class="nav-link">
+
+                            Albums
+
+                        </a>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <a
+                            href="{{ route('admin.galleries.index') }}"
+                            class="nav-link">
+
+                            Galleries
+
+                        </a>
+
+                    </li>
+
+                @endif
+
             </ul>
 
         </div>
@@ -193,7 +318,9 @@
             @if(session('success'))
 
                 <div class="alert alert-success">
+
                     {{ session('success') }}
+
                 </div>
 
             @endif

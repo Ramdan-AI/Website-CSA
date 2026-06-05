@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             NewsCategorySeeder::class,
             SettingSeeder::class,
             AdminSeeder::class,
+            UserRoleSeeder::class,
         ]);
     }
 }
