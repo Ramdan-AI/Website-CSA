@@ -2,72 +2,49 @@
 
 @section('content')
 
-<h2>Edit Document</h2>
+<x-page-header
+    title="Edit Dokumen"
+    subtitle="Perbarui informasi dokumen yang telah tersimpan."
+/>
 
-<form
-    action="{{ route('admin.documents.update',$document) }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.documents.update', $document) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
+        <x-form.input
+            name="title"
+            label="Judul Dokumen"
+            :value="$document->title"
+            placeholder="Contoh: SOP Divisi Programming"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.input
+            name="file"
+            label="File"
+            :value="$document->file"
+            placeholder="Masukkan path atau nama file"
+            required="true"
+        />
 
-        <div class="card-body">
+        <x-form.textarea
+            name="description"
+            label="Deskripsi"
+            :value="$document->description"
+            placeholder="Tuliskan deskripsi singkat dokumen..."
+        />
 
-            <div class="mb-3">
-
-                <label>Title</label>
-
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control"
-                    value="{{ old('title',$document->title) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>File</label>
-
-                <input
-                    type="text"
-                    name="file"
-                    class="form-control"
-                    value="{{ old('file',$document->file) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Description</label>
-
-                <textarea
-                    name="description"
-                    rows="5"
-                    class="form-control">{{ old('description',$document->description) }}</textarea>
-
-            </div>
-
-        </div>
-
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Update
-
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
             </button>
 
+            <a href="{{ route('admin.documents.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

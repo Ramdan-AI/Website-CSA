@@ -2,103 +2,64 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Albums Management"
+    subtitle="Kelola seluruh album galeri yang tersimpan dalam sistem."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.albums.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Album
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Albums</h2>
+<x-admin.crud-table :pagination="$albums">
 
-    <a
-        href="{{ route('admin.albums.create') }}"
-        class="btn btn-primary">
-
-        Tambah Album
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>ID</th>
-
+            <th width="100">ID</th>
             <th>Judul</th>
-
             <th>Cover</th>
-
-            <th width="200">
-                Aksi
-            </th>
-
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
+    @forelse($albums as $album)
+        <tr>
+            <td>
+                <span class="data-id">
+                    #{{ str_pad($album->id, 3, '0', STR_PAD_LEFT) }}
+                </span>
+            </td>
 
-    <tbody>
+            <td>
+                <div class="data-name">
+                    {{ $album->title }}
+                </div>
+            </td>
 
-        @forelse($albums as $album)
+            <td>
+                <div class="data-description" title="{{ $album->cover_image }}">
+                    {{ $album->cover_image ?: '-' }}
+                </div>
+            </td>
 
-            <tr>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.albums.edit', $album)"
+                    :deleteRoute="route('admin.albums.destroy', $album)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="4"
+            icon="images"
+            title="Database Kosong"
+            subtitle="Belum ada album yang tersimpan."
+        />
+    @endforelse
 
-                <td>{{ $album->id }}</td>
-
-                <td>{{ $album->title }}</td>
-
-                <td>{{ $album->cover_image }}</td>
-
-                <td>
-
-                    <a
-                        href="{{ route('admin.albums.edit',$album) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.albums.destroy',$album) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
-
-{{ $albums->links() }}
+</x-admin.crud-table>
 
 @endsection

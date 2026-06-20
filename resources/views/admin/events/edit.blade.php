@@ -2,144 +2,95 @@
 
 @section('content')
 
-<h2>Edit Event</h2>
+<x-page-header
+    title="Edit Event"
+    subtitle="Perbarui informasi event yang telah terdaftar."
+/>
 
-<form
-    action="{{ route('admin.events.update', $event) }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.events.update', $event) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
+        <x-form.input
+            name="title"
+            label="Judul Event"
+            :value="$event->title"
+            placeholder="Contoh: Workshop Laravel"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.input
+            name="slug"
+            label="Slug"
+            :value="$event->slug"
+            placeholder="contoh: workshop-laravel"
+            required="true"
+        />
 
-        <div class="card-body">
+        <x-form.textarea
+            name="description"
+            label="Deskripsi Event"
+            :value="$event->description"
+            placeholder="Tuliskan deskripsi lengkap event..."
+            required="true"
+        />
 
-            <div class="mb-3">
-                <label>Title</label>
+        <x-form.input
+            name="location"
+            label="Lokasi"
+            :value="$event->location"
+            placeholder="Contoh: Aula Kampus"
+        />
 
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control"
-                    value="{{ old('title', $event->title) }}"
-                    required>
-            </div>
+        <x-form.input
+            name="event_date"
+            label="Tanggal Event"
+            type="date"
+            value="{{ old('event_date', $event->event_date->format('Y-m-d')) }}"
+            required="true"
+        />
 
-            <div class="mb-3">
-                <label>Slug</label>
+        <x-form.input
+            name="banner"
+            label="Banner"
+            :value="$event->banner"
+            placeholder="URL banner event"
+        />
 
-                <input
-                    type="text"
-                    name="slug"
-                    class="form-control"
-                    value="{{ old('slug', $event->slug) }}"
-                    required>
-            </div>
+        <x-form.input
+            name="registration_link"
+            label="Registration Link"
+            :value="$event->registration_link"
+            placeholder="https://..."
+        />
 
-            <div class="mb-3">
-                <label>Description</label>
+        <div class="mb-4">
+            <label class="custom-label">Status</label>
 
-                <textarea
-                    name="description"
-                    rows="6"
-                    class="form-control"
-                    required>{{ old('description', $event->description) }}</textarea>
-
-            </div>
-
-            <div class="mb-3">
-                <label>Location</label>
-
-                <input
-                    type="text"
-                    name="location"
-                    class="form-control"
-                    value="{{ old('location', $event->location) }}">
-            </div>
-
-            <div class="mb-3">
-                <label>Event Date</label>
-
-                <input
-                    type="date"
-                    name="event_date"
-                    class="form-control"
-                    value="{{ old('event_date', $event->event_date->format('Y-m-d')) }}"
-                    required>
-            </div>
-
-            <div class="mb-3">
-                <label>Banner</label>
-
-                <input
-                    type="text"
-                    name="banner"
-                    class="form-control"
-                    value="{{ old('banner', $event->banner) }}">
-            </div>
-
-            <div class="mb-3">
-                <label>Registration Link</label>
-
-                <input
-                    type="text"
-                    name="registration_link"
-                    class="form-control"
-                    value="{{ old('registration_link', $event->registration_link) }}">
-            </div>
-
-            <div class="mb-3">
-                <label>Status</label>
-
-                <select
-                    name="status"
-                    class="form-control">
-
-                    <option
-                        value="draft"
-                        {{ old('status', $event->status) == 'draft' ? 'selected' : '' }}>
-
-                        Draft
-
-                    </option>
-
-                    <option
-                        value="published"
-                        {{ old('status', $event->status) == 'published' ? 'selected' : '' }}>
-
-                        Published
-
-                    </option>
-
-                    <option
-                        value="closed"
-                        {{ old('status', $event->status) == 'closed' ? 'selected' : '' }}>
-
-                        Closed
-
-                    </option>
-
-                </select>
-
-            </div>
-
+            <select name="status" class="custom-input">
+                <option value="draft" {{ old('status', $event->status) == 'draft' ? 'selected' : '' }}>
+                    Draft
+                </option>
+                <option value="published" {{ old('status', $event->status) == 'published' ? 'selected' : '' }}>
+                    Published
+                </option>
+                <option value="closed" {{ old('status', $event->status) == 'closed' ? 'selected' : '' }}>
+                    Closed
+                </option>
+            </select>
         </div>
 
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Update
-
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
             </button>
 
+            <a href="{{ route('admin.events.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

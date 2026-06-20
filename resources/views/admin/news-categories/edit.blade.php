@@ -2,114 +2,49 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<x-page-header
+    title="Edit Kategori Berita"
+    subtitle="Perbarui informasi kategori berita yang sudah terdaftar."
+/>
 
-    <h2>Edit Kategori Berita</h2>
+<div class="form-card">
+    <form action="{{ route('admin.news-categories.update', $newsCategory) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    <a
-        href="{{ route('admin.news-categories.index') }}"
-        class="btn btn-secondary">
+        <x-form.input
+            name="name"
+            label="Nama Kategori"
+            :value="$newsCategory->name"
+            placeholder="Contoh: Teknologi"
+            required="true"
+        />
 
-        Kembali
+        <x-form.input
+            name="slug"
+            label="Slug"
+            :value="$newsCategory->slug"
+            placeholder="contoh: teknologi"
+            required="true"
+        />
 
-    </a>
+        <x-form.textarea
+            name="description"
+            label="Deskripsi"
+            :value="$newsCategory->description"
+            placeholder="Tuliskan deskripsi singkat kategori berita..."
+        />
 
-</div>
-
-@if ($errors->any())
-
-    <div class="alert alert-danger">
-
-        <ul class="mb-0">
-
-            @foreach ($errors->all() as $error)
-
-                <li>{{ $error }}</li>
-
-            @endforeach
-
-        </ul>
-
-    </div>
-
-@endif
-
-<form
-    action="{{ route('admin.news-categories.update', $newsCategory) }}"
-    method="POST">
-
-    @csrf
-    @method('PUT')
-
-    <div class="card">
-
-        <div class="card-body">
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Nama Kategori
-
-                </label>
-
-                <input
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    value="{{ old('name', $newsCategory->name) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Slug
-
-                </label>
-
-                <input
-                    type="text"
-                    name="slug"
-                    class="form-control"
-                    value="{{ old('slug', $newsCategory->slug) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Deskripsi
-
-                </label>
-
-                <textarea
-                    name="description"
-                    rows="4"
-                    class="form-control">{{ old('description', $newsCategory->description) }}</textarea>
-
-            </div>
-
-        </div>
-
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Update
-
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
             </button>
 
+            <a href="{{ route('admin.news-categories.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

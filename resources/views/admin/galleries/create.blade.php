@@ -2,84 +2,57 @@
 
 @section('content')
 
-<h2>Tambah Gallery</h2>
+<x-page-header
+    title="Tambah Gallery Baru"
+    subtitle="Tambahkan gambar baru ke dalam album galeri."
+/>
 
-<form
-    action="{{ route('admin.galleries.store') }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.galleries.store') }}" method="POST">
+        @csrf
 
-    @csrf
+        <div class="mb-4">
+            <label class="custom-label">Album</label>
 
-    <div class="card">
+            <select name="album_id" class="custom-input" required>
+                <option value="">Pilih Album</option>
 
-        <div class="card-body">
-
-            <div class="mb-3">
-
-                <label>Album</label>
-
-                <select
-                    name="album_id"
-                    class="form-control"
-                    required>
-
-                    <option value="">
-                        Pilih Album
+                @foreach($albums as $album)
+                    <option
+                        value="{{ $album->id }}"
+                        {{ old('album_id') == $album->id ? 'selected' : '' }}
+                    >
+                        {{ $album->title }}
                     </option>
-
-                    @foreach($albums as $album)
-
-                        <option
-                            value="{{ $album->id }}">
-
-                            {{ $album->title }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Image</label>
-
-                <input
-                    type="text"
-                    name="image"
-                    class="form-control"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Caption</label>
-
-                <input
-                    type="text"
-                    name="caption"
-                    class="form-control">
-
-            </div>
-
+                @endforeach
+            </select>
         </div>
 
-        <div class="card-footer">
+        <x-form.input
+            name="image"
+            label="Image"
+            value="{{ old('image') }}"
+            placeholder="URL gambar"
+            required="true"
+        />
 
-            <button
-                class="btn btn-primary">
+        <x-form.input
+            name="caption"
+            label="Caption"
+            value="{{ old('caption') }}"
+            placeholder="Caption gambar (opsional)"
+        />
 
-                Simpan
-
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Data
             </button>
 
+            <a href="{{ route('admin.galleries.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

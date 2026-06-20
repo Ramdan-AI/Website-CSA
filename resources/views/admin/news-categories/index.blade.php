@@ -1,117 +1,56 @@
 @extends('layouts.admin')
 
 @section('content')
+    <x-page-header title="News Categories Management" subtitle="Kelola kategori berita dalam sistem publikasi konten.">
+        <x-slot:actions>
+            <a href="{{ route('admin.news-categories.create') }}" class="btn-csa-primary mb-4">
+                <i class="fas fa-plus"></i> Tambah Kategori
+            </a>
+        </x-slot:actions>
+    </x-page-header>
 
-<div class="d-flex justify-content-between mb-3">
+    <x-admin.crud-table :pagination="$categories">
 
-    <h2>News Categories</h2>
-
-    <a
-        href="{{ route('admin.news-categories.create') }}"
-        class="btn btn-primary">
-
-        Tambah Kategori
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
-        <tr>
-
-            <th>ID</th>
-
-            <th>Nama</th>
-
-            <th>Slug</th>
-
-            <th>Deskripsi</th>
-
-            <th width="200">
-                Aksi
-            </th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
+        <x-slot:head>
+            <tr>
+                <th width="100">ID</th>
+                <th width="250">Nama</th>
+                <th width="220">Slug</th>
+                <th>Deskripsi</th>
+                <th width="140" class="text-end">Aksi Sistem</th>
+            </tr>
+        </x-slot:head>
 
         @forelse($categories as $category)
-
             <tr>
-
                 <td>
-                    {{ $category->id }}
+                    <span class="data-id">
+                        #{{ str_pad($category->id, 3, '0', STR_PAD_LEFT) }}
+                    </span>
                 </td>
 
                 <td>
-                    {{ $category->name }}
+                    <div class="data-name">{{ $category->name }}</div>
                 </td>
 
                 <td>
-                    {{ $category->slug }}
+                    <div class="data-description">{{ $category->slug }}</div>
                 </td>
 
                 <td>
-                    {{ $category->description }}
+                    <div class="data-description" title="{{ $category->description }}">
+                        {{ $category->description ?: '-' }}
+                    </div>
                 </td>
 
                 <td>
-
-                    <a
-                        href="{{ route('admin.news-categories.edit', $category) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.news-categories.destroy', $category) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm"
-                            onclick="return confirm('Yakin hapus kategori ini?')">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
+                    <x-admin.action-buttons :editRoute="route('admin.news-categories.edit', $category)" :deleteRoute="route('admin.news-categories.destroy', $category)" />
                 </td>
-
             </tr>
-
         @empty
-
-            <tr>
-
-                <td
-                    colspan="5"
-                    class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
+            <x-admin.empty-state colspan="5" icon="newspaper" title="Database Kosong"
+                subtitle="Belum ada kategori berita yang diregistrasikan." />
         @endforelse
 
-    </tbody>
-
-</table>
-
-{{ $categories->links() }}
-
+    </x-admin.crud-table>
 @endsection

@@ -2,129 +2,96 @@
 
 @section('content')
 
-<h2>Tambah Event</h2>
+<x-page-header
+    title="Tambah Event Baru"
+    subtitle="Registrasikan event baru ke dalam sistem."
+/>
 
-<form
-    action="{{ route('admin.events.store') }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.events.store') }}" method="POST">
+        @csrf
 
-    @csrf
+        <x-form.input
+            name="title"
+            label="Judul Event"
+            value="{{ old('title') }}"
+            placeholder="Contoh: Workshop Laravel"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.input
+            name="slug"
+            label="Slug"
+            value="{{ old('slug') }}"
+            placeholder="contoh: workshop-laravel"
+            required="true"
+        />
 
-        <div class="card-body">
+        <x-form.textarea
+            name="description"
+            label="Deskripsi Event"
+            placeholder="Tuliskan deskripsi lengkap event..."
+            required="true"
+        />
 
-            <div class="mb-3">
-                <label>Title</label>
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control"
-                    value="{{ old('title') }}"
-                    required>
-            </div>
+        <x-form.input
+            name="location"
+            label="Lokasi"
+            value="{{ old('location') }}"
+            placeholder="Contoh: Aula Kampus"
+        />
 
-            <div class="mb-3">
-                <label>Slug</label>
-                <input
-                    type="text"
-                    name="slug"
-                    class="form-control"
-                    value="{{ old('slug') }}"
-                    required>
-            </div>
+        <x-form.input
+            name="event_date"
+            label="Tanggal Event"
+            type="date"
+            value="{{ old('event_date') }}"
+            required="true"
+        />
 
-            <div class="mb-3">
-                <label>Description</label>
+        <x-form.input
+            name="banner"
+            label="Banner"
+            value="{{ old('banner') }}"
+            placeholder="URL banner event"
+        />
 
-                <textarea
-                    name="description"
-                    rows="6"
-                    class="form-control"
-                    required>{{ old('description') }}</textarea>
+        <x-form.input
+            name="registration_link"
+            label="Registration Link"
+            value="{{ old('registration_link') }}"
+            placeholder="https://..."
+        />
 
-            </div>
+        <div class="mb-4">
+            <label class="custom-label">Status</label>
 
-            <div class="mb-3">
-                <label>Location</label>
-
-                <input
-                    type="text"
-                    name="location"
-                    class="form-control"
-                    value="{{ old('location') }}">
-            </div>
-
-            <div class="mb-3">
-                <label>Event Date</label>
-
-                <input
-                    type="date"
-                    name="event_date"
-                    class="form-control"
-                    value="{{ old('event_date') }}"
-                    required>
-            </div>
-
-            <div class="mb-3">
-                <label>Banner</label>
-
-                <input
-                    type="text"
-                    name="banner"
-                    class="form-control"
-                    value="{{ old('banner') }}">
-            </div>
-
-            <div class="mb-3">
-                <label>Registration Link</label>
-
-                <input
-                    type="text"
-                    name="registration_link"
-                    class="form-control"
-                    value="{{ old('registration_link') }}">
-            </div>
-
-            <div class="mb-3">
-                <label>Status</label>
-
-                <select
-                    name="status"
-                    class="form-control">
-
-                    <option value="draft">
-                        Draft
-                    </option>
-
-                    <option value="published">
-                        Published
-                    </option>
-
-                    <option value="closed">
-                        Closed
-                    </option>
-
-                </select>
-
-            </div>
-
+            <select
+                name="status"
+                class="custom-input"
+            >
+                <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>
+                    Draft
+                </option>
+                <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>
+                    Published
+                </option>
+                <option value="closed" {{ old('status') == 'closed' ? 'selected' : '' }}>
+                    Closed
+                </option>
+            </select>
         </div>
 
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Simpan
-
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Data
             </button>
 
+            <a href="{{ route('admin.events.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

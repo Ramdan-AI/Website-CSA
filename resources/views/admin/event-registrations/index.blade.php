@@ -2,109 +2,64 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Event Registrations Management"
+    subtitle="Kelola seluruh data registrasi member terhadap event."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.event-registrations.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Registrasi
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Event Registrations</h2>
+<x-admin.crud-table :pagination="$registrations">
 
-    <a
-        href="{{ route('admin.event-registrations.create') }}"
-        class="btn btn-primary">
-
-        Tambah Registrasi
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
             <th>Event</th>
             <th>Member</th>
-            <th>Registered At</th>
-
-            <th width="200">
-
-                Aksi
-
-            </th>
-
+            <th width="200">Registered At</th>
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
-
-    <tbody>
-
-        @forelse($registrations as $registration)
-
-            <tr>
-
-                <td>
+    @forelse($registrations as $registration)
+        <tr>
+            <td>
+                <div class="data-name">
                     {{ $registration->event->title }}
-                </td>
+                </div>
+            </td>
 
-                <td>
+            <td>
+                <div class="data-description">
                     {{ $registration->member->name }}
-                </td>
+                </div>
+            </td>
 
-                <td>
+            <td>
+                <div class="data-description">
                     {{ $registration->registered_at }}
-                </td>
+                </div>
+            </td>
 
-                <td>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.event-registrations.edit', $registration)"
+                    :deleteRoute="route('admin.event-registrations.destroy', $registration)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="4"
+            icon="calendar-check"
+            title="Database Kosong"
+            subtitle="Belum ada registrasi event yang tercatat."
+        />
+    @endforelse
 
-                    <a
-                        href="{{ route('admin.event-registrations.edit', $registration) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.event-registrations.destroy', $registration) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
-
-{{ $registrations->links() }}
+</x-admin.crud-table>
 
 @endsection

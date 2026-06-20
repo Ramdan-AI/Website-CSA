@@ -2,330 +2,156 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-3">
+<x-page-header
+    title="Tambah Member"
+    subtitle="Registrasikan anggota baru ke dalam sistem organisasi."
+/>
 
-    <h2>Tambah Member</h2>
+<div class="form-card">
+    <form action="{{ route('admin.members.store') }}" method="POST">
+        @csrf
 
-    <a
-        href="{{ route('admin.members.index') }}"
-        class="btn btn-secondary">
+        <div class="mb-4">
+            <label class="custom-label">
+                User Login
+                <span class="text-optional">Opsional</span>
+            </label>
 
-        Kembali
+            <select name="user_id" class="custom-input">
+                <option value="">Tidak Ada User</option>
 
-    </a>
-
-</div>
-
-@if ($errors->any())
-
-    <div class="alert alert-danger">
-
-        <ul class="mb-0">
-
-            @foreach ($errors->all() as $error)
-
-                <li>{{ $error }}</li>
-
-            @endforeach
-
-        </ul>
-
-    </div>
-
-@endif
-
-<form
-    action="{{ route('admin.members.store') }}"
-    method="POST">
-
-    @csrf
-
-    <div class="card">
-
-        <div class="card-body">
-
-            {{-- USER --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    User Login (Opsional)
-
-                </label>
-
-                <select
-                    name="user_id"
-                    class="form-control">
-
-                    <option value="">
-
-                        Tidak Ada User
-
+                @foreach($users as $user)
+                    <option
+                        value="{{ $user->id }}"
+                        {{ old('user_id') == $user->id ? 'selected' : '' }}
+                    >
+                        {{ $user->name }} ({{ $user->email }})
                     </option>
-
-                    @foreach($users as $user)
-
-                        <option
-                            value="{{ $user->id }}"
-                            {{ old('user_id') == $user->id ? 'selected' : '' }}>
-
-                            {{ $user->name }} ({{ $user->email }})
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            {{-- DIVISION --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Divisi
-
-                </label>
-
-                <select
-                    name="division_id"
-                    class="form-control"
-                    required>
-
-                    <option value="">
-
-                        Pilih Divisi
-
-                    </option>
-
-                    @foreach($divisions as $division)
-
-                        <option
-                            value="{{ $division->id }}"
-                            {{ old('division_id') == $division->id ? 'selected' : '' }}>
-
-                            {{ $division->name }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            {{-- POSITION --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Posisi
-
-                </label>
-
-                <select
-                    name="position_id"
-                    class="form-control"
-                    required>
-
-                    <option value="">
-
-                        Pilih Posisi
-
-                    </option>
-
-                    @foreach($positions as $position)
-
-                        <option
-                            value="{{ $position->id }}"
-                            {{ old('position_id') == $position->id ? 'selected' : '' }}>
-
-                            {{ $position->name }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            {{-- NAME --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Nama
-
-                </label>
-
-                <input
-                    type="text"
-                    name="name"
-                    class="form-control"
-                    value="{{ old('name') }}"
-                    required>
-
-            </div>
-
-            {{-- NIM --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    NIM
-
-                </label>
-
-                <input
-                    type="text"
-                    name="nim"
-                    class="form-control"
-                    value="{{ old('nim') }}">
-
-            </div>
-
-            {{-- PHONE --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    No. HP
-
-                </label>
-
-                <input
-                    type="text"
-                    name="phone"
-                    class="form-control"
-                    value="{{ old('phone') }}">
-
-            </div>
-
-            {{-- BIO --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Bio
-
-                </label>
-
-                <textarea
-                    name="bio"
-                    rows="4"
-                    class="form-control">{{ old('bio') }}</textarea>
-
-            </div>
-
-            {{-- LINKEDIN --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    LinkedIn
-
-                </label>
-
-                <input
-                    type="text"
-                    name="linkedin"
-                    class="form-control"
-                    value="{{ old('linkedin') }}">
-
-            </div>
-
-            {{-- INSTAGRAM --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Instagram
-
-                </label>
-
-                <input
-                    type="text"
-                    name="instagram"
-                    class="form-control"
-                    value="{{ old('instagram') }}">
-
-            </div>
-
-            {{-- GITHUB --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Github
-
-                </label>
-
-                <input
-                    type="text"
-                    name="github"
-                    class="form-control"
-                    value="{{ old('github') }}">
-
-            </div>
-
-            {{-- STATUS --}}
-
-            <div class="mb-3">
-
-                <label class="form-label">
-
-                    Status
-
-                </label>
-
-                <select
-                    name="is_active"
-                    class="form-control">
-
-                    <option value="1" selected>
-
-                        Aktif
-
-                    </option>
-
-                    <option value="0">
-
-                        Nonaktif
-
-                    </option>
-
-                </select>
-
-            </div>
-
+                @endforeach
+            </select>
         </div>
 
-        <div class="card-footer">
+        <div class="mb-4">
+            <label class="custom-label">Divisi</label>
 
-            <button
-                type="submit"
-                class="btn btn-primary">
+            <select
+                name="division_id"
+                class="custom-input @error('division_id') is-invalid @enderror"
+                required
+            >
+                <option value="">Pilih Divisi</option>
 
-                Simpan
+                @foreach($divisions as $division)
+                    <option
+                        value="{{ $division->id }}"
+                        {{ old('division_id') == $division->id ? 'selected' : '' }}
+                    >
+                        {{ $division->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
+        <div class="mb-4">
+            <label class="custom-label">Posisi</label>
+
+            <select
+                name="position_id"
+                class="custom-input @error('position_id') is-invalid @enderror"
+                required
+            >
+                <option value="">Pilih Posisi</option>
+
+                @foreach($positions as $position)
+                    <option
+                        value="{{ $position->id }}"
+                        {{ old('position_id') == $position->id ? 'selected' : '' }}
+                    >
+                        {{ $position->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <x-form.input
+            name="name"
+            label="Nama"
+            value="{{ old('name') }}"
+            placeholder="Masukkan nama member"
+            required="true"
+        />
+
+        <x-form.input
+            name="nim"
+            label="NIM"
+            value="{{ old('nim') }}"
+            placeholder="Masukkan NIM"
+            required="true"
+        />
+
+        <x-form.input
+            name="phone"
+            label="No. HP"
+            value="{{ old('phone') }}"
+            placeholder="08xxxxxxxxxx"
+        />
+
+        <x-form.textarea
+            name="bio"
+            label="Bio"
+            value="{{ old('bio') }}"
+            placeholder="Tuliskan bio singkat..."
+            {{-- required="true" --}}
+        />
+
+        <x-form.input
+            name="linkedin"
+            label="LinkedIn"
+            value="{{ old('linkedin') }}"
+            placeholder="https://linkedin.com/in/username"
+            {{-- required="true" --}}
+        />
+
+        <x-form.input
+            name="instagram"
+            label="Instagram"
+            value="{{ old('instagram') }}"
+            placeholder="@username"
+            {{-- required="true" --}}
+        />
+
+        <x-form.input
+            name="github"
+            label="Github"
+            value="{{ old('github') }}"
+            placeholder="https://github.com/username"
+            {{-- required="true" --}}
+        />
+
+        <div class="mb-4">
+            <label class="custom-label">Status</label>
+
+            <select name="is_active" class="custom-input">
+                <option value="1" {{ old('is_active', 1) == 1 ? 'selected' : '' }}>
+                    Aktif
+                </option>
+
+                <option value="0" {{ old('is_active') == 0 ? 'selected' : '' }}>
+                    Nonaktif
+                </option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Data
             </button>
 
+            <a href="{{ route('admin.members.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

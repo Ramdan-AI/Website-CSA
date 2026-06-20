@@ -2,129 +2,81 @@
 
 @section('content')
 
-<h2>Settings</h2>
+<x-page-header
+    title="System Settings"
+    subtitle="Kelola konfigurasi utama website dan informasi organisasi."
+/>
 
-<form
-    action="{{ route('admin.settings.update') }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.settings.update') }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
+        <x-form.input
+            name="site_name"
+            label="Nama Website"
+            value="{{ old('site_name', $setting->site_name) }}"
+            placeholder="Contoh: CSA Organization"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.input
+            name="email"
+            label="Email"
+            type="email"
+            value="{{ old('email', $setting->email) }}"
+            placeholder="admin@example.com"
+            required="true"
+        />
 
-        <div class="card-body">
+        <x-form.input
+            name="phone"
+            label="Nomor Telepon"
+            value="{{ old('phone', $setting->phone) }}"
+            placeholder="08xxxxxxxxxx"
+        />
 
-            <div class="mb-3">
+        <x-form.textarea
+            name="address"
+            label="Alamat"
+            rows="3"
+            placeholder="Masukkan alamat lengkap..."
+        >{{ old('address', $setting->address) }}</x-form.textarea>
 
-                <label>Site Name</label>
+        <x-form.input
+            name="instagram"
+            label="Instagram"
+            value="{{ old('instagram', $setting->instagram) }}"
+            placeholder="https://instagram.com/..."
+        />
 
-                <input
-                    type="text"
-                    name="site_name"
-                    class="form-control"
-                    value="{{ old('site_name', $setting->site_name) }}">
+        <x-form.input
+            name="youtube"
+            label="YouTube"
+            value="{{ old('youtube', $setting->youtube) }}"
+            placeholder="https://youtube.com/..."
+        />
 
-            </div>
+        <x-form.input
+            name="linkedin"
+            label="LinkedIn"
+            value="{{ old('linkedin', $setting->linkedin) }}"
+            placeholder="https://linkedin.com/company/..."
+        />
 
-            <div class="mb-3">
+        <x-form.textarea
+            name="about"
+            label="Tentang Organisasi"
+            rows="6"
+            placeholder="Tuliskan deskripsi organisasi..."
+        >{{ old('about', $setting->about) }}</x-form.textarea>
 
-                <label>Email</label>
-
-                <input
-                    type="email"
-                    name="email"
-                    class="form-control"
-                    value="{{ old('email', $setting->email) }}">
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Phone</label>
-
-                <input
-                    type="text"
-                    name="phone"
-                    class="form-control"
-                    value="{{ old('phone', $setting->phone) }}">
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Address</label>
-
-                <textarea
-                    name="address"
-                    rows="3"
-                    class="form-control">{{ old('address', $setting->address) }}</textarea>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Instagram</label>
-
-                <input
-                    type="text"
-                    name="instagram"
-                    class="form-control"
-                    value="{{ old('instagram', $setting->instagram) }}">
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Youtube</label>
-
-                <input
-                    type="text"
-                    name="youtube"
-                    class="form-control"
-                    value="{{ old('youtube', $setting->youtube) }}">
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>LinkedIn</label>
-
-                <input
-                    type="text"
-                    name="linkedin"
-                    class="form-control"
-                    value="{{ old('linkedin', $setting->linkedin) }}">
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>About</label>
-
-                <textarea
-                    name="about"
-                    rows="6"
-                    class="form-control">{{ old('about', $setting->about) }}</textarea>
-
-            </div>
-
-        </div>
-
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Save Settings
-
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Pengaturan
             </button>
-
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

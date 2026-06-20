@@ -2,82 +2,56 @@
 
 @section('content')
 
-<h2>Edit Gallery</h2>
+<x-page-header
+    title="Edit Gallery"
+    subtitle="Perbarui informasi gallery yang tersimpan."
+/>
 
-<form
-    action="{{ route('admin.galleries.update',$gallery) }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.galleries.update', $gallery) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
+        <div class="mb-4">
+            <label class="custom-label">Album</label>
 
-    <div class="card">
-
-        <div class="card-body">
-
-            <div class="mb-3">
-
-                <label>Album</label>
-
-                <select
-                    name="album_id"
-                    class="form-control">
-
-                    @foreach($albums as $album)
-
-                        <option
-                            value="{{ $album->id }}"
-                            {{ old('album_id',$gallery->album_id) == $album->id ? 'selected' : '' }}>
-
-                            {{ $album->title }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Image</label>
-
-                <input
-                    type="text"
-                    name="image"
-                    class="form-control"
-                    value="{{ old('image',$gallery->image) }}">
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Caption</label>
-
-                <input
-                    type="text"
-                    name="caption"
-                    class="form-control"
-                    value="{{ old('caption',$gallery->caption) }}">
-
-            </div>
-
+            <select name="album_id" class="custom-input" required>
+                @foreach($albums as $album)
+                    <option
+                        value="{{ $album->id }}"
+                        {{ old('album_id', $gallery->album_id) == $album->id ? 'selected' : '' }}
+                    >
+                        {{ $album->title }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
-        <div class="card-footer">
+        <x-form.input
+            name="image"
+            label="Image"
+            :value="$gallery->image"
+            placeholder="URL gambar"
+            required="true"
+        />
 
-            <button
-                class="btn btn-primary">
+        <x-form.input
+            name="caption"
+            label="Caption"
+            :value="$gallery->caption"
+            placeholder="Caption gambar (opsional)"
+        />
 
-                Update
-
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
             </button>
 
+            <a href="{{ route('admin.galleries.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

@@ -2,106 +2,71 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Gallery Management"
+    subtitle="Kelola seluruh galeri foto yang terhubung dengan album."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.galleries.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Gallery
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Galleries</h2>
+<x-admin.crud-table :pagination="$galleries">
 
-    <a
-        href="{{ route('admin.galleries.create') }}"
-        class="btn btn-primary">
-
-        Tambah Gallery
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>ID</th>
-            <th>Album</th>
+            <th width="80">ID</th>
+            <th width="220">Album</th>
             <th>Image</th>
             <th>Caption</th>
-
-            <th width="200">
-
-                Aksi
-
-            </th>
-
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
+    @forelse($galleries as $gallery)
+        <tr>
+            <td>
+                <div class="data-description">
+                    #{{ $gallery->id }}
+                </div>
+            </td>
 
-    <tbody>
+            <td>
+                <div class="data-name">
+                    {{ $gallery->album->title }}
+                </div>
+            </td>
 
-        @forelse($galleries as $gallery)
+            <td>
+                <div class="data-description" title="{{ $gallery->image }}">
+                    {{ $gallery->image }}
+                </div>
+            </td>
 
-            <tr>
+            <td>
+                <div class="data-description">
+                    {{ $gallery->caption ?: '-' }}
+                </div>
+            </td>
 
-                <td>{{ $gallery->id }}</td>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.galleries.edit', $gallery)"
+                    :deleteRoute="route('admin.galleries.destroy', $gallery)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="5"
+            icon="images"
+            title="Gallery Kosong"
+            subtitle="Belum ada gambar yang ditambahkan."
+        />
+    @endforelse
 
-                <td>{{ $gallery->album->title }}</td>
-
-                <td>{{ $gallery->image }}</td>
-
-                <td>{{ $gallery->caption }}</td>
-
-                <td>
-
-                    <a
-                        href="{{ route('admin.galleries.edit',$gallery) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.galleries.destroy',$gallery) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td
-                    colspan="5"
-                    class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
-
-{{ $galleries->links() }}
+</x-admin.crud-table>
 
 @endsection

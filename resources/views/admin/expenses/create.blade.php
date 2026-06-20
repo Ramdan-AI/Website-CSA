@@ -2,84 +2,56 @@
 
 @section('content')
 
-<h2>Tambah Expense</h2>
+<x-page-header
+    title="Tambah Expense Baru"
+    subtitle="Tambahkan data pengeluaran ke dalam sistem."
+/>
 
-<form
-    action="{{ route('admin.expenses.store') }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.expenses.store') }}" method="POST">
+        @csrf
 
-    @csrf
+        <x-form.input
+            name="title"
+            label="Title"
+            value="{{ old('title') }}"
+            placeholder="Contoh: Pembelian Konsumsi"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.input
+            name="amount"
+            label="Amount"
+            type="number"
+            value="{{ old('amount') }}"
+            placeholder="Contoh: 500000"
+            required="true"
+        />
 
-        <div class="card-body">
+        <x-form.input
+            name="transaction_date"
+            label="Transaction Date"
+            type="date"
+            value="{{ old('transaction_date') }}"
+            required="true"
+        />
 
-            <div class="mb-3">
+        <x-form.textarea
+            name="description"
+            label="Description"
+            placeholder="Deskripsi pengeluaran..."
+        />
 
-                <label>Title</label>
-
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control"
-                    value="{{ old('title') }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Amount</label>
-
-                <input
-                    type="number"
-                    name="amount"
-                    class="form-control"
-                    value="{{ old('amount') }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Transaction Date</label>
-
-                <input
-                    type="date"
-                    name="transaction_date"
-                    class="form-control"
-                    value="{{ old('transaction_date') }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Description</label>
-
-                <textarea
-                    name="description"
-                    rows="5"
-                    class="form-control">{{ old('description') }}</textarea>
-
-            </div>
-
-        </div>
-
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Simpan
-
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Data
             </button>
 
+            <a href="{{ route('admin.expenses.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection
