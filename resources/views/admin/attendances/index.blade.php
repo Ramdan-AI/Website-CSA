@@ -2,112 +2,71 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Attendances Management"
+    subtitle="Kelola seluruh data absensi member pada event."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.attendances.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Absensi
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Attendances</h2>
+<x-admin.crud-table :pagination="$attendances">
 
-    <a
-        href="{{ route('admin.attendances.create') }}"
-        class="btn btn-primary">
-
-        Tambah Absensi
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
             <th>Event</th>
             <th>Member</th>
-            <th>Status</th>
-            <th>Check In</th>
-
-            <th width="200">
-                Aksi
-            </th>
-
+            <th width="140">Status</th>
+            <th width="200">Check In</th>
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
-
-    <tbody>
-
-        @forelse($attendances as $attendance)
-
-            <tr>
-
-                <td>
+    @forelse($attendances as $attendance)
+        <tr>
+            <td>
+                <div class="data-name">
                     {{ $attendance->event->title }}
-                </td>
+                </div>
+            </td>
 
-                <td>
+            <td>
+                <div class="data-description">
                     {{ $attendance->member->name }}
-                </td>
+                </div>
+            </td>
 
-                <td>
-                    {{ $attendance->status }}
-                </td>
+            <td>
+                <div class="data-description">
+                    {{ ucfirst($attendance->status) }}
+                </div>
+            </td>
 
-                <td>
-                    {{ $attendance->check_in_at }}
-                </td>
+            <td>
+                <div class="data-description">
+                    {{ $attendance->check_in_at ?? '-' }}
+                </div>
+            </td>
 
-                <td>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.attendances.edit', $attendance)"
+                    :deleteRoute="route('admin.attendances.destroy', $attendance)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="5"
+            icon="clipboard-check"
+            title="Database Kosong"
+            subtitle="Belum ada data absensi yang tercatat."
+        />
+    @endforelse
 
-                    <a
-                        href="{{ route('admin.attendances.edit',$attendance) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.attendances.destroy',$attendance) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td
-                    colspan="5"
-                    class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
-
-{{ $attendances->links() }}
+</x-admin.crud-table>
 
 @endsection

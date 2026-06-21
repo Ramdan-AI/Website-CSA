@@ -2,101 +2,64 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Documents Management"
+    subtitle="Kelola seluruh dokumen yang tersimpan dalam sistem."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.documents.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Dokumen
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Documents</h2>
+<x-admin.crud-table :pagination="$documents">
 
-    <a
-        href="{{ route('admin.documents.create') }}"
-        class="btn btn-primary">
-
-        Tambah Document
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>Title</th>
+            <th width="320">Judul</th>
             <th>File</th>
-            <th>Uploader</th>
-
-            <th width="200">
-                Aksi
-            </th>
-
+            <th width="200">Uploader</th>
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
+    @forelse($documents as $document)
+        <tr>
+            <td>
+                <div class="data-name">
+                    {{ $document->title }}
+                </div>
+            </td>
 
-    <tbody>
+            <td>
+                <div class="data-description" title="{{ $document->file }}">
+                    {{ $document->file }}
+                </div>
+            </td>
 
-        @forelse($documents as $document)
+            <td>
+                <div class="data-description">
+                    {{ $document->user?->name ?? '-' }}
+                </div>
+            </td>
 
-            <tr>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.documents.edit', $document)"
+                    :deleteRoute="route('admin.documents.destroy', $document)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="4"
+            icon="file-alt"
+            title="Database Kosong"
+            subtitle="Belum ada dokumen yang diunggah."
+        />
+    @endforelse
 
-                <td>{{ $document->title }}</td>
-
-                <td>{{ $document->file }}</td>
-
-                <td>{{ $document->user->name }}</td>
-
-                <td>
-
-                    <a
-                        href="{{ route('admin.documents.edit',$document) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.documents.destroy',$document) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td
-                    colspan="4"
-                    class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
-
-{{ $documents->links() }}
+</x-admin.crud-table>
 
 @endsection

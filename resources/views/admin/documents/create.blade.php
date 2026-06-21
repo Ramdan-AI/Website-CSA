@@ -2,71 +2,48 @@
 
 @section('content')
 
-<h2>Tambah Document</h2>
+<x-page-header
+    title="Tambah Dokumen"
+    subtitle="Unggah dan registrasikan dokumen baru ke dalam sistem."
+/>
 
-<form
-    action="{{ route('admin.documents.store') }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.documents.store') }}" method="POST">
+        @csrf
 
-    @csrf
+        <x-form.input
+            name="title"
+            label="Judul Dokumen"
+            value="{{ old('title') }}"
+            placeholder="Contoh: SOP Divisi Programming"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.input
+            name="file"
+            label="File"
+            value="{{ old('file') }}"
+            placeholder="Masukkan path atau nama file"
+            required="true"
+        />
 
-        <div class="card-body">
+        <x-form.textarea
+            name="description"
+            label="Deskripsi"
+            value="{{ old('description') }}"
+            placeholder="Tuliskan deskripsi singkat dokumen..."
+        />
 
-            <div class="mb-3">
-
-                <label>Title</label>
-
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control"
-                    value="{{ old('title') }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>File</label>
-
-                <input
-                    type="text"
-                    name="file"
-                    class="form-control"
-                    value="{{ old('file') }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Description</label>
-
-                <textarea
-                    name="description"
-                    rows="5"
-                    class="form-control">{{ old('description') }}</textarea>
-
-            </div>
-
-        </div>
-
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Simpan
-
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Data
             </button>
 
+            <a href="{{ route('admin.documents.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

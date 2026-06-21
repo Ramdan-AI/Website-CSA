@@ -2,46 +2,38 @@
 
 @section('content')
 
-<h2>Tambah Divisi</h2>
+<x-page-header 
+    title="Tambah Divisi Baru" 
+    subtitle="Registrasikan data divisi baru ke dalam sistem operasional." 
+/>
 
-<form
-    action="{{ route('admin.divisions.store') }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.divisions.store') }}" method="POST">
+        @csrf
 
-    @csrf
+        <x-form.input 
+            name="name" 
+            label="Nama Divisi" 
+            value="{{ old('name') }}"
+            placeholder="Contoh: Pemrograman" 
+            required="true" 
+        />
 
-    <div class="mb-3">
+        <x-form.textarea 
+            name="description" 
+            label="Deskripsi Divisi" 
+            placeholder="Tuliskan tugas dan tanggung jawab singkat dari divisi ini..." 
+        />
 
-        <label>
-            Nama Divisi
-        </label>
-
-        <input
-            type="text"
-            name="name"
-            class="form-control"
-            value="{{ old('name') }}">
-
-    </div>
-
-    <div class="mb-3">
-
-        <label>
-            Deskripsi
-        </label>
-
-        <textarea
-            name="description"
-            class="form-control"></textarea>
-
-    </div>
-
-    <button class="btn btn-success">
-
-        Simpan
-
-    </button>
-
-</form>
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Data
+            </button>
+            <a href="{{ route('admin.divisions.index') }}" class="btn-solid-light">
+                Batal
+            </a>
+        </div>
+    </form>
+</div>
 
 @endsection

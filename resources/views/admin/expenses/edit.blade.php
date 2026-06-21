@@ -1,86 +1,60 @@
+{{-- resources/views/admin/expenses/edit.blade.php --}}
 @extends('layouts.admin')
 
 @section('content')
 
-<h2>Edit Expense</h2>
+<x-page-header
+    title="Edit Expense"
+    subtitle="Perbarui data pengeluaran yang tersimpan."
+/>
 
-<form
-    action="{{ route('admin.expenses.update', $expense) }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.expenses.update', $expense) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
+        <x-form.input
+            name="title"
+            label="Title"
+            :value="$expense->title"
+            placeholder="Contoh: Pembelian Konsumsi"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.input
+            name="amount"
+            label="Amount"
+            type="number"
+            :value="$expense->amount"
+            placeholder="Contoh: 500000"
+            required="true"
+        />
 
-        <div class="card-body">
+        <x-form.input
+            name="transaction_date"
+            label="Transaction Date"
+            type="date"
+            value="{{ old('transaction_date', $expense->transaction_date?->format('Y-m-d')) }}"
+            required="true"
+        />
 
-            <div class="mb-3">
+        <x-form.textarea
+            name="description"
+            label="Description"
+            :value="$expense->description"
+            placeholder="Deskripsi pengeluaran..."
+        />
 
-                <label>Title</label>
-
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control"
-                    value="{{ old('title', $expense->title) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Amount</label>
-
-                <input
-                    type="number"
-                    name="amount"
-                    class="form-control"
-                    value="{{ old('amount', $expense->amount) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Transaction Date</label>
-
-                <input
-                    type="date"
-                    name="transaction_date"
-                    class="form-control"
-                    value="{{ old('transaction_date', $expense->transaction_date?->format('Y-m-d')) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Description</label>
-
-                <textarea
-                    name="description"
-                    rows="5"
-                    class="form-control">{{ old('description', $expense->description) }}</textarea>
-
-            </div>
-
-        </div>
-
-        <div class="card-footer">
-
-            <button
-                type="submit"
-                class="btn btn-primary">
-
-                Update
-
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
             </button>
 
+            <a href="{{ route('admin.expenses.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

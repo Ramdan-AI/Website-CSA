@@ -2,111 +2,71 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="News Management"
+    subtitle="Kelola seluruh berita dan publikasi konten dalam sistem."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.news.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Berita
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>News</h2>
+<x-admin.crud-table :pagination="$news">
 
-    <a
-        href="{{ route('admin.news.create') }}"
-        class="btn btn-primary">
-
-        Tambah Berita
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>Judul</th>
-
-            <th>Kategori</th>
-
-            <th>Author</th>
-
-            <th>Status</th>
-
-            <th width="200">
-
-                Aksi
-
-            </th>
-
+            <th width="320">Judul</th>
+            <th width="200">Kategori</th>
+            <th width="180">Author</th>
+            <th width="140">Status</th>
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
+    @forelse($news as $item)
+        <tr>
+            <td>
+                <div class="data-name">{{ $item->title }}</div>
+            </td>
 
-    <tbody>
+            <td>
+                <div class="data-description">
+                    {{ $item->category?->name ?? '-' }}
+                </div>
+            </td>
 
-        @foreach($news as $item)
+            <td>
+                <div class="data-description">
+                    {{ $item->author?->name ?? '-' }}
+                </div>
+            </td>
 
-            <tr>
+            <td>
+                @if($item->status === 'published')
+                    <span class="badge bg-success">Published</span>
+                @else
+                    <span class="badge bg-warning text-dark">Draft</span>
+                @endif
+            </td>
 
-                <td>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.news.edit', $item)"
+                    :deleteRoute="route('admin.news.destroy', $item)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="5"
+            icon="newspaper"
+            title="Database Kosong"
+            subtitle="Belum ada berita yang dipublikasikan."
+        />
+    @endforelse
 
-                    {{ $item->title }}
-
-                </td>
-
-                <td>
-
-                    {{ $item->category->name }}
-
-                </td>
-
-                <td>
-
-                    {{ $item->author->name }}
-
-                </td>
-
-                <td>
-
-                    {{ $item->status }}
-
-                </td>
-
-                <td>
-
-                    <a
-                        href="{{ route('admin.news.edit',$item) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.news.destroy',$item) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @endforeach
-
-    </tbody>
-
-</table>
-
-{{ $news->links() }}
+</x-admin.crud-table>
 
 @endsection

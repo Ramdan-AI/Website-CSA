@@ -2,76 +2,45 @@
 
 @section('content')
 
-<h2>Edit Album</h2>
+<x-page-header
+    title="Edit Album"
+    subtitle="Perbarui informasi album yang sudah tersimpan."
+/>
 
-<form
-    action="{{ route('admin.albums.update',$album) }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.albums.update', $album) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
+        <x-form.input
+            name="title"
+            label="Judul Album"
+            :value="$album->title"
+            required="true"
+        />
 
-    <div class="card">
+        <x-form.textarea
+            name="description"
+            label="Deskripsi"
+            :value="$album->description"
+        />
 
-        <div class="card-body">
+        <x-form.input
+            name="cover_image"
+            label="Cover Image"
+            :value="$album->cover_image"
+        />
 
-            <div class="mb-3">
-
-                <label>
-                    Judul Album
-                </label>
-
-                <input
-                    type="text"
-                    name="title"
-                    class="form-control"
-                    value="{{ old('title',$album->title) }}"
-                    required>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>
-                    Deskripsi
-                </label>
-
-                <textarea
-                    name="description"
-                    rows="5"
-                    class="form-control">{{ old('description',$album->description) }}</textarea>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>
-                    Cover Image
-                </label>
-
-                <input
-                    type="text"
-                    name="cover_image"
-                    class="form-control"
-                    value="{{ old('cover_image',$album->cover_image) }}">
-
-            </div>
-
-        </div>
-
-        <div class="card-footer">
-
-            <button
-                class="btn btn-primary">
-
-                Update
-
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
             </button>
 
+            <a href="{{ route('admin.albums.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

@@ -2,109 +2,71 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Expense Management"
+    subtitle="Kelola seluruh pengeluaran keuangan dalam sistem."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.expenses.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Expense
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Expenses</h2>
+<x-admin.crud-table :pagination="$expenses">
 
-    <a
-        href="{{ route('admin.expenses.create') }}"
-        class="btn btn-primary">
-
-        Tambah Expense
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>Title</th>
-            <th>Amount</th>
-            <th>Date</th>
+            <th width="260">Title</th>
+            <th width="180">Amount</th>
+            <th width="180">Date</th>
             <th>Created By</th>
-
-            <th width="200">
-                Action
-            </th>
-
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
+    @forelse($expenses as $expense)
+        <tr>
+            <td>
+                <div class="data-name">
+                    {{ $expense->title }}
+                </div>
+            </td>
 
-    <tbody>
-
-        @forelse($expenses as $expense)
-
-            <tr>
-
-                <td>{{ $expense->title }}</td>
-
-                <td>
+            <td>
+                <div class="data-description">
                     Rp {{ number_format($expense->amount, 0, ',', '.') }}
-                </td>
+                </div>
+            </td>
 
-                <td>
+            <td>
+                <div class="data-description">
                     {{ $expense->transaction_date }}
-                </td>
+                </div>
+            </td>
 
-                <td>
-                    {{ $expense->user->name }}
-                </td>
+            <td>
+                <div class="data-description">
+                    {{ $expense->user?->name ?? '-' }}
+                </div>
+            </td>
 
-                <td>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.expenses.edit', $expense)"
+                    :deleteRoute="route('admin.expenses.destroy', $expense)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="5"
+            icon="receipt"
+            title="Data Expense Kosong"
+            subtitle="Belum ada pengeluaran yang tercatat."
+        />
+    @endforelse
 
-                    <a
-                        href="{{ route('admin.expenses.edit', $expense) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.expenses.destroy', $expense) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            type="submit"
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td colspan="5" class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
-
-{{ $expenses->links() }}
+</x-admin.crud-table>
 
 @endsection

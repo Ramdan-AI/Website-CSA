@@ -2,47 +2,40 @@
 
 @section('content')
 
-<h2>Edit Divisi</h2>
+<x-page-header 
+    title="Edit Data Divisi" 
+    subtitle="Perbarui informasi dan struktur divisi operasional CSA." 
+/>
 
-<form
-    action="{{ route('admin.divisions.update',$division) }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.divisions.update', $division) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
+        <x-form.input 
+            name="name" 
+            label="Nama Divisi" 
+            :value="$division->name" 
+            placeholder="Contoh: Pemrograman" 
+            required="true" 
+        />
 
-    <div class="mb-3">
+        <x-form.textarea 
+            name="description" 
+            label="Deskripsi Divisi" 
+            :value="$division->description" 
+            placeholder="Tuliskan tugas dan tanggung jawab singkat dari divisi ini..." 
+        />
 
-        <label>
-            Nama Divisi
-        </label>
-
-        <input
-            type="text"
-            name="name"
-            class="form-control"
-            value="{{ old('name',$division->name) }}">
-
-    </div>
-
-    <div class="mb-3">
-
-        <label>
-            Deskripsi
-        </label>
-
-        <textarea
-            name="description"
-            class="form-control">{{ old('description',$division->description) }}</textarea>
-
-    </div>
-
-    <button class="btn btn-primary">
-
-        Update
-
-    </button>
-
-</form>
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
+            </button>
+            <a href="{{ route('admin.divisions.index') }}" class="btn-solid-light">
+                Batal
+            </a>
+        </div>
+    </form>
+</div>
 
 @endsection

@@ -2,108 +2,63 @@
 
 @section('content')
 
-<h2>Tambah Absensi</h2>
+<x-page-header
+    title="Tambah Absensi"
+    subtitle="Tambahkan data absensi member ke dalam event."
+/>
 
-<form
-    action="{{ route('admin.attendances.store') }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.attendances.store') }}" method="POST">
+        @csrf
 
-    @csrf
+        <div class="mb-4">
+            <label class="custom-label">Event</label>
+            <select name="event_id" class="custom-input" required>
+                <option value="">Pilih Event</option>
 
-    <div class="card">
-
-        <div class="card-body">
-
-            <div class="mb-3">
-
-                <label>Event</label>
-
-                <select
-                    name="event_id"
-                    class="form-control"
-                    required>
-
-                    <option value="">Pilih Event</option>
-
-                    @foreach($events as $event)
-
-                        <option
-                            value="{{ $event->id }}"
-                            {{ old('event_id') == $event->id ? 'selected' : '' }}>
-
-                            {{ $event->title }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Member</label>
-
-                <select
-                    name="member_id"
-                    class="form-control"
-                    required>
-
-                    <option value="">Pilih Member</option>
-
-                    @foreach($members as $member)
-
-                        <option
-                            value="{{ $member->id }}"
-                            {{ old('member_id') == $member->id ? 'selected' : '' }}>
-
-                            {{ $member->name }}
-
-                        </option>
-
-                    @endforeach
-
-                </select>
-
-            </div>
-
-            <div class="mb-3">
-
-                <label>Status</label>
-
-                <select
-                    name="status"
-                    class="form-control">
-
-                    <option value="present">
-                        Present
+                @foreach($events as $event)
+                    <option
+                        value="{{ $event->id }}"
+                        {{ old('event_id') == $event->id ? 'selected' : '' }}>
+                        {{ $event->title }}
                     </option>
-
-                    <option value="absent">
-                        Absent
-                    </option>
-
-                </select>
-
-            </div>
-
+                @endforeach
+            </select>
         </div>
 
-        <div class="card-footer">
+        <div class="mb-4">
+            <label class="custom-label">Member</label>
+            <select name="member_id" class="custom-input" required>
+                <option value="">Pilih Member</option>
 
-            <button
-                type="submit"
-                class="btn btn-primary">
+                @foreach($members as $member)
+                    <option
+                        value="{{ $member->id }}"
+                        {{ old('member_id') == $member->id ? 'selected' : '' }}>
+                        {{ $member->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-                Simpan
+        <div class="mb-4">
+            <label class="custom-label">Status</label>
+            <select name="status" class="custom-input">
+                <option value="present">Present</option>
+                <option value="absent">Absent</option>
+            </select>
+        </div>
 
+        <div class="form-actions">
+            <button type="submit" class="btn-csa-primary">
+                <i class="fas fa-save me-2"></i> Simpan Data
             </button>
 
+            <a href="{{ route('admin.attendances.index') }}" class="btn-solid-light">
+                Batal
+            </a>
         </div>
-
-    </div>
-
-</form>
+    </form>
+</div>
 
 @endsection

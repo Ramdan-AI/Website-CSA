@@ -2,47 +2,41 @@
 
 @section('content')
 
-<h2>Edit Posisi</h2>
+<x-page-header 
+    title="Edit Data Posisi" 
+    subtitle="Perbarui informasi jabatan yang sudah terdaftar." 
+/>
 
-<form
-    action="{{ route('admin.positions.update',$position) }}"
-    method="POST">
+<div class="form-card">
+    <form action="{{ route('admin.positions.update', $position) }}" method="POST">
+        @csrf
+        @method('PUT')
 
-    @csrf
-    @method('PUT')
-
-    <div class="mb-3">
-
-        <label>
-            Nama Posisi
-        </label>
-
-        <input
-            type="text"
+        <x-form.input 
             name="name"
-            class="form-control"
-            value="{{ old('name',$position->name) }}">
+            label="Nama Posisi"
+            :value="$position->name"
+            placeholder="Contoh: Ketua Umum"
+            required="true"
+        />
 
-    </div>
-
-    <div class="mb-3">
-
-        <label>
-            Deskripsi
-        </label>
-
-        <textarea
+        <x-form.textarea
             name="description"
-            class="form-control">{{ old('description',$position->description) }}</textarea>
+            label="Deskripsi Posisi"
+            :value="$position->description"
+            placeholder="Tuliskan wewenang dan tanggung jawab posisi ini..."
+        />
 
-    </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-solid-success">
+                <i class="fas fa-check me-2"></i> Perbarui Data
+            </button>
 
-    <button class="btn btn-primary">
-
-        Update
-
-    </button>
-
-</form>
+            <a href="{{ route('admin.positions.index') }}" class="btn-solid-light">
+                Batal
+            </a>
+        </div>
+    </form>
+</div>
 
 @endsection

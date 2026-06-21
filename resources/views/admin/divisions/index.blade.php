@@ -2,107 +2,66 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+    <div>
+        <h1 class="page-title">Divisions Management</h1>
+        <p class="page-subtitle">
+            Kelola struktur dan informasi divisi dalam sistem operasional CSA.
+        </p>
+    </div>
 
-    <h2>Divisions</h2>
-
-    <a
-        href="{{ route('admin.divisions.create') }}"
-        class="btn btn-primary">
-
-        Tambah Divisi
-
+    <a href="{{ route('admin.divisions.create') }}" class="btn-csa-primary">
+        <i class="fas fa-plus"></i> Tambah Divisi
     </a>
-
 </div>
 
-<table class="table table-bordered">
+<x-admin.crud-table :pagination="$divisions">
 
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>ID</th>
-
-            <th>Nama</th>
-
-            <th>Deskripsi</th>
-
-            <th width="200">
-                Aksi
-            </th>
-
+            <th width="100">ID</th>
+            <th width="280">Nama Divisi</th>
+            <th>Deskripsi Operasional</th>
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
-
-    </thead>
-
-    <tbody>
+    </x-slot:head>
 
     @forelse($divisions as $division)
-
         <tr>
-
             <td>
-                {{ $division->id }}
+                <span class="data-id">
+                    #{{ str_pad($division->id, 3, '0', STR_PAD_LEFT) }}
+                </span>
             </td>
 
             <td>
-                {{ $division->name }}
+                <div class="data-name">
+                    {{ $division->name }}
+                </div>
             </td>
 
             <td>
-                {{ $division->description }}
+                <div class="data-description" title="{{ $division->description }}">
+                    {{ $division->description ?: '-' }}
+                </div>
             </td>
 
             <td>
-
-                <a
-                    href="{{ route('admin.divisions.edit',$division) }}"
-                    class="btn btn-warning btn-sm">
-
-                    Edit
-
-                </a>
-
-                <form
-                    action="{{ route('admin.divisions.destroy',$division) }}"
-                    method="POST"
-                    class="d-inline">
-
-                    @csrf
-                    @method('DELETE')
-
-                    <button
-                        class="btn btn-danger btn-sm">
-
-                        Hapus
-
-                    </button>
-
-                </form>
-
+                <x-admin.action-buttons
+                    :editRoute="route('admin.divisions.edit', $division)"
+                    :deleteRoute="route('admin.divisions.destroy', $division)"
+                />
             </td>
-
         </tr>
-
     @empty
-
-        <tr>
-
-            <td colspan="4" class="text-center">
-
-                Belum ada data
-
-            </td>
-
-        </tr>
-
+        <x-admin.empty-state
+            colspan="4"
+            icon="folder-open"
+            title="Database Kosong"
+            subtitle="Belum ada data divisi yang diregistrasikan."
+        />
     @endforelse
 
-    </tbody>
-
-</table>
-
-{{ $divisions->links() }}
+</x-admin.crud-table>
 
 @endsection

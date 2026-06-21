@@ -2,123 +2,80 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Members Management"
+    subtitle="Kelola seluruh anggota, divisi, dan struktur jabatan dalam sistem."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.members.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Member
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Members</h2>
+<x-admin.crud-table :pagination="$members">
 
-    <a
-        href="{{ route('admin.members.create') }}"
-        class="btn btn-primary">
-
-        Tambah Member
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>Nama</th>
-
-            <th>Divisi</th>
-
-            <th>Posisi</th>
-
+            <th width="220">Nama</th>
+            <th width="180">Divisi</th>
+            <th width="180">Posisi</th>
             <th>User</th>
-
-            <th>Status</th>
-
-            <th width="200">
-                Aksi
-            </th>
-
+            <th width="120">Status</th>
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
-
-    </thead>
-
-    <tbody>
+    </x-slot:head>
 
     @forelse($members as $member)
-
         <tr>
-
-            <td>{{ $member->name }}</td>
-
-            <td>{{ $member->division->name }}</td>
-
-            <td>{{ $member->position->name }}</td>
-
             <td>
-                {{ $member->user?->email ?? '-' }}
+                <div class="data-name">
+                    {{ $member->name }}
+                </div>
             </td>
 
             <td>
+                <div class="data-description">
+                    {{ $member->division?->name ?? '-' }}
+                </div>
+            </td>
 
+            <td>
+                <div class="data-description">
+                    {{ $member->position?->name ?? '-' }}
+                </div>
+            </td>
+
+            <td>
+                <div class="data-description">
+                    {{ $member->user?->email ?? '-' }}
+                </div>
+            </td>
+
+            <td>
                 @if($member->is_active)
-
-                    Aktif
-
+                    <span class="badge bg-success">Aktif</span>
                 @else
-
-                    Nonaktif
-
+                    <span class="badge bg-secondary">Nonaktif</span>
                 @endif
-
             </td>
 
             <td>
-
-                <a
-                    href="{{ route('admin.members.edit',$member) }}"
-                    class="btn btn-warning btn-sm">
-
-                    Edit
-
-                </a>
-
-                <form
-                    action="{{ route('admin.members.destroy',$member) }}"
-                    method="POST"
-                    class="d-inline">
-
-                    @csrf
-                    @method('DELETE')
-
-                    <button
-                        class="btn btn-danger btn-sm">
-
-                        Hapus
-
-                    </button>
-
-                </form>
-
+                <x-admin.action-buttons
+                    :editRoute="route('admin.members.edit', $member)"
+                    :deleteRoute="route('admin.members.destroy', $member)"
+                />
             </td>
-
         </tr>
-
     @empty
-
-        <tr>
-
-            <td colspan="6" class="text-center">
-
-                Belum ada data
-
-            </td>
-
-        </tr>
-
+        <x-admin.empty-state
+            colspan="6"
+            icon="users"
+            title="Database Kosong"
+            subtitle="Belum ada data member yang terdaftar."
+        />
     @endforelse
 
-    </tbody>
-
-</table>
-
-{{ $members->links() }}
+</x-admin.crud-table>
 
 @endsection

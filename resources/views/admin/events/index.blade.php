@@ -2,104 +2,71 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between mb-3">
+<x-page-header
+    title="Events Management"
+    subtitle="Kelola seluruh event dan agenda kegiatan dalam sistem."
+>
+    <x-slot:actions>
+        <a href="{{ route('admin.events.create') }}" class="btn-csa-primary">
+            <i class="fas fa-plus"></i> Tambah Event
+        </a>
+    </x-slot:actions>
+</x-page-header>
 
-    <h2>Events</h2>
+<x-admin.crud-table :pagination="$events">
 
-    <a
-        href="{{ route('admin.events.create') }}"
-        class="btn btn-primary">
-
-        Tambah Event
-
-    </a>
-
-</div>
-
-<table class="table table-bordered">
-
-    <thead>
-
+    <x-slot:head>
         <tr>
-
-            <th>Title</th>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Status</th>
-
-            <th width="200">
-                Aksi
-            </th>
-
+            <th width="280">Judul Event</th>
+            <th width="180">Tanggal</th>
+            <th>Lokasi</th>
+            <th width="140">Status</th>
+            <th width="140" class="text-end">Aksi Sistem</th>
         </tr>
+    </x-slot:head>
 
-    </thead>
+    @forelse($events as $event)
+        <tr>
+            <td>
+                <div class="data-name">
+                    {{ $event->title }}
+                </div>
+            </td>
 
-    <tbody>
+            <td>
+                <div class="data-description">
+                    {{ $event->event_date }}
+                </div>
+            </td>
 
-        @forelse($events as $event)
+            <td>
+                <div class="data-description" title="{{ $event->location }}">
+                    {{ $event->location }}
+                </div>
+            </td>
 
-            <tr>
+            <td>
+                <div class="data-description">
+                    {{ ucfirst($event->status) }}
+                </div>
+            </td>
 
-                <td>{{ $event->title }}</td>
+            <td>
+                <x-admin.action-buttons
+                    :editRoute="route('admin.events.edit', $event)"
+                    :deleteRoute="route('admin.events.destroy', $event)"
+                />
+            </td>
+        </tr>
+    @empty
+        <x-admin.empty-state
+            colspan="5"
+            icon="calendar-days"
+            title="Database Kosong"
+            subtitle="Belum ada data event yang diregistrasikan."
+        />
+    @endforelse
 
-                <td>{{ $event->event_date }}</td>
-
-                <td>{{ $event->location }}</td>
-
-                <td>{{ $event->status }}</td>
-
-                <td>
-
-                    <a
-                        href="{{ route('admin.events.edit',$event) }}"
-                        class="btn btn-warning btn-sm">
-
-                        Edit
-
-                    </a>
-
-                    <form
-                        action="{{ route('admin.events.destroy',$event) }}"
-                        method="POST"
-                        class="d-inline">
-
-                        @csrf
-                        @method('DELETE')
-
-                        <button
-                            class="btn btn-danger btn-sm">
-
-                            Hapus
-
-                        </button>
-
-                    </form>
-
-                </td>
-
-            </tr>
-
-        @empty
-
-            <tr>
-
-                <td
-                    colspan="5"
-                    class="text-center">
-
-                    Belum ada data
-
-                </td>
-
-            </tr>
-
-        @endforelse
-
-    </tbody>
-
-</table>
-
-{{ $events->links() }}
+</x-admin.crud-table>
 
 @endsection
