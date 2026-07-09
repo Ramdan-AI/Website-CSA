@@ -1,3 +1,5 @@
+import "bootstrap";
+
 document.addEventListener("DOMContentLoaded", () => {
     // Logic Sonner Toast
     const toast = document.getElementById("csa-sonner-toast");
