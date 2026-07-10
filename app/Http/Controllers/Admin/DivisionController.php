@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Division;
+use App\Models\Member;
 use App\Http\Requests\DivisionRequest;
 use Illuminate\Support\Facades\Storage;
 
@@ -11,14 +12,30 @@ class DivisionController extends Controller
 {
     public function index()
     {
-        $divisions = Division::latest()->paginate(10);
+        $divisions = Division::with(['members' => function ($query) {
+            $query->select('id', 'name', 'division_id', 'position_id')
+                ->with('position:id,name');
+        }])
+            ->withCount('members')
+            ->latest()
+            ->paginate(12);
+
+        $divisions->each(function ($division) {
+            $leader = $division->members->first(function ($member) {
+                return $member->position && (
+                    str_contains(strtolower($member->position->name), 'ketua divisi') ||
+                    str_contains(strtolower($member->position->name), 'ketua')
+                );
+            });
+            $division->leader_name = $leader ? $leader->name : null;
+        });
 
         return view('pages.admin.divisions.index', compact('divisions'));
     }
 
     public function create()
     {
-        return view('pages.admin.divisions.create');
+        return view('pages.admin.divisions.form');
     }
 
     public function store(DivisionRequest $request)
@@ -38,7 +55,7 @@ class DivisionController extends Controller
 
     public function edit(Division $division)
     {
-        return view('pages.admin.divisions.edit', compact('division'));
+        return view('pages.admin.divisions.form', compact('division'));
     }
 
     public function update(DivisionRequest $request, Division $division)
@@ -77,5 +94,25 @@ class DivisionController extends Controller
         $division->delete();
 
         return back()->with('success', 'Divisi berhasil dihapus.');
+    }
+
+    public function members(Division $division)
+    {
+        $members = $division->members()
+            ->with('position')
+            ->latest()
+            ->paginate(10);
+
+        return view('pages.admin.divisions.members', compact('division', 'members'));
+    }
+
+    public function removeMember(Division $division, $memberId)
+    {
+        $member = Member::findOrFail($memberId);
+        $memberName = $member->name;
+        $member->division_id = null;
+        $member->save();
+
+        return back()->with('success', $memberName . ' berhasil dikeluarkan dari ' . $division->name);
     }
 }

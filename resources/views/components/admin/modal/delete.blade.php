@@ -6,7 +6,7 @@
 
 <div id="{{ $id }}"
     class="fixed inset-0 z-[9999] hidden items-center justify-center p-6 transition-opacity duration-300"
-    style="backdrop-filter: blur(3px);" onclick="closeModal('{{ $id }}', event)">
+    style="backdrop-filter: blur(3px);" onclick="closeDeleteModal('{{ $id }}', event)">
     <div id="{{ $id }}Content" class="relative w-full max-w-md transform scale-95 transition-all duration-300"
         onclick="event.stopPropagation()">
         <div
@@ -21,7 +21,7 @@
                 <h3 class="text-lg font-bold text-gray-900 mb-2">{{ $title }}</h3>
                 <p class="text-sm text-gray-500 mb-6">{{ $message }}</p>
                 <div class="flex items-center justify-center gap-3">
-                    <button onclick="closeModal('{{ $id }}')"
+                    <button onclick="closeDeleteModal('{{ $id }}')"
                         class="px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-200 transition-colors">
                         Batal
                     </button>

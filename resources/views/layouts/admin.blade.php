@@ -114,10 +114,13 @@
         </main>
     </div>
 
-    {{-- Di bagian @push('scripts') atau di file JS terpisah --}}
+    <x-admin.modal.delete id="deleteModal" />
+    <x-admin.modal.image-preview id="imagePreviewModal" />
+
+    <x-admin.toast id="globalToast" />
+
     <script>
-        // Modal Delete
-        function openDeleteModal(modalId, url, itemName) {
+        function openDeleteModal(modalId, url) {
             const modal = document.getElementById(modalId);
             const content = document.getElementById(modalId + 'Content');
             const form = document.getElementById(modalId + 'Form');
@@ -134,14 +137,14 @@
             });
         }
 
-        function closeModal(modalId, event) {
+        function closeDeleteModal(modalId, event) {
             if (event && event.target !== document.getElementById(modalId)) return;
 
             const modal = document.getElementById(modalId);
             const content = document.getElementById(modalId + 'Content');
 
             modal.style.opacity = '0';
-            content.style.transform = 'scale(0.95)';
+            content.style.transform = 'scale(0.9)';
 
             setTimeout(() => {
                 modal.classList.add('hidden');
@@ -150,7 +153,6 @@
             }, 300);
         }
 
-        // Image Preview
         function openImagePreview(modalId, imageUrl, title) {
             const modal = document.getElementById(modalId);
             const content = document.getElementById(modalId + 'Content');
@@ -192,8 +194,11 @@
             if (e.key === 'Escape') {
                 document.querySelectorAll('[id$="Modal"]').forEach(modal => {
                     if (!modal.classList.contains('hidden')) {
-                        closeModal(modal.id);
-                        closeImagePreview(modal.id);
+                        if (modal.id.includes('delete')) {
+                            closeDeleteModal(modal.id);
+                        } else {
+                            closeImagePreview(modal.id);
+                        }
                     }
                 });
             }

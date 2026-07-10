@@ -51,16 +51,44 @@ Route::prefix('admin')
             'role:super-admin'
         ])->group(function () {
 
+            // Divisions
             Route::resource(
                 'divisions',
                 DivisionController::class
             );
 
+            Route::get(
+                'divisions/{division}/members',
+                [DivisionController::class, 'members']
+            )->name('divisions.members');
+
+            Route::delete(
+                'divisions/{division}/remove/{member}',
+                [DivisionController::class, 'removeMember']
+            )->name('divisions.remove-member');
+
+            // Positions
             Route::resource(
                 'positions',
                 PositionController::class
             );
 
+            Route::get(
+                'positions/{position}/members',
+                [PositionController::class, 'members']
+            )->name('positions.members');
+
+            Route::post(
+                'positions/{position}/assign',
+                [PositionController::class, 'assignMember']
+            )->name('positions.assign');
+
+            Route::delete(
+                'positions/{position}/remove/{member}',
+                [PositionController::class, 'removeMember']
+            )->name('positions.remove-member');
+
+            // Settings
             Route::get(
                 'settings',
                 [SettingController::class, 'edit']

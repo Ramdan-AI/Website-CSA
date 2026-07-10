@@ -8,11 +8,16 @@ class Position extends Model
 {
     protected $fillable = [
         'name',
-        'description'
+        'description',
+        'max_members',
     ];
 
     public function members()
     {
         return $this->hasMany(Member::class);
+    }
+    public function getMembersCountAttribute()
+    {
+        return $this->members()->count();
     }
 }
