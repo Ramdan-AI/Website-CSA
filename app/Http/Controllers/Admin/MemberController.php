@@ -21,8 +21,7 @@ class MemberController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.members.index',
+        return view('pages.admin.members.index',
             compact('members')
         );
     }
@@ -35,8 +34,7 @@ class MemberController extends Controller
 
         $positions = Position::orderBy('name')->get();
 
-        return view(
-            'admin.members.create',
+        return view('pages.admin.members.create',
             compact(
                 'users',
                 'divisions',
@@ -67,8 +65,7 @@ class MemberController extends Controller
 
         $positions = Position::orderBy('name')->get();
 
-        return view(
-            'admin.members.edit',
+        return view('pages.admin.members.edit',
             compact(
                 'member',
                 'users',

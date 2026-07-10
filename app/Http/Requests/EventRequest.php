@@ -15,45 +15,34 @@ class EventRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'title' => [
                 'required',
                 'max:255'
             ],
-
-            'slug' => [
-                'required',
-                'max:255'
-            ],
-
             'description' => [
                 'required'
             ],
-
             'location' => [
                 'nullable',
                 'max:255'
             ],
-
             'event_date' => [
                 'required',
                 'date'
             ],
-
             'banner' => [
                 'nullable',
-                'max:255'
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
             ],
-
             'registration_link' => [
                 'nullable',
                 'max:255'
             ],
-
             'status' => [
                 'required'
             ]
-
         ];
     }
 }

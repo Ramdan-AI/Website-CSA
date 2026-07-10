@@ -19,9 +19,9 @@ use App\Http\Controllers\Admin\IncomeController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\SettingController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
+
+Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
 
 Auth::routes();
 

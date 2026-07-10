@@ -13,16 +13,14 @@ class AlbumController extends Controller
         $albums = Album::latest()
             ->paginate(10);
 
-        return view(
-            'admin.albums.index',
+        return view('pages.admin.albums.index',
             compact('albums')
         );
     }
 
     public function create()
     {
-        return view(
-            'admin.albums.create'
+        return view('pages.admin.albums.create'
         );
     }
 
@@ -44,8 +42,7 @@ class AlbumController extends Controller
     public function edit(
         Album $album
     ) {
-        return view(
-            'admin.albums.edit',
+        return view('pages.admin.albums.edit',
             compact('album')
         );
     }

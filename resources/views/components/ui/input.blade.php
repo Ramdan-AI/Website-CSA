@@ -1,7 +1,6 @@
 {{--
     Component: ui/input
-    Engineering justification: Centralising input styling allows uniform error-state
-    injection and prevents per-field class repetition in form views.
+    Compliant with Universal Light Mode V2 plan.
 
     Props:
         $label       → string, visible label text
@@ -12,7 +11,7 @@
         $value       → old() value passthrough
         $error       → error message string (optional)
         $hint        → subtle helper text below field (optional)
-        $mono        → bool, use JetBrains Mono for data fields (default: false)
+        $mono        → bool, use mono font for data-type fields (default: false)
 --}}
 @props([
     'label'       => '',
@@ -28,16 +27,16 @@
 
 @php
 $resolvedName = $name ?? $id;
-$inputBase = 'block w-full h-10 px-3 bg-zinc-900 border text-sm text-zinc-100 placeholder-zinc-600 rounded transition-colors duration-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-zinc-950';
+$inputBase = 'block w-full h-10 px-3 bg-white border text-sm text-gray-900 placeholder-gray-400 rounded-lg transition-shadow duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500';
 $inputState = $error
-    ? 'border-red-600 focus-visible:ring-red-500'
-    : 'border-zinc-700 hover:border-zinc-600 focus-visible:ring-blue-500';
+    ? 'border-red-400 focus:ring-red-500/40 focus:border-red-400'
+    : 'border-gray-300 hover:border-gray-400';
 $fontClass = $mono ? 'font-mono text-xs tracking-tight' : '';
 @endphp
 
 <div class="flex flex-col gap-1.5">
     @if($label)
-        <label for="{{ $id }}" class="text-xs font-semibold text-zinc-400 tracking-wide uppercase">
+        <label for="{{ $id }}" class="text-sm font-medium text-gray-700">
             {{ $label }}
         </label>
     @endif
@@ -52,8 +51,8 @@ $fontClass = $mono ? 'font-mono text-xs tracking-tight' : '';
     >
 
     @if($error)
-        <p class="text-xs text-red-400 font-mono">{{ $error }}</p>
+        <p class="text-xs text-red-500">{{ $error }}</p>
     @elseif($hint)
-        <p class="text-xs text-zinc-600">{{ $hint }}</p>
+        <p class="text-xs text-gray-500">{{ $hint }}</p>
     @endif
 </div>

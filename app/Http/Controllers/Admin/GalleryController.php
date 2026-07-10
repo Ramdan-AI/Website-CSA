@@ -15,8 +15,7 @@ class GalleryController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.galleries.index',
+        return view('pages.admin.galleries.index',
             compact('galleries')
         );
     }
@@ -25,8 +24,7 @@ class GalleryController extends Controller
     {
         $albums = Album::orderBy('title')->get();
 
-        return view(
-            'admin.galleries.create',
+        return view('pages.admin.galleries.create',
             compact('albums')
         );
     }
@@ -51,8 +49,7 @@ class GalleryController extends Controller
     ) {
         $albums = Album::orderBy('title')->get();
 
-        return view(
-            'admin.galleries.edit',
+        return view('pages.admin.galleries.edit',
             compact(
                 'gallery',
                 'albums'
@@ -90,8 +87,7 @@ class GalleryController extends Controller
     public function show(
         Gallery $gallery
     ) {
-        return view(
-            'admin.galleries.show',
+        return view('pages.admin.galleries.show',
             compact('gallery')
         );
     }

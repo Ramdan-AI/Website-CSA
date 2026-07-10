@@ -19,8 +19,7 @@ class NewsController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.news.index',
+        return view('pages.admin.news.index',
             compact('news')
         );
     }
@@ -29,8 +28,7 @@ class NewsController extends Controller
     {
         $categories = NewsCategory::orderBy('name')->get();
 
-        return view(
-            'admin.news.create',
+        return view('pages.admin.news.create',
             compact('categories')
         );
     }
@@ -69,8 +67,7 @@ class NewsController extends Controller
     ) {
         $categories = NewsCategory::orderBy('name')->get();
 
-        return view(
-            'admin.news.edit',
+        return view('pages.admin.news.edit',
             compact(
                 'news',
                 'categories'

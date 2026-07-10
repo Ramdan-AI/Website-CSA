@@ -15,16 +15,14 @@ class DocumentController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.documents.index',
+        return view('pages.admin.documents.index',
             compact('documents')
         );
     }
 
     public function create()
     {
-        return view(
-            'admin.documents.create'
+        return view('pages.admin.documents.create'
         );
     }
 
@@ -54,8 +52,7 @@ class DocumentController extends Controller
     public function edit(
         Document $document
     ) {
-        return view(
-            'admin.documents.edit',
+        return view('pages.admin.documents.edit',
             compact('document')
         );
     }

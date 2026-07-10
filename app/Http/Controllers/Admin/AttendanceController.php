@@ -19,8 +19,7 @@ class AttendanceController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.attendances.index',
+        return view('pages.admin.attendances.index',
             compact('attendances')
         );
     }
@@ -31,8 +30,7 @@ class AttendanceController extends Controller
 
         $members = Member::orderBy('name')->get();
 
-        return view(
-            'admin.attendances.create',
+        return view('pages.admin.attendances.create',
             compact(
                 'events',
                 'members'
@@ -70,8 +68,7 @@ class AttendanceController extends Controller
 
         $members = Member::orderBy('name')->get();
 
-        return view(
-            'admin.attendances.edit',
+        return view('pages.admin.attendances.edit',
             compact(
                 'attendance',
                 'events',

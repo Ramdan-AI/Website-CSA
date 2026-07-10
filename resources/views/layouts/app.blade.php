@@ -16,130 +16,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('head')
 </head>
-<body class="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased">
-
-    {{-- ══════════════════════════════
-         NAVIGATION
-         Fixed header, no glow/gradient.
-         Depth established by 1px border only.
-         ══════════════════════════════ --}}
-    <header
-        class="fixed inset-x-0 top-0 z-50 h-14 flex items-center border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-md"
-        x-data="{ mobileOpen: false }"
-    >
-        <nav class="w-full max-w-7xl mx-auto px-6 flex items-center justify-between">
-
-            {{-- Brand --}}
-            <a href="{{ url('/') }}" class="flex items-center gap-3 group shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded">
-                <img
-                    src="{{ asset('storage/system/logos/csa.png') }}"
-                    alt="CSA STMIKMI"
-                    class="h-8 w-auto object-contain transition-opacity group-hover:opacity-80"
-                    loading="eager"
-                >
-                <span class="hidden sm:inline text-sm font-semibold text-zinc-200 tracking-tight">
-                    CSA <span class="text-zinc-500 font-normal">STMIKMI</span>
-                </span>
-            </a>
-
-            {{-- Desktop auth links --}}
-            <div class="hidden sm:flex items-center gap-2">
-                @guest
-                    @if (Route::has('login'))
-                        <a href="{{ route('login') }}"
-                           class="h-8 px-4 inline-flex items-center text-sm font-medium text-zinc-400 hover:text-zinc-100 rounded transition-colors duration-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500">
-                            Masuk
-                        </a>
-                    @endif
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}"
-                           class="h-8 px-4 inline-flex items-center text-sm font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded transition-colors duration-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400">
-                            Daftar
-                        </a>
-                    @endif
-                @else
-                    {{-- Authenticated dropdown --}}
-                    <div class="relative" x-data="{ open: false }">
-                        <button
-                            @click="open = !open"
-                            @keydown.escape="open = false"
-                            class="h-8 px-3 inline-flex items-center gap-2 text-sm font-medium text-zinc-300 hover:text-zinc-100 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded transition-colors duration-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
-                        >
-                            <span class="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center text-[10px] font-bold text-white uppercase shrink-0">
-                                {{ Str::substr(Auth::user()->name, 0, 1) }}
-                            </span>
-                            <span class="max-w-[120px] truncate">{{ Auth::user()->name }}</span>
-                            <svg class="w-3 h-3 text-zinc-500 transition-transform duration-100" :class="open ? 'rotate-180' : ''" viewBox="0 0 16 16" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"/>
-                            </svg>
-                        </button>
-
-                        <div
-                            x-show="open"
-                            x-transition:enter="transition duration-100 ease-out"
-                            x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
-                            x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                            x-transition:leave="transition duration-75 ease-in"
-                            x-transition:leave-start="opacity-100 scale-100"
-                            x-transition:leave-end="opacity-0 scale-95"
-                            @click.outside="open = false"
-                            class="absolute right-0 mt-2 top-full w-48 rounded-lg border border-zinc-800 bg-zinc-900 shadow-xl shadow-zinc-950/50 py-1 z-50"
-                            style="display: none;"
-                        >
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit"
-                                        class="w-full text-left px-4 py-2 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors focus:outline-none focus-visible:bg-zinc-800">
-                                    Keluar
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                @endguest
-            </div>
-
-            {{-- Mobile burger —  Alpine.js toggle, no inline onclick --}}
-            <button
-                class="sm:hidden h-8 w-8 flex items-center justify-center text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 rounded transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500"
-                @click="mobileOpen = !mobileOpen"
-                :aria-expanded="mobileOpen.toString()"
-                aria-label="Toggle navigation"
-            >
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-                    <path x-show="!mobileOpen" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                    <path x-show="mobileOpen" stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" style="display:none;"/>
-                </svg>
-            </button>
-        </nav>
-
-        {{-- Mobile nav drawer --}}
-        <div
-            x-show="mobileOpen"
-            x-transition:enter="transition duration-150 ease-out"
-            x-transition:enter-start="opacity-0 -translate-y-2"
-            x-transition:enter-end="opacity-100 translate-y-0"
-            x-transition:leave="transition duration-100 ease-in"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="absolute inset-x-0 top-full border-b border-zinc-800 bg-zinc-950 px-6 py-4 sm:hidden space-y-1"
-            style="display: none;"
-        >
-            @guest
-                @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="block py-2 text-sm font-medium text-zinc-400 hover:text-zinc-100 transition-colors">Masuk</a>
-                @endif
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="block py-2 text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors">Daftar</a>
-                @endif
-            @else
-                <p class="py-2 text-sm font-medium text-zinc-300">{{ Auth::user()->name }}</p>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="block py-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors">Keluar</button>
-                </form>
-            @endguest
-        </div>
-    </header>
+<body class="min-h-screen bg-white text-gray-800 font-sans antialiased">
+    <x-public.navigation.navbar />
 
     {{-- Page content — offset for fixed header --}}
     <main class="pt-14">
@@ -147,15 +25,65 @@
     </main>
 
     {{-- Footer --}}
-    <footer class="border-t border-zinc-900 py-8 mt-auto">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-600">
-            <div class="flex items-center gap-3">
-                <img src="{{ asset('storage/system/logos/csa.png') }}" alt="" class="h-5 w-auto opacity-40" aria-hidden="true">
-                <span class="font-mono">&copy; {{ date('Y') }} CSA STMIKMI. All rights reserved.</span>
+    <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8 mt-auto text-gray-400">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+            <div>
+                <div class="flex items-center gap-3 mb-4">
+                    <img src="{{ asset('storage/system/logos/csa.png') }}" alt="CSA" class="h-10 w-auto">
+                    <div>
+                        <h4 class="text-white font-bold text-lg">Creative Student Association</h4>
+                        <p class="text-xs text-gray-500">STMIK Mardira Indonesia</p>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 leading-relaxed max-w-sm">
+                    Organisasi mahasiswa yang fokus pada pengembangan kreativitas, teknologi, dan inovasi di lingkungan kampus.
+                </p>
             </div>
-            <div class="flex items-center gap-6 font-mono">
-                <a href="#" class="hover:text-zinc-400 transition-colors">Privacy</a>
-                <a href="#" class="hover:text-zinc-400 transition-colors">Terms</a>
+            
+            <div>
+                <h4 class="text-white font-bold mb-4">Kontak Kami</h4>
+                <ul class="space-y-3">
+                    <li class="flex items-start gap-3">
+                        <div class="w-5 h-5 mt-0.5 text-gray-500">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-300">Humas I</p>
+                            <p class="text-sm">+62 857 9568 6906</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <div class="w-5 h-5 mt-0.5 text-gray-500">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-gray-300">Humas II</p>
+                            <p class="text-sm">+62 821 2661 9180</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-white font-bold mb-4">Follow Us</h4>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-blue-600 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/></svg>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:bg-blue-600 hover:text-white transition-all">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-6 border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-sm text-gray-500">
+                &copy; {{ date('Y') }} Made with &hearts; by Creative Student Association.
+            </div>
+            <div class="flex gap-6 text-sm text-gray-500">
+                <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
             </div>
         </div>
     </footer>

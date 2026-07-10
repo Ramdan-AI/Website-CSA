@@ -19,8 +19,7 @@ class SettingController extends Controller
             ]);
         }
 
-        return view(
-            'admin.settings.edit',
+        return view('pages.admin.settings.edit',
             compact('setting')
         );
     }

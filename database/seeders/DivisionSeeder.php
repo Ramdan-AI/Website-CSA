@@ -2,22 +2,29 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Division;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class DivisionSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Division::insert([
-            ['name' => 'Programming'],
-            ['name' => 'Design'],
-            ['name' => 'Multimedia'],
-            ['name' => 'Public Relation'],
-        ]);
+        $divisions = [
+            [
+                'name' => 'Divisi Pemrograman',
+                'slug' => Str::slug('Divisi Pemrograman'),
+                'description' => 'Fokus pada pengembangan aplikasi berbasis web dan mobile dengan teknologi terkini. Anggota akan belajar tentang front-end, back-end, dan fullstack development.',
+            ],
+            [
+                'name' => 'Divisi Multimedia',
+                'slug' => Str::slug('Divisi Multimedia'),
+                'description' => 'Mengembangkan keterampilan desain grafis, editing video, animasi, dan konten visual. Anggota akan belajar membuat konten kreatif untuk berbagai platform.',
+            ],
+        ];
+
+        foreach ($divisions as $division) {
+            Division::create($division);
+        }
     }
 }

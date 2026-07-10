@@ -12,16 +12,14 @@ class PositionController extends Controller
     {
         $positions = Position::latest()->paginate(10);
 
-        return view(
-            'admin.positions.index',
+        return view('pages.admin.positions.index',
             compact('positions')
         );
     }
 
     public function create()
     {
-        return view(
-            'admin.positions.create'
+        return view('pages.admin.positions.create'
         );
     }
 
@@ -43,8 +41,7 @@ class PositionController extends Controller
     public function edit(
         Position $position
     ) {
-        return view(
-            'admin.positions.edit',
+        return view('pages.admin.positions.edit',
             compact('position')
         );
     }
