@@ -22,7 +22,7 @@ class IncomeController extends Controller
 
     public function create()
     {
-        return view('pages.admin.incomes.create'
+        return view('pages.admin.incomes.form'
         );
     }
 
@@ -54,7 +54,7 @@ class IncomeController extends Controller
     public function edit(
         Income $income
     ) {
-        return view('pages.admin.incomes.edit',
+        return view('pages.admin.incomes.form',
             compact('income')
         );
     }

@@ -26,7 +26,7 @@ class AlbumRequest extends FormRequest
 
             'cover_image' => [
                 'nullable',
-                'max:255'
+                'max:3012'
             ]
 
         ];

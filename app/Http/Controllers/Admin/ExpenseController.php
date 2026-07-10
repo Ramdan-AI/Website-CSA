@@ -22,7 +22,7 @@ class ExpenseController extends Controller
 
     public function create()
     {
-        return view('pages.admin.expenses.create'
+        return view('pages.admin.expenses.form'
         );
     }
 
@@ -54,7 +54,7 @@ class ExpenseController extends Controller
     public function edit(
         Expense $expense
     ) {
-        return view('pages.admin.expenses.edit',
+        return view('pages.admin.expenses.form',
             compact('expense')
         );
     }

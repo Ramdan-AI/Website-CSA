@@ -14,45 +14,25 @@ class SettingRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'site_name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'instagram' => ['nullable', 'url', 'max:255'],
+            'youtube' => ['nullable', 'url', 'max:255'],
+            'linkedin' => ['nullable', 'url', 'max:255'],
+            'about' => ['nullable', 'string'],
+            'logo' => ['nullable', 'image', 'mimes:png,svg', 'max:2048'],
+        ];
+    }
 
-            'site_name' => [
-                'required',
-                'max:255'
-            ],
-
-            'email' => [
-                'nullable',
-                'email'
-            ],
-
-            'phone' => [
-                'nullable',
-                'max:255'
-            ],
-
-            'address' => [
-                'nullable'
-            ],
-
-            'instagram' => [
-                'nullable',
-                'max:255'
-            ],
-
-            'youtube' => [
-                'nullable',
-                'max:255'
-            ],
-
-            'linkedin' => [
-                'nullable',
-                'max:255'
-            ],
-
-            'about' => [
-                'nullable'
-            ]
-
+    public function messages(): array
+    {
+        return [
+            'site_name.required' => 'Nama situs wajib diisi.',
+            'logo.image' => 'File harus berupa gambar.',
+            'logo.mimes' => 'Format logo harus PNG atau SVG.',
+            'logo.max' => 'Ukuran logo maksimal 2MB.',
         ];
     }
 }
