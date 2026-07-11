@@ -14,21 +14,13 @@ class NewsCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'name' => [
                 'required',
                 'max:255'
             ],
-
-            'slug' => [
-                'required',
-                'max:255'
-            ],
-
             'description' => [
                 'nullable'
             ]
-
         ];
     }
 }

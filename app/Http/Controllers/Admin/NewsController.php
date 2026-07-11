@@ -44,8 +44,6 @@ class NewsController extends Controller
 
             'title' => $request->title,
 
-            'slug' => $request->slug,
-
             'content' => $request->content,
 
             'status' => $request->status,
@@ -84,8 +82,6 @@ class NewsController extends Controller
             'category_id' => $request->category_id,
 
             'title' => $request->title,
-
-            'slug' => $request->slug,
 
             'content' => $request->content,
 

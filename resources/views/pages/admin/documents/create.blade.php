@@ -1,49 +1,84 @@
 @extends('layouts.admin')
 
 @section('content')
+<div class="space-y-6">
 
-<x-page-header
-    title="Tambah Dokumen"
-    subtitle="Unggah dan registrasikan dokumen baru ke dalam sistem."
-/>
+    <div>
+        <p class="text-xs font-semibold text-teal-400 uppercase tracking-widest">Publikasi</p>
+        <h1 class="text-3xl font-bold text-gray-900 mt-1">Tambah Dokumen</h1>
+        <p class="text-sm text-gray-400 mt-1.5 font-medium">Unggah dan registrasikan dokumen baru ke dalam sistem.</p>
+    </div>
 
-<div class="form-card">
-    <form action="{{ route('admin.documents.store') }}" method="POST">
-        @csrf
+    <div class="relative bg-white/70 backdrop-blur-xl rounded-[30px] border border-white/50 shadow-[0_2px_16px_-4px_rgba(20,184,166,0.08)] overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-teal-400/5 to-cyan-400/5 pointer-events-none"></div>
 
-        <x-form.input
-            name="title"
-            label="Judul Dokumen"
-            value="{{ old('title') }}"
-            placeholder="Contoh: SOP Divisi Programming"
-            required="true"
-        />
+        <div class="relative p-6">
+            <form action="{{ route('admin.documents.store') }}" method="POST" class="space-y-6">
+                @csrf
 
-        <x-form.input
-            name="file"
-            label="File"
-            value="{{ old('file') }}"
-            placeholder="Masukkan path atau nama file"
-            required="true"
-        />
+                <div class="bg-gray-50/40 rounded-[24px] p-5">
+                    <h3 class="text-[13px] font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-1.5 h-5 rounded-full bg-teal-500"></span>
+                        Informasi Dokumen
+                    </h3>
 
-        <x-form.textarea
-            name="description"
-            label="Deskripsi"
-            value="{{ old('description') }}"
-            placeholder="Tuliskan deskripsi singkat dokumen..."
-        />
+                    <div class="space-y-4">
+                        <div>
+                            <label for="title" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
+                                Judul Dokumen <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" name="title" id="title"
+                                   value="{{ old('title') }}"
+                                   class="w-full h-[44px] px-4 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all bg-white/60"
+                                   placeholder="Contoh: SOP Divisi Programming" required autofocus>
+                            @error('title')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn-csa-primary">
-                <i class="fas fa-save me-2"></i> Simpan Data
-            </button>
+                        <div>
+                            <label for="file" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
+                                File <span class="text-red-400">*</span>
+                            </label>
+                            <input type="text" name="file" id="file"
+                                   value="{{ old('file') }}"
+                                   class="w-full h-[44px] px-4 rounded-[14px] border border-gray-200/80 text-[13px] font-mono focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all bg-white/60"
+                                   placeholder="Masukkan path atau nama file" required>
+                            @error('file')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-            <a href="{{ route('admin.documents.index') }}" class="btn-solid-light">
-                Batal
-            </a>
+                        <div>
+                            <label for="description" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
+                                Deskripsi <span class="text-gray-400 font-normal">(opsional)</span>
+                            </label>
+                            <textarea name="description" id="description" rows="3"
+                                      class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all resize-none bg-white/60"
+                                      placeholder="Tuliskan deskripsi singkat dokumen...">{{ old('description') }}</textarea>
+                            @error('description')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 pt-2">
+                    <button type="submit"
+                            class="relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-[13px] font-semibold rounded-[18px] shadow-[0_4px_16px_-4px_rgba(20,184,166,0.3)] hover:shadow-[0_8px_24px_-4px_rgba(20,184,166,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
+                        <div class="absolute inset-0 bg-white/20 rounded-[18px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        <span class="relative flex items-center gap-2">
+                            <i class="fas fa-plus text-[10px]"></i>
+                            Tambah Dokumen
+                        </span>
+                    </button>
+                    <a href="{{ route('admin.documents.index') }}"
+                       class="px-5 py-2.5 bg-gray-100 text-gray-700 text-[13px] font-semibold rounded-[18px] hover:bg-gray-200 transition-colors">
+                        Batal
+                    </a>
+                </div>
+            </form>
         </div>
-    </form>
+    </div>
 </div>
-
 @endsection
