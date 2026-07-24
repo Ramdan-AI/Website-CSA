@@ -2,11 +2,10 @@
 
 @section('content')
     @php
-        $isEdit = isset($division);
-        $title = $isEdit ? 'Edit Divisi' : 'Tambah Divisi';
-        $hasImage = $isEdit && $division->image;
-        $imageUrl = $hasImage ? asset('storage/' . $division->image) : '#';
-    @endphp
+    $title = $isEdit ? 'Edit Divisi' : 'Tambah Divisi';
+    $hasImage = $isEdit && !empty($division->image);
+    $imageUrl = ($isEdit && $hasImage) ? asset('storage/' . $division->image) : '#';
+@endphp
 
     <div class="space-y-6">
 

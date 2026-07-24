@@ -116,6 +116,7 @@
 
     <x-admin.modal.delete id="deleteModal" />
     <x-admin.modal.image-preview id="imagePreviewModal" />
+    <x-admin.modal.docs-preview />
 
     <x-admin.toast id="globalToast" />
 

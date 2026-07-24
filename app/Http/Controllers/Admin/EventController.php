@@ -24,8 +24,8 @@ class EventController extends Controller
 
     public function create()
     {
-        return view('pages.admin.events.create'
-        );
+        $event = new Event();
+        return view('pages.admin.events.form', compact('event'));
     }
 
     public function store(EventRequest $request)
@@ -50,9 +50,7 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
-        return view('pages.admin.events.edit',
-            compact('event')
-        );
+        return view('pages.admin.events.form', compact('event'));
     }
 
     public function update(EventRequest $request, Event $event)

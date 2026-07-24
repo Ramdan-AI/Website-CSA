@@ -35,7 +35,7 @@
                             </label>
                             <input type="text" name="name" id="name" value="{{ old('name', $position->name ?? '') }}"
                                 class="w-full h-[46px] px-4 rounded-[16px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all bg-white/60"
-                                placeholder="Contoh: Ketua, Sekretaris 1" required autofocus>
+                                placeholder="Contoh: Sekretaris" required autofocus>
                             @error('name')
                                 <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                             @enderror

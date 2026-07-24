@@ -14,15 +14,41 @@ class PositionSeeder extends Seeder
     public function run(): void
     {
         Position::insert([
-            ['name' => 'Ketua', 'description' => 'Pimpinan tertinggi organisasi'],
-            ['name' => 'Wakil Ketua', 'description' => 'Mendampingi ketua'],
-            ['name' => 'Ketua Divisi', 'description' => 'Pemimpin divisi'],
-            ['name' => 'Wakil Ketua Divisi', 'description' => 'Mendampingi ketua divisi'],
-            ['name' => 'Sekretaris 1', 'description' => 'Administrasi utama'],
-            ['name' => 'Sekretaris 2', 'description' => 'Administrasi pendukung'],
-            ['name' => 'Bendahara 1', 'description' => 'Pengelola keuangan utama'],
-            ['name' => 'Bendahara 2', 'description' => 'Pengelola keuangan cadangan'],
-            ['name' => 'Anggota', 'description' => 'Anggota biasa'],
+            [
+                'name' => 'Ketua',
+                'description' => 'Pimpinan tertinggi organisasi',
+                'max_members' => 1
+            ],
+            [
+                'name' => 'Wakil Ketua',
+                'description' => 'Mendampingi ketua',
+                'max_members' => 1
+            ],
+            [
+                'name' => 'Ketua Divisi',
+                'description' => 'Pemimpin divisi',
+                'max_members' => 5
+            ],
+            [
+                'name' => 'Wakil Ketua Divisi',
+                'description' => 'Mendampingi ketua divisi',
+                'max_members' => 5
+            ],
+            [
+                'name' => 'Sekretaris',
+                'description' => 'Mengurus administrasi organisasi',
+                'max_members' => 2
+            ],
+            [
+                'name' => 'Bendahara',
+                'description' => 'Mengurus keuangan organisasi',
+                'max_members' => 2
+            ],
+            [
+                'name' => 'Anggota',
+                'description' => 'Anggota biasa',
+                'max_members' => 150
+            ],
         ]);
     }
 }

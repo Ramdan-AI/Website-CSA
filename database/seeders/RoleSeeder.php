@@ -23,16 +23,24 @@ class RoleSeeder extends Seeder
                 'slug' => 'ketua'
             ],
             [
+                'name' => 'Wakil Ketua',
+                'slug' => 'wakil-ketua'
+            ],
+            [
+                'name' => 'Ketua Divisi',
+                'slug' => 'ketua-divisi'
+            ],
+            [
+                'name' => 'Wakil Ketua Divisi',
+                'slug' => 'wakil-ketua-divisi'
+            ],
+            [
                 'name' => 'Sekretaris',
                 'slug' => 'sekretaris'
             ],
             [
                 'name' => 'Bendahara',
                 'slug' => 'bendahara'
-            ],
-            [
-                'name' => 'Kepala Divisi',
-                'slug' => 'kepala-divisi'
             ],
             [
                 'name' => 'Anggota',

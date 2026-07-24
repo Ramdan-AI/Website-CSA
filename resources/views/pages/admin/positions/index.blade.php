@@ -24,7 +24,7 @@
         @forelse($positions as $position)
             @php
                 $firstMember = $position->members->first();
-                $isUnique = in_array(strtolower($position->name), ['ketua', 'wakil ketua', 'sekretaris 1', 'sekretaris 2', 'bendahara 1', 'bendahara 2']);
+                $isUnique = in_array(strtolower($position->name), ['ketua', 'wakil ketua', 'ketua divisi', 'wakil ketua divisi', 'sekretaris', 'bendahara']);
             @endphp
             <div class="relative group/card">
                 <div class="absolute -inset-[2px] bg-gradient-to-br from-blue-400/30 via-blue-300/20 to-cyan-300/30 rounded-[34px] blur-lg opacity-0 group-hover/card:opacity-100 transition-all duration-500"></div>

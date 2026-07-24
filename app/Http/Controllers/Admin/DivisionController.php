@@ -35,7 +35,9 @@ class DivisionController extends Controller
 
     public function create()
     {
-        return view('pages.admin.divisions.form');
+        $division = new Division();
+        $isEdit = false;
+        return view('pages.admin.divisions.form', compact('division', 'isEdit'));
     }
 
     public function store(DivisionRequest $request)
@@ -55,7 +57,8 @@ class DivisionController extends Controller
 
     public function edit(Division $division)
     {
-        return view('pages.admin.divisions.form', compact('division'));
+        $isEdit = true;
+        return view('pages.admin.divisions.form', compact('division', 'isEdit'));
     }
 
     public function update(DivisionRequest $request, Division $division)

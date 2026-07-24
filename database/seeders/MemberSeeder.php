@@ -22,10 +22,8 @@ class MemberSeeder extends Seeder
 
         $ketua = $positions->firstWhere('name', 'Ketua')?->id;
         $wakilKetua = $positions->firstWhere('name', 'Wakil Ketua')?->id;
-        $sekretaris1 = $positions->firstWhere('name', 'Sekretaris 1')?->id;
-        $sekretaris2 = $positions->firstWhere('name', 'Sekretaris 2')?->id;
-        $bendahara1 = $positions->firstWhere('name', 'Bendahara 1')?->id;
-        $bendahara2 = $positions->firstWhere('name', 'Bendahara 2')?->id;
+        $sekretaris = $positions->firstWhere('name', 'Sekretaris')?->id;
+        $bendahara = $positions->firstWhere('name', 'Bendahara')?->id;
 
         $ketuaDivisi = $positions->firstWhere('name', 'Ketua Divisi')?->id;
         $wakilKetuaDivisi = $positions->firstWhere('name', 'Wakil Ketua Divisi')?->id;
@@ -61,7 +59,7 @@ class MemberSeeder extends Seeder
             [
                 'name' => 'Siti Nurhaliza',
                 'division_id' => $divPemrograman,
-                'position_id' => $sekretaris1,
+                'position_id' => $sekretaris,
                 'nim' => '20240002',
                 'email' => 'siti.nurhaliza@csa.ac.id',
                 'phone' => '081234567891',
@@ -72,7 +70,7 @@ class MemberSeeder extends Seeder
             [
                 'name' => 'Rina Anggraini',
                 'division_id' => $divMultimedia,
-                'position_id' => $sekretaris2,
+                'position_id' => $sekretaris,
                 'nim' => '20240006',
                 'email' => 'rina.anggraini@csa.ac.id',
                 'phone' => '081234567895',
@@ -81,7 +79,7 @@ class MemberSeeder extends Seeder
             [
                 'name' => 'Eko Prasetyo',
                 'division_id' => $divPemrograman,
-                'position_id' => $bendahara1,
+                'position_id' => $bendahara,
                 'nim' => '20240005',
                 'email' => 'eko.prasetyo@csa.ac.id',
                 'phone' => '081234567894',
@@ -91,7 +89,7 @@ class MemberSeeder extends Seeder
             [
                 'name' => 'Fitri Handayani',
                 'division_id' => $divMultimedia,
-                'position_id' => $bendahara2,
+                'position_id' => $bendahara,
                 'nim' => '20240013',
                 'email' => 'fitri.handayani@csa.ac.id',
                 'phone' => '081234567898',

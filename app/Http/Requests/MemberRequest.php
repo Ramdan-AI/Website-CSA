@@ -29,7 +29,7 @@ class MemberRequest extends FormRequest
                 'exists:positions,id',
                 function ($attribute, $value, $fail) {
                     $position = \App\Models\Position::find($value);
-                    $uniquePositions = ['Ketua', 'Wakil Ketua', 'Sekretaris 1', 'Sekretaris 2', 'Bendahara 1', 'Bendahara 2'];
+                    $uniquePositions = ['Ketua', 'Wakil Ketua', 'Ketua Divisi', 'Wakil Ketua Divisi', 'Sekretaris', 'Bendahara'];
 
                     if ($position && in_array($position->name, $uniquePositions)) {
                         $exists = \App\Models\Member::where('position_id', $value)

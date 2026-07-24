@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UserRoleSeeder extends Seeder
 {
@@ -13,88 +14,58 @@ class UserRoleSeeder extends Seeder
      */
     public function run(): void
     {
+        $roles = Role::all();
+
+        if ($roles->isEmpty()) {
+            $this->command->warn('Pastikan RoleSeeder sudah dijalankan terlebih dahulu.');
+            return;
+        }
+
+        $roleKetua = $roles->firstWhere('slug', 'ketua')?->id;
+        $roleSekretaris = $roles->firstWhere('slug', 'sekretaris')?->id;
+        $roleBendahara = $roles->firstWhere('slug', 'bendahara')?->id;
+        $roleKetuaDivisi = $roles->firstWhere('slug', 'ketua-divisi')?->id;
+        $roleAnggota = $roles->firstWhere('slug', 'anggota')?->id;
+
+        $defaultPassword = Hash::make('password');
+
         User::create([
-            'role_id' => Role::where(
-                'slug',
-                'ketua'
-            )->first()->id,
-
-            'name' => 'Ketua CSA',
-
-            'email' => 'ketua@csa.local',
-
-            'password' => bcrypt(
-                'password'
-            ),
-
+            'role_id'   => $roleKetua,
+            'name'      => 'Ketua CSA',
+            'email'     => 'ketua@csa.local',
+            'password'  => $defaultPassword,
             'is_active' => true,
         ]);
 
         User::create([
-            'role_id' => Role::where(
-                'slug',
-                'sekretaris'
-            )->first()->id,
-
-            'name' => 'Sekretaris CSA',
-
-            'email' => 'sekretaris@csa.local',
-
-            'password' => bcrypt(
-                'password'
-            ),
-
+            'role_id'   => $roleSekretaris,
+            'name'      => 'Sekretaris CSA',
+            'email'     => 'sekretaris@csa.local',
+            'password'  => $defaultPassword,
             'is_active' => true,
         ]);
 
         User::create([
-            'role_id' => Role::where(
-                'slug',
-                'bendahara'
-            )->first()->id,
-
-            'name' => 'Bendahara CSA',
-
-            'email' => 'bendahara@csa.local',
-
-            'password' => bcrypt(
-                'password'
-            ),
-
+            'role_id'   => $roleBendahara,
+            'name'      => 'Bendahara CSA',
+            'email'     => 'bendahara@csa.local',
+            'password'  => $defaultPassword,
             'is_active' => true,
         ]);
 
         User::create([
-            'role_id' => Role::where(
-                'slug',
-                'kepala-divisi'
-            )->first()->id,
-
-            'name' => 'Kepala Divisi CSA',
-
-            'email' => 'kepaladivisi@csa.local',
-
-            'password' => bcrypt(
-                'password'
-            ),
-
+            'role_id'   => $roleKetuaDivisi,
+            'name'      => 'Ketua Divisi CSA',
+            'email'     => 'ketuadivisi@csa.local',
+            'password'  => $defaultPassword,
             'is_active' => true,
         ]);
 
         User::create([
-            'role_id' => Role::where(
-                'slug',
-                'anggota'
-            )->first()->id,
-
-            'name' => 'Anggota CSA',
-
-            'email' => 'anggota@csa.local',
-
-            'password' => bcrypt(
-                'password'
-            ),
-
+            'role_id'   => $roleAnggota,
+            'name'      => 'Anggota CSA',
+            'email'     => 'anggota@csa.local',
+            'password'  => $defaultPassword,
             'is_active' => true,
         ]);
     }

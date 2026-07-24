@@ -101,38 +101,43 @@ Route::prefix('admin')
         });
 
         /*
-        |--------------------------------------------------------------------------
-        | Super Admin + Sekretaris
-        |--------------------------------------------------------------------------
-        */
+|--------------------------------------------------------------------------
+| Super Admin + Sekretaris
+|--------------------------------------------------------------------------
+*/
 
         Route::middleware([
             'role:super-admin,sekretaris'
         ])->group(function () {
 
-            Route::resource(
-                'news-categories',
-                NewsCategoryController::class
-            );
+        Route::get(
+            'documents/{document}/download',
+            [DocumentController::class, 'download']
+        )->name('documents.download');
 
-            Route::resource(
-                'news',
-                NewsController::class
-            );
+        Route::resource(
+            'news-categories',
+            NewsCategoryController::class
+        );
 
-            Route::resource(
-                'documents',
-                DocumentController::class
-            );
-        });
+        Route::resource(
+            'news',
+            NewsController::class
+        );
 
-        /*
+        Route::resource(
+            'documents',
+            DocumentController::class
+        )->except(['show']);
+    });
+
+    /*
         |--------------------------------------------------------------------------
         | Super Admin + Bendahara
         |--------------------------------------------------------------------------
         */
 
-        Route::middleware([
+    Route::middleware([
             'role:super-admin,bendahara'
         ])->group(function () {
 

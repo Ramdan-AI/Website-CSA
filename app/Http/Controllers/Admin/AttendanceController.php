@@ -26,16 +26,11 @@ class AttendanceController extends Controller
 
     public function create()
     {
-        $events = Event::orderBy('title')->get();
-
+        $attendance = new Attendance();
+        $events = Event::orderBy('event_date', 'desc')->get();
         $members = Member::orderBy('name')->get();
 
-        return view('pages.admin.attendances.create',
-            compact(
-                'events',
-                'members'
-            )
-        );
+        return view('pages.admin.attendances.form', compact('attendance', 'events', 'members'));
     }
 
     public function store(
@@ -61,20 +56,12 @@ class AttendanceController extends Controller
             );
     }
 
-    public function edit(
-        Attendance $attendance
-    ) {
-        $events = Event::orderBy('title')->get();
-
+    public function edit(Attendance $attendance)
+    {
+        $events = Event::orderBy('event_date', 'desc')->get();
         $members = Member::orderBy('name')->get();
 
-        return view('pages.admin.attendances.edit',
-            compact(
-                'attendance',
-                'events',
-                'members'
-            )
-        );
+        return view('pages.admin.attendances.form', compact('attendance', 'events', 'members'));
     }
 
     public function update(

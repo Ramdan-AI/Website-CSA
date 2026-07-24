@@ -36,17 +36,12 @@ class DashboardController extends Controller
         ->groupBy('month')
         ->pluck('total', 'month')->toArray();
 
-        // Format data for chart (Jan-Dec)
         $chartIncomes = [];
         $chartExpenses = [];
         for ($i = 1; $i <= 12; $i++) {
             $chartIncomes[] = $monthlyIncomes[$i] ?? 0;
             $chartExpenses[] = $monthlyExpenses[$i] ?? 0;
         }
-
-        // Recent Activities (Latest Incomes and Expenses mixed)
-        // We'll pass it to view if needed, but the user said "tidak perlu mengisi bagian yang memang tidak ada"
-        // so we'll just pass the chart data.
 
         return view(
             'pages.admin.dashboard',
