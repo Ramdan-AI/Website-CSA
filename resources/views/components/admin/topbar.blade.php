@@ -33,9 +33,12 @@
     $ringMap = [
         'super-admin' => 'from-blue-400 via-purple-400 to-fuchsia-400',
         'ketua' => 'from-amber-400 via-orange-400 to-rose-400',
+        'wakil-ketua' => 'from-yellow-400 via-amber-400 to-orange-400',
         'sekretaris' => 'from-teal-400 via-cyan-400 to-sky-400',
         'bendahara' => 'from-emerald-400 via-green-400 to-teal-400',
-        'kepala-divisi' => 'from-violet-400 via-purple-400 to-indigo-400',
+        'ketua-divisi' => 'from-violet-400 via-purple-400 to-indigo-400',
+        'wakil-ketua-divisi' => 'from-indigo-400 via-blue-400 to-violet-400',
+        'anggota' => 'from-gray-400 via-slate-400 to-zinc-400',
     ];
     $userRole = auth()->user()->role->slug ?? 'super-admin';
     $ringClass = $ringMap[$userRole] ?? 'from-gray-400 via-gray-500 to-gray-600';

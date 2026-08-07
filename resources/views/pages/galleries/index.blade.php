@@ -47,6 +47,19 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
+                                <form action="{{ route('admin.galleries.toggle-hero', $gallery) }}" method="POST" class="inline">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit"
+                                        class="w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200
+                                        {{ $gallery->is_hero
+                                            ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                            : 'bg-white/90 text-gray-400 hover:bg-blue-500 hover:text-white' }}"
+                                        onclick="event.stopPropagation()"
+                                        title="{{ $gallery->is_hero ? 'Sembunyikan dari hero' : 'Tampilkan di hero' }}">
+                                        <i class="fas fa-star {{ $gallery->is_hero ? 'text-[9px]' : 'text-[9px]' }}"></i>
+                                    </button>
+                                </form>
                                 <a href="{{ route('admin.galleries.edit', $gallery) }}" 
                                    class="w-7 h-7 rounded-lg flex items-center justify-center bg-white/90 text-gray-700 hover:bg-blue-500 hover:text-white transition-all duration-200"
                                    onclick="event.stopPropagation()">

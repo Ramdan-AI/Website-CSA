@@ -16,11 +16,13 @@ class Division extends Model
         'slug',
         'image',
         'description',
+        'skills',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'skills' => 'array',
     ];
 
     protected static function booted()

@@ -19,7 +19,7 @@ class AttendanceController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('pages.admin.attendances.index',
+        return view('pages.attendances.index',
             compact('attendances')
         );
     }
@@ -30,7 +30,7 @@ class AttendanceController extends Controller
         $events = Event::orderBy('event_date', 'desc')->get();
         $members = Member::orderBy('name')->get();
 
-        return view('pages.admin.attendances.form', compact('attendance', 'events', 'members'));
+        return view('pages.attendances.form', compact('attendance', 'events', 'members'));
     }
 
     public function store(
@@ -61,7 +61,7 @@ class AttendanceController extends Controller
         $events = Event::orderBy('event_date', 'desc')->get();
         $members = Member::orderBy('name')->get();
 
-        return view('pages.admin.attendances.form', compact('attendance', 'events', 'members'));
+        return view('pages.attendances.form', compact('attendance', 'events', 'members'));
     }
 
     public function update(

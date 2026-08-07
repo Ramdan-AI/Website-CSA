@@ -19,7 +19,7 @@ class EventRegistrationController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('pages.admin.event-registrations.index',
+        return view('pages.event-registrations.index',
             compact('registrations')
         );
     }
@@ -30,7 +30,7 @@ class EventRegistrationController extends Controller
 
         $members = Member::orderBy('name')->get();
 
-        return view('pages.admin.event-registrations.create',
+        return view('pages.event-registrations.create',
             compact(
                 'events',
                 'members'
@@ -68,7 +68,7 @@ class EventRegistrationController extends Controller
 
         $members = Member::orderBy('name')->get();
 
-        return view('pages.admin.event-registrations.edit',
+        return view('pages.event-registrations.edit',
             compact(
                 'eventRegistration',
                 'events',

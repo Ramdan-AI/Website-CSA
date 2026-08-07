@@ -30,19 +30,20 @@ class DivisionController extends Controller
             $division->leader_name = $leader ? $leader->name : null;
         });
 
-        return view('pages.admin.divisions.index', compact('divisions'));
+        return view('pages.divisions.index', compact('divisions'));
     }
 
     public function create()
     {
         $division = new Division();
         $isEdit = false;
-        return view('pages.admin.divisions.form', compact('division', 'isEdit'));
+        return view('pages.divisions.form', compact('division', 'isEdit'));
     }
 
     public function store(DivisionRequest $request)
     {
         $data = $request->validated();
+        $data['skills'] = $this->normalizeSkills($request->input('skills'));
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('divisions', 'public');
@@ -58,7 +59,7 @@ class DivisionController extends Controller
     public function edit(Division $division)
     {
         $isEdit = true;
-        return view('pages.admin.divisions.form', compact('division', 'isEdit'));
+        return view('pages.divisions.form', compact('division', 'isEdit'));
     }
 
     public function update(DivisionRequest $request, Division $division)
@@ -79,6 +80,7 @@ class DivisionController extends Controller
             $data['image'] = $request->file('image')->store('divisions', 'public');
         }
 
+        $data['skills'] = $this->normalizeSkills($request->input('skills'));
         unset($data['remove_image']);
 
         $division->update($data);
@@ -106,7 +108,7 @@ class DivisionController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('pages.admin.divisions.members', compact('division', 'members'));
+        return view('pages.divisions.members', compact('division', 'members'));
     }
 
     public function removeMember(Division $division, $memberId)
@@ -117,5 +119,19 @@ class DivisionController extends Controller
         $member->save();
 
         return back()->with('success', $memberName . ' berhasil dikeluarkan dari ' . $division->name);
+    }
+
+    private function normalizeSkills($skills)
+    {
+        if (!is_array($skills)) {
+            return null;
+        }
+
+        $cleaned = array_values(array_filter(array_map(
+            fn ($skill) => trim((string) $skill),
+            $skills
+        )));
+
+        return $cleaned === [] ? null : $cleaned;
     }
 }

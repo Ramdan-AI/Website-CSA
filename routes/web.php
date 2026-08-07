@@ -18,189 +18,110 @@ use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\IncomeController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\RoleController;
 
 use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
+use App\Http\Controllers\Frontend\ImageController;
 
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
 
-Auth::routes();
+Route::get('anggota', [FrontendHomeController::class, 'anggota'])->name('anggota');
 
-Route::prefix('admin')
+// On-the-fly resized thumbnails for storage/app/public files (see ImageController).
+Route::get('img/{width}/{path}', [ImageController::class, 'show'])
+    ->where('width', '[0-9]+')
+    ->where('path', '.*')
+    ->name('img.thumb');
+
+Auth::routes(['register' => false, 'confirm' => true]);
+
+Route::middleware(['registration.open'])->group(function () {
+    Route::get('register', 'App\Http\Controllers\Auth\RegisterController@showRegistrationForm')->name('register');
+    Route::post('register', 'App\Http\Controllers\Auth\RegisterController@register');
+});
+
+Route::prefix('{roleSlug}')
     ->name('admin.')
-    ->middleware(['auth'])
+    ->middleware(['auth', 'role.match'])
     ->group(function () {
 
-        /*
-        |--------------------------------------------------------------------------
-        | Dashboard
-        |--------------------------------------------------------------------------
-        */
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        Route::get(
-            '/dashboard',
-            [DashboardController::class, 'index']
-        )->name('dashboard');
-
-        /*
-        |--------------------------------------------------------------------------
-        | Super Admin Only
-        |--------------------------------------------------------------------------
-        */
-
-        Route::middleware([
-            'role:super-admin'
-        ])->group(function () {
-
-            // Divisions
-            Route::resource(
-                'divisions',
-                DivisionController::class
-            );
-
-            Route::get(
-                'divisions/{division}/members',
-                [DivisionController::class, 'members']
-            )->name('divisions.members');
-
-            Route::delete(
-                'divisions/{division}/remove/{member}',
-                [DivisionController::class, 'removeMember']
-            )->name('divisions.remove-member');
-
-            // Positions
-            Route::resource(
-                'positions',
-                PositionController::class
-            );
-
-            Route::get(
-                'positions/{position}/members',
-                [PositionController::class, 'members']
-            )->name('positions.members');
-
-            Route::post(
-                'positions/{position}/assign',
-                [PositionController::class, 'assignMember']
-            )->name('positions.assign');
-
-            Route::delete(
-                'positions/{position}/remove/{member}',
-                [PositionController::class, 'removeMember']
-            )->name('positions.remove-member');
-
-            // Settings
-            Route::get(
-                'settings',
-                [SettingController::class, 'edit']
-            )->name('settings.edit');
-
-            Route::put(
-                'settings',
-                [SettingController::class, 'update']
-            )->name('settings.update');
+        Route::middleware(['can:manage-divisions'])->group(function () {
+            Route::resource('divisions', DivisionController::class)->except(['show']);
+            Route::get('divisions/{division}/members', [DivisionController::class, 'members'])->name('divisions.members');
+            Route::delete('divisions/{division}/remove/{member}', [DivisionController::class, 'removeMember'])->name('divisions.remove-member');
         });
 
-        /*
-|--------------------------------------------------------------------------
-| Super Admin + Sekretaris
-|--------------------------------------------------------------------------
-*/
-
-        Route::middleware([
-            'role:super-admin,sekretaris'
-        ])->group(function () {
-
-        Route::get(
-            'documents/{document}/download',
-            [DocumentController::class, 'download']
-        )->name('documents.download');
-
-        Route::resource(
-            'news-categories',
-            NewsCategoryController::class
-        );
-
-        Route::resource(
-            'news',
-            NewsController::class
-        );
-
-        Route::resource(
-            'documents',
-            DocumentController::class
-        )->except(['show']);
-    });
-
-    /*
-        |--------------------------------------------------------------------------
-        | Super Admin + Bendahara
-        |--------------------------------------------------------------------------
-        */
-
-    Route::middleware([
-            'role:super-admin,bendahara'
-        ])->group(function () {
-
-            Route::resource(
-                'incomes',
-                IncomeController::class
-            );
-
-            Route::resource(
-                'expenses',
-                ExpenseController::class
-            );
+        Route::middleware(['can:manage-positions'])->group(function () {
+            Route::resource('positions', PositionController::class)->except(['show']);
+            Route::get('positions/{position}/members', [PositionController::class, 'members'])->name('positions.members');
+            Route::post('positions/{position}/assign', [PositionController::class, 'assignMember'])->name('positions.assign');
+            Route::delete('positions/{position}/remove/{member}', [PositionController::class, 'removeMember'])->name('positions.remove-member');
         });
 
-        /*
-        |--------------------------------------------------------------------------
-        | Super Admin + Kepala Divisi
-        |--------------------------------------------------------------------------
-        */
-
-        Route::middleware([
-            'role:super-admin,kepala-divisi'
-        ])->group(function () {
-
-            Route::resource(
-                'members',
-                MemberController::class
-            );
-
-            Route::resource(
-                'events',
-                EventController::class
-            );
-
-            Route::resource(
-                'event-registrations',
-                EventRegistrationController::class
-            );
-
-            Route::resource(
-                'attendances',
-                AttendanceController::class
-            );
+        Route::middleware(['can:manage-settings'])->group(function () {
+            Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
+            Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
         });
 
-        /*
-        |--------------------------------------------------------------------------
-        | Semua Pengurus
-        |--------------------------------------------------------------------------
-        */
+        Route::middleware(['can:manage-roles'])->group(function () {
+            Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
+            Route::get('roles/create', [RoleController::class, 'create'])->name('roles.create');
+            Route::post('roles', [RoleController::class, 'store'])->name('roles.store');
+            Route::get('roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+            Route::put('roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+            Route::delete('roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+            Route::get('roles/{role}/permissions', [RoleController::class, 'permissions'])->name('roles.permissions');
+            Route::put('roles/{role}/permissions', [RoleController::class, 'updatePermissions'])->name('roles.permissions.update');
+        });
 
-        Route::middleware([
-            'role:super-admin,ketua,sekretaris,bendahara,kepala-divisi'
-        ])->group(function () {
+        // Members
+        Route::middleware(['can:manage-members'])->group(function () {
+            Route::resource('members', MemberController::class)->except(['show']);
+        });
 
-            Route::resource(
-                'albums',
-                AlbumController::class
-            );
+        // Attendances
+        Route::middleware(['can:manage-attendances'])->group(function () {
+            Route::resource('attendances', AttendanceController::class);
+        });
 
-            Route::resource(
-                'galleries',
-                GalleryController::class
-            );
+        // News & Documents
+        Route::middleware(['can:manage-news'])->group(function () {
+            Route::resource('news-categories', NewsCategoryController::class);
+            Route::resource('news', NewsController::class)->except(['show']);
+        });
+
+        Route::middleware(['can:manage-documents'])->group(function () {
+            Route::get('documents/{document}/download', [DocumentController::class, 'download'])->name('documents.download');
+            Route::resource('documents', DocumentController::class)->except(['show']);
+        });
+
+        // Events
+        Route::middleware(['can:manage-events'])->group(function () {
+            Route::resource('events', EventController::class)->except(['show']);
+        });
+
+        Route::middleware(['can:manage-registrations'])->group(function () {
+            Route::resource('event-registrations', EventRegistrationController::class);
+        });
+
+        // Finance — CRUD
+        Route::middleware(['can:manage-finance'])->group(function () {
+            Route::resource('incomes', IncomeController::class)->except(['index']);
+            Route::resource('expenses', ExpenseController::class)->except(['index']);
+        });
+
+        // Finance — view (termasuk untuk role yang hanya bisa lihat)
+        Route::middleware(['can:view-finance'])->group(function () {
+            Route::get('incomes', [IncomeController::class, 'index'])->name('incomes.index');
+            Route::get('expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+        });
+
+        // Media
+        Route::middleware(['can:manage-media'])->group(function () {
+            Route::resource('albums', AlbumController::class)->except(['show']);
+            Route::resource('galleries', GalleryController::class);
+            Route::put('galleries/{gallery}/toggle-hero', [GalleryController::class, 'toggleHero'])->name('galleries.toggle-hero');
         });
     });

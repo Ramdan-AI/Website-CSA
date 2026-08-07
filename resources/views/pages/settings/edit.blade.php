@@ -158,18 +158,22 @@
 
                         <div class="bg-gray-50/40 rounded-[24px] p-5">
                             <h3 class="text-[13px] font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <span class="w-1.5 h-5 rounded-full bg-blue-500"></span>
-                                Tentang CSA
+                                <span class="w-1.5 h-5 rounded-full bg-amber-500"></span>
+                                Kontrol Pendaftaran
                             </h3>
-                            
-                            <div>
-                                <textarea name="about" id="about" rows="6"
-                                          class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 transition-all resize-none bg-white/60"
-                                          placeholder="Deskripsikan tentang organisasi CSA...">{{ old('about', $setting->about) }}</textarea>
-                                @error('about')
-                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+                            <label class="flex items-center justify-between cursor-pointer">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">Buka Pendaftaran</p>
+                                    <p class="text-xs text-gray-400 mt-0.5">Jika diaktifkan, pengguna baru bisa mendaftar akun.</p>
+                                </div>
+                                <div class="relative">
+                                    <input type="hidden" name="registration_open" value="0">
+                                    <input type="checkbox" name="registration_open" value="1"
+                                        {{ old('registration_open', $setting->registration_open) ? 'checked' : '' }}
+                                        class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+                                </div>
+                            </label>
                         </div>
                     </div>
                 </div>

@@ -15,7 +15,7 @@ class SettingController extends Controller
             'site_name' => 'CSA',
         ]);
 
-        return view('pages.admin.settings.edit', compact('setting'));
+        return view('pages.settings.edit', compact('setting'));
     }
 
     public function update(SettingRequest $request)

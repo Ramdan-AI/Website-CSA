@@ -15,14 +15,14 @@ class ExpenseController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('pages.admin.expenses.index',
+        return view('pages.expenses.index',
             compact('expenses')
         );
     }
 
     public function create()
     {
-        return view('pages.admin.expenses.form'
+        return view('pages.expenses.form'
         );
     }
 
@@ -54,7 +54,7 @@ class ExpenseController extends Controller
     public function edit(
         Expense $expense
     ) {
-        return view('pages.admin.expenses.form',
+        return view('pages.expenses.form',
             compact('expense')
         );
     }

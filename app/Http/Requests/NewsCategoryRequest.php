@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class NewsCategoryRequest extends FormRequest
 {
@@ -13,14 +14,26 @@ class NewsCategoryRequest extends FormRequest
 
     public function rules(): array
     {
+        $categoryId = $this->route('newsCategory');
+
         return [
             'name' => [
                 'required',
-                'max:255'
+                'string',
+                'max:255',
+                Rule::unique('news_categories')->ignore($categoryId),
             ],
             'description' => [
-                'nullable'
+                'nullable',
+                'string'
             ]
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.unique' => 'Nama kategori sudah digunakan.',
         ];
     }
 }

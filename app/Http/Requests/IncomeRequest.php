@@ -14,26 +14,31 @@ class IncomeRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'title' => [
                 'required',
+                'string',
                 'max:255'
             ],
-
             'amount' => [
                 'required',
-                'numeric'
+                'numeric',
+                'min:1'
             ],
-
             'description' => [
-                'nullable'
+                'nullable',
+                'string'
             ],
-
             'transaction_date' => [
                 'required',
                 'date'
             ]
+        ];
+    }
 
+    public function messages(): array
+    {
+        return [
+            'amount.min' => 'Jumlah pemasukan harus lebih dari 0.',
         ];
     }
 }

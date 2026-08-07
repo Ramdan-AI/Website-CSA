@@ -9,8 +9,18 @@ class Gallery extends Model
     protected $fillable = [
         'album_id',
         'image',
-        'caption'
+        'caption',
+        'is_hero'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_hero' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 
     public function album()
     {

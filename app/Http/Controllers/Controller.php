@@ -9,4 +9,11 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+
+    public function callAction($method, $parameters)
+    {
+        unset($parameters['roleSlug']);
+
+        return parent::callAction($method, $parameters);
+    }
 }

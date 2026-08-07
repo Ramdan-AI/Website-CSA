@@ -17,7 +17,7 @@ class EventController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view('pages.admin.events.index',
+        return view('pages.events.index',
             compact('events')
         );
     }
@@ -25,7 +25,7 @@ class EventController extends Controller
     public function create()
     {
         $event = new Event();
-        return view('pages.admin.events.form', compact('event'));
+        return view('pages.events.form', compact('event'));
     }
 
     public function store(EventRequest $request)
@@ -50,7 +50,7 @@ class EventController extends Controller
 
     public function edit(Event $event)
     {
-        return view('pages.admin.events.form', compact('event'));
+        return view('pages.events.form', compact('event'));
     }
 
     public function update(EventRequest $request, Event $event)

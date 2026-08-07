@@ -11,17 +11,18 @@ class AlbumController extends Controller
 {
     public function index()
     {
-        $albums = Album::latest()
+        $albums = Album::withCount('galleries')
+            ->latest()
             ->paginate(10);
 
-        return view('pages.admin.albums.index',
+        return view('pages.albums.index',
             compact('albums')
         );
     }
 
     public function create()
     {
-        return view('pages.admin.albums.form'
+        return view('pages.albums.form'
         );
     }
 
@@ -43,7 +44,7 @@ class AlbumController extends Controller
     public function edit(
         Album $album
     ) {
-        return view('pages.admin.albums.form',
+        return view('pages.albums.form',
             compact('album')
         );
     }
@@ -70,11 +71,26 @@ class AlbumController extends Controller
     public function destroy(
         Album $album
     ) {
+        // Hapus cover album jika ada
+        if ($album->cover_image) {
+            Storage::disk('public')->delete($album->cover_image);
+        }
+
+        // Hapus semua file galeri terkait
+        foreach ($album->galleries as $gallery) {
+            if ($gallery->image) {
+                Storage::disk('public')->delete($gallery->image);
+            }
+        }
+
+        // Hapus galeri dari database (cascade delete)
+        $album->galleries()->delete();
+
         $album->delete();
 
         return back()->with(
             'success',
-            'Album berhasil dihapus'
+            'Album beserta seluruh galeri berhasil dihapus'
         );
     }
 }

@@ -99,6 +99,20 @@
                                 @enderror
                             </div>
 
+                            <div>
+                                <label for="skills"
+                                    class="block text-sm font-semibold text-gray-900 mb-2">Keterampilan yang Diasah</label>
+                                <input type="text" name="skills" id="skills"
+                                    value="{{ old('skills', $isEdit && !empty($division->skills) ? implode(', ', $division->skills) : '') }}"
+                                    class="w-full h-12 px-4 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all bg-white/50"
+                                    placeholder="HTML/CSS, PHP, JavaScript, Laravel">
+                                <p class="text-[11px] text-gray-400 mt-1.5 font-medium">Pisahkan setiap keterampilan
+                                    dengan koma.</p>
+                                @error('skills')
+                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
                             @if ($isEdit)
                                 <div class="flex items-center gap-4 p-4 rounded-2xl bg-gray-50/50">
                                     <label class="relative inline-flex items-center cursor-pointer">

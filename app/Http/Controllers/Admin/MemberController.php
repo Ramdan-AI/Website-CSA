@@ -23,11 +23,12 @@ class MemberController extends Controller
         $name = strtolower($position->name);
 
         return match (true) {
-            str_contains($name, 'ketua') && !str_contains($name, 'wakil') => 'ketua',
+            str_contains($name, 'ketua divisi') => 'ketua-divisi',
+            str_contains($name, 'wakil ketua divisi') => 'wakil-ketua-divisi',
             str_contains($name, 'wakil ketua') => 'wakil-ketua',
+            str_contains($name, 'ketua') && !str_contains($name, 'wakil') => 'ketua',
             str_contains($name, 'sekretaris') => 'sekretaris',
             str_contains($name, 'bendahara') => 'bendahara',
-            str_contains($name, 'kepala divisi') => 'kepala-divisi',
             default => 'anggota',
         };
     }
@@ -44,7 +45,7 @@ class MemberController extends Controller
             ->latest()
             ->paginate(12);
 
-        return view('pages.admin.members.index', compact('members'));
+        return view('pages.members.index', compact('members'));
     }
 
     public function create()
@@ -52,7 +53,7 @@ class MemberController extends Controller
         $divisions = Division::active()->orderBy('name')->get();
         $positions = Position::orderBy('name')->get();
 
-        return view('pages.admin.members.form', compact('divisions', 'positions'));
+        return view('pages.members.form', compact('divisions', 'positions'));
     }
 
     public function store(MemberRequest $request)
@@ -91,7 +92,7 @@ class MemberController extends Controller
         $divisions = Division::active()->orderBy('name')->get();
         $positions = Position::orderBy('name')->get();
 
-        return view('pages.admin.members.form', compact('member', 'divisions', 'positions'));
+        return view('pages.members.form', compact('member', 'divisions', 'positions'));
     }
 
     public function update(MemberRequest $request, Member $member)
@@ -150,8 +151,13 @@ class MemberController extends Controller
             Storage::disk('public')->delete($member->photo);
         }
 
+        // Hapus user terkait untuk mencegah data yatim piatu
+        if ($member->user) {
+            $member->user->delete();
+        }
+
         $member->delete();
 
-        return back()->with('success', 'Anggota berhasil dihapus.');
+        return back()->with('success', 'Anggota dan akun terkait berhasil dihapus.');
     }
 }

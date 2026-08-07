@@ -13,14 +13,14 @@ class NewsCategoryController extends Controller
         $categories = NewsCategory::latest()
             ->paginate(10);
 
-        return view('pages.admin.news-categories.index',
+        return view('pages.news-categories.index',
             compact('categories')
         );
     }
 
     public function create()
     {
-        return view('pages.admin.news-categories.create'
+        return view('pages.news-categories.create'
         );
     }
 
@@ -44,7 +44,7 @@ class NewsCategoryController extends Controller
     public function edit(
         NewsCategory $newsCategory
     ) {
-        return view('pages.admin.news-categories.edit',
+        return view('pages.news-categories.edit',
             compact('newsCategory')
         );
     }

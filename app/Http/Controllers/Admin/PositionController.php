@@ -21,11 +21,12 @@ class PositionController extends Controller
         $name = strtolower($position->name);
 
         return match (true) {
-            str_contains($name, 'ketua') && !str_contains($name, 'wakil') => 'ketua',
+            str_contains($name, 'ketua divisi') => 'ketua-divisi',
+            str_contains($name, 'wakil ketua divisi') => 'wakil-ketua-divisi',
             str_contains($name, 'wakil ketua') => 'wakil-ketua',
+            str_contains($name, 'ketua') && !str_contains($name, 'wakil') => 'ketua',
             str_contains($name, 'sekretaris') => 'sekretaris',
             str_contains($name, 'bendahara') => 'bendahara',
-            str_contains($name, 'kepala divisi') => 'kepala-divisi',
             default => 'anggota',
         };
     }
@@ -48,12 +49,12 @@ class PositionController extends Controller
     {
         $positions = Position::withCount('members')->latest()->paginate(10);
 
-        return view('pages.admin.positions.index', compact('positions'));
+        return view('pages.positions.index', compact('positions'));
     }
 
     public function create()
     {
-        return view('pages.admin.positions.form');
+        return view('pages.positions.form');
     }
 
     public function store(PositionRequest $request)
@@ -67,7 +68,7 @@ class PositionController extends Controller
 
     public function edit(Position $position)
     {
-        return view('pages.admin.positions.form', compact('position'));
+        return view('pages.positions.form', compact('position'));
     }
 
     public function update(PositionRequest $request, Position $position)
@@ -97,7 +98,7 @@ class PositionController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('pages.admin.positions.members', compact('position', 'members', 'allMembers'));
+        return view('pages.positions.members', compact('position', 'members', 'allMembers'));
     }
 
     public function assignMember(Request $request, Position $position)

@@ -20,17 +20,28 @@ class NewsRequest extends FormRequest
             ],
             'title' => [
                 'required',
+                'string',
                 'max:255'
             ],
             'content' => [
-                'required'
+                'required',
+                'string'
             ],
             'status' => [
-                'required'
+                'required',
+                'in:draft,published'
             ],
             'published_at' => [
-                'nullable'
+                'nullable',
+                'date'
             ]
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'status.in' => 'Status berita harus draft atau published.',
         ];
     }
 }

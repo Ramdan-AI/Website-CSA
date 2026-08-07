@@ -16,13 +16,13 @@ class GalleryController extends Controller
             ->latest()
             ->paginate(20);
 
-        return view('pages.admin.galleries.index', compact('galleries'));
+        return view('pages.galleries.index', compact('galleries'));
     }
 
     public function create()
     {
         $albums = Album::orderBy('title')->get();
-        return view('pages.admin.galleries.form', compact('albums'));
+        return view('pages.galleries.form', compact('albums'));
     }
 
     public function store(GalleryRequest $request)
@@ -43,7 +43,7 @@ class GalleryController extends Controller
     public function edit(Gallery $gallery)
     {
         $albums = Album::orderBy('title')->get();
-        return view('pages.admin.galleries.form', compact('gallery', 'albums'));
+        return view('pages.galleries.form', compact('gallery', 'albums'));
     }
 
     public function update(GalleryRequest $request, Gallery $gallery)
@@ -73,5 +73,13 @@ class GalleryController extends Controller
         $gallery->delete();
 
         return back()->with('success', 'Foto berhasil dihapus.');
+    }
+
+    public function toggleHero(Gallery $gallery)
+    {
+        $gallery->update(['is_hero' => !$gallery->is_hero]);
+
+        $status = $gallery->is_hero ? 'ditampilkan' : 'disembunyikan';
+        return back()->with('success', "Foto {$status} di halaman utama.");
     }
 }

@@ -22,6 +22,7 @@ class SettingRequest extends FormRequest
             'youtube' => ['nullable', 'url', 'max:255'],
             'linkedin' => ['nullable', 'url', 'max:255'],
             'about' => ['nullable', 'string'],
+            'registration_open' => ['nullable', 'boolean'],
             'logo' => ['nullable', 'image', 'mimes:png,svg', 'max:2048'],
         ];
     }

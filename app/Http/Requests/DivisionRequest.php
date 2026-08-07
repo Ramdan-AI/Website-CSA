@@ -35,6 +35,15 @@ class DivisionRequest extends FormRequest
                 'string',
                 'max:1000',
             ],
+            'skills' => [
+                'nullable',
+                'array',
+            ],
+            'skills.*' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
             'is_active' => [
                 'boolean',
             ],

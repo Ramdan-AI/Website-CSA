@@ -19,9 +19,13 @@ class Event extends Model
         'status'
     ];
 
-    protected $casts = [
-        'event_date' => 'date'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'event_date' => 'date',
+            'status' => 'string',
+        ];
+    }
 
     public function user()
     {

@@ -44,7 +44,7 @@ class DashboardController extends Controller
         }
 
         return view(
-            'pages.admin.dashboard',
+            'pages.dashboard',
             [
                 'totalUsers' => User::count(),
                 'totalMembers' => Member::count(),

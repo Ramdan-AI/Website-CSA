@@ -26,4 +26,9 @@
     input[type="checkbox"] {
         accent-color: #2563eb;
     }
+
+    /* Hide Alpine-managed elements before the framework boots. */
+    [x-cloak] {
+        display: none !important;
+    }
 }

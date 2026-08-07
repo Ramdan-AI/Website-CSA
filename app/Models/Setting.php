@@ -15,6 +15,16 @@ class Setting extends Model
         'instagram',
         'youtube',
         'linkedin',
-        'about'
+        'about',
+        'registration_open'
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'registration_open' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
 }

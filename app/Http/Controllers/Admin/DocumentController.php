@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\DocumentDownload;
-use Illuminate\Http\Request;
+use App\Http\Requests\DocumentRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -18,22 +18,18 @@ class DocumentController extends Controller
             ->latest()
             ->paginate(12);
 
-        return view('pages.admin.documents.index', compact('documents'));
+        return view('pages.documents.index', compact('documents'));
     }
 
     public function create()
     {
         $document = new Document();
-        return view('pages.admin.documents.form', compact('document'));
+        return view('pages.documents.form', compact('document'));
     }
 
-    public function store(Request $request)
+    public function store(DocumentRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
-            'description' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -52,16 +48,12 @@ class DocumentController extends Controller
 
     public function edit(Document $document)
     {
-        return view('pages.admin.documents.form', compact('document'));
+        return view('pages.documents.form', compact('document'));
     }
 
-    public function update(Request $request, Document $document)
+    public function update(DocumentRequest $request, Document $document)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
-            'description' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('file')) {
             // Hapus file lama
@@ -73,15 +65,13 @@ class DocumentController extends Controller
             $filename = Str::slug($validated['title']) . '-' . time() . '.' . $file->getClientOriginalExtension();
             $validated['file'] = $file->storeAs('documents', $filename, 'public');
         } else {
-            // Jika judul berubah, rename file juga
+            // If title changed, use Storage facade to move the file
             if ($document->title !== $validated['title'] && $document->file) {
-                $oldPath = storage_path('app/public/' . $document->file);
                 $extension = pathinfo($document->file, PATHINFO_EXTENSION);
                 $newFilename = 'documents/' . Str::slug($validated['title']) . '-' . $document->created_at->timestamp . '.' . $extension;
-                $newPath = storage_path('app/public/' . $newFilename);
 
-                if (file_exists($oldPath)) {
-                    rename($oldPath, $newPath);
+                if (Storage::disk('public')->exists($document->file)) {
+                    Storage::disk('public')->move($document->file, $newFilename);
                     $validated['file'] = $newFilename;
                 }
             } else {
@@ -98,9 +88,7 @@ class DocumentController extends Controller
 
     public function download(Document $document)
     {
-        $filePath = storage_path('app/public/' . $document->file);
-
-        if (!file_exists($filePath)) {
+        if (!Storage::disk('public')->exists($document->file)) {
             return back()->with('error', 'File tidak ditemukan.');
         }
 
@@ -114,7 +102,7 @@ class DocumentController extends Controller
         // Download dengan nama yang rapi: Judul Dokumen.extension
         $downloadName = Str::slug($document->title) . '.' . pathinfo($document->file, PATHINFO_EXTENSION);
 
-        return response()->download($filePath, $downloadName);
+        return Storage::disk('public')->download($document->file, $downloadName);
     }
 
     public function destroy(Document $document)

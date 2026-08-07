@@ -19,13 +19,18 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RoleSeeder::class,
+            PermissionSeeder::class,
+            RolePermissionSeeder::class,
             DivisionSeeder::class,
             PositionSeeder::class,
             NewsCategorySeeder::class,
+            NewsSeeder::class,
             SettingSeeder::class,
             AdminSeeder::class,
             UserRoleSeeder::class,
-            MemberSeeder::class
+            MemberSeeder::class,
+            AlbumSeeder::class,
+            GallerySeeder::class,
         ]);
     }
 }
