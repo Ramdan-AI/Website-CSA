@@ -40,8 +40,8 @@
                                             <img src="{{ $firstMember->photo_url }}" alt="{{ $firstMember->name }}" class="w-full h-full object-cover">
                                         </div>
                                     @else
-                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-[0_2px_8px_-2px_rgba(59,130,246,0.25)] shrink-0">
-                                            {{ strtoupper(substr($firstMember->name, 0, 2)) }}
+                                        <div class="w-10 h-10 rounded-full overflow-hidden ring-2 ring-blue-100 shadow-[0_2px_8px_-2px_rgba(59,130,246,0.2)] shrink-0">
+                                            <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $firstMember->name }}" class="w-full h-full object-cover">
                                         </div>
                                     @endif
                                 @else

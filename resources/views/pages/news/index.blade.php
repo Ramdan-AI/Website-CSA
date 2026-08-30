@@ -42,8 +42,8 @@
                 </td>
                 <td class="py-4 px-6">
                     <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white font-bold text-[9px] ring-2 ring-white shadow-[0_2px_6px_rgba(20,184,166,0.2)]">
-                            {{ strtoupper(substr($item->author?->name ?? 'U', 0, 2)) }}
+                        <div class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white shrink-0 shadow-sm">
+                            <img src="{{ $item->author?->avatar ? asset('storage/' . $item->author->avatar) : asset('storage/profile/profile-placeholder.png') }}" alt="{{ $item->author?->name }}" class="w-full h-full object-cover">
                         </div>
                         <span class="text-xs text-gray-600">{{ $item->author?->name ?? '-' }}</span>
                     </div>

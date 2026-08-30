@@ -46,7 +46,7 @@
                                 @if($member->photo_url)
                                     <img src="{{ $member->photo_url }}" alt="{{ $member->name }}" class="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300">
                                 @else
-                                    <span class="group-hover/avatar:scale-110 transition-transform duration-300">{{ strtoupper(substr($member->name, 0, 2)) }}</span>
+                                    <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300">
                                 @endif
                             </div>
                             @if($member->photo_url)

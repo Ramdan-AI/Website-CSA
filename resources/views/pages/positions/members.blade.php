@@ -92,8 +92,8 @@
                                 @foreach($members as $member)
                                     <div class="flex items-center justify-between p-3 rounded-[18px] bg-white/60 hover:bg-blue-50/60 transition-all duration-200 group/item">
                                         <div class="flex items-center gap-3 min-w-0 flex-1">
-                                            <div class="w-[40px] h-[40px] rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white font-semibold text-[11px] shadow-[0_4px_12px_-2px_rgba(59,130,246,0.3)] ring-[3px] ring-white shrink-0">
-                                                {{ strtoupper(substr($member->name, 0, 2)) }}
+                                            <div class="w-[40px] h-[40px] rounded-full overflow-hidden shadow-[0_4px_12px_-2px_rgba(59,130,246,0.3)] ring-[3px] ring-white shrink-0">
+                                                <img src="{{ $member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                                             </div>
                                             <div class="min-w-0">
                                                 <p class="text-[13px] font-semibold text-gray-900 truncate">{{ $member->name }}</p>

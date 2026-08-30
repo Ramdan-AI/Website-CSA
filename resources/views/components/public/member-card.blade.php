@@ -16,7 +16,7 @@
         @if ($avatar)
             <img src="{{ $avatar }}" alt="{{ $member->name }}" class="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" loading="lazy" decoding="async">
         @else
-            <span class="absolute inset-0 flex items-center justify-center text-6xl font-extrabold text-[#3664AF]/10 select-none">{{ $initials }}</span>
+            <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover group-hover:scale-[1.04] transition-transform duration-500" loading="lazy" decoding="async">
         @endif
     </div>
     <div class="p-6">
@@ -39,7 +39,7 @@
             @if ($avatar)
                 <img src="{{ $avatar }}" alt="{{ $member->name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
             @else
-                <span class="text-lg font-bold text-[#3664AF]/50">{{ $initials }}</span>
+                <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
             @endif
         </div>
         <div class="min-w-0 flex-1">

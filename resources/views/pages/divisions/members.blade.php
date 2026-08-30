@@ -60,8 +60,8 @@
                                     <div class="flex items-center gap-3">
                                         <div class="relative">
                                             <div
-                                                class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-[0_4px_8px_rgba(59,130,246,0.2)]">
-                                                {{ strtoupper(substr($member->name, 0, 2)) }}
+                                                class="w-10 h-10 rounded-xl overflow-hidden shadow-[0_4px_8px_rgba(59,130,246,0.2)] shrink-0">
+                                                <img src="{{ $member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                                             </div>
                                             <div
                                                 class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-white shadow-[0_0_6px_rgba(16,185,129,0.5)]">

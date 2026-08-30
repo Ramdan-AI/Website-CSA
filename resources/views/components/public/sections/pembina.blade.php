@@ -79,7 +79,7 @@
                             @if ($pembinaPhoto)
                                 <img src="{{ $pembinaPhoto }}" alt="{{ $pembina['name'] }}" class="w-full h-[112%] object-cover" data-parallax="-40" loading="lazy" decoding="async">
                             @else
-                                <span class="absolute inset-0 flex items-center justify-center text-8xl font-extrabold text-[#3664AF]/10 select-none">{{ $monogram($pembina['name']) }}</span>
+                                <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
                             @endif
                         </div>
 
@@ -118,10 +118,10 @@
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" data-reveal-stagger>
                         @foreach ($founders as $i => $founder)
                             <div class="group relative aspect-[4/5] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#EEF3FB] border border-[#3664AF]/10 hover:border-[#3664AF]/30 hover:shadow-[0_28px_64px_-36px_rgba(54,100,175,0.45)] hover:-translate-y-1 transition-all duration-300">
-                                <span class="absolute inset-0 flex items-center justify-center text-[clamp(5rem,14vw,8.5rem)] font-extrabold text-[#3664AF]/10 group-hover:text-[#3664AF]/20 group-hover:scale-110 transition-all duration-500 select-none">{{ $monogram($founder) }}</span>
-                                <div class="absolute bottom-0 inset-x-0 p-6 sm:p-7">
-                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#3664AF]/70">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }} &middot; Founder</p>
-                                    <h3 class="text-lg sm:text-xl font-bold text-gray-900 mt-2 leading-snug">{{ $founder }}</h3>
+                                <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $founder }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <div class="absolute bottom-0 inset-x-0 p-6 sm:p-7 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                                    <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-200">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }} &middot; Founder</p>
+                                    <h3 class="text-lg sm:text-xl font-bold text-white mt-1 leading-snug">{{ $founder }}</h3>
                                 </div>
                             </div>
                         @endforeach

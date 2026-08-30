@@ -23,7 +23,7 @@
         @if ($avatar)
             <img src="{{ $avatar }}" alt="{{ $member->name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
         @else
-            <span class="{{ $compact ? 'text-lg' : 'text-2xl' }} font-bold text-[#3664AF]/50">{{ $initials }}</span>
+            <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
         @endif
     </div>
 

@@ -54,8 +54,8 @@
                     <td class="py-4 px-6">
                         <div class="flex items-center gap-2">
                             <div
-                                class="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold text-[9px] ring-2 ring-white shadow-[0_2px_6px_rgba(16,185,129,0.2)]">
-                                {{ strtoupper(substr($income->user->name, 0, 2)) }}
+                                class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white shrink-0 shadow-sm">
+                                <img src="{{ $income->user->avatar ? asset('storage/' . $income->user->avatar) : asset('storage/profile/profile-placeholder.png') }}" alt="{{ $income->user->name }}" class="w-full h-full object-cover">
                             </div>
                             <span class="text-xs text-gray-600">{{ $income->user->name }}</span>
                         </div>

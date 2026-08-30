@@ -174,8 +174,8 @@
                                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
                                         alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
                                 @else
-                                    <span
-                                        class="text-sm font-bold text-gray-700">{{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}</span>
+                                    <img src="{{ asset('storage/profile/profile-placeholder.png') }}"
+                                        alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
                                 @endif
                             </div>
                         </div>
@@ -205,8 +205,8 @@
                                             <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
                                                 alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
                                         @else
-                                            <span
-                                                class="text-xl font-bold text-gray-700">{{ strtoupper(substr(Auth::user()->name ?? 'A', 0, 1)) }}</span>
+                                            <img src="{{ asset('storage/profile/profile-placeholder.png') }}"
+                                                alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
                                         @endif
                                     </div>
                                 </div>
