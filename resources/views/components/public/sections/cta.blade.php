@@ -24,12 +24,24 @@
             </p>
         </div>
 
+        @php
+            $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+        @endphp
+
         <div class="mt-10 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-4" data-reveal="up" data-reveal-delay="0.35">
-            <a href="{{ route('register') }}"
-                class="inline-flex items-center justify-center gap-3 px-9 min-h-[60px] bg-[#E8A33D] text-[#0B1B3B] text-sm sm:text-[15px] font-bold rounded-[2px] hover:bg-white transition-colors duration-300">
-                Daftar sekarang
-                <span>&rarr;</span>
-            </a>
+            @if ($regOpen)
+                <a href="{{ route('register') }}"
+                    class="inline-flex items-center justify-center gap-3 px-9 min-h-[60px] bg-[#E8A33D] text-[#0B1B3B] text-sm sm:text-[15px] font-bold rounded-[2px] hover:bg-white transition-colors duration-300">
+                    Daftar sekarang
+                    <span>&rarr;</span>
+                </a>
+            @else
+                <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                    class="inline-flex items-center justify-center gap-3 px-9 min-h-[60px] bg-[#E8A33D] text-[#0B1B3B] text-sm sm:text-[15px] font-bold rounded-[2px] hover:bg-white transition-colors duration-300 cursor-pointer">
+                    Daftar sekarang
+                    <span>&rarr;</span>
+                </button>
+            @endif
             <a href="#kepengurusan"
                 class="inline-flex items-center justify-center gap-3 px-9 min-h-[60px] border border-white/15 text-white text-sm sm:text-[15px] font-semibold rounded-[2px] hover:border-[#E8A33D] hover:text-[#E8A33D] transition-colors duration-300">
                 Lihat struktur kami

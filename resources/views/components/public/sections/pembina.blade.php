@@ -126,17 +126,34 @@
                             </div>
                         @endforeach
 
-                        <a href="{{ route('register') }}"
-                            class="group relative aspect-[4/5] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#0B1B3B] flex flex-col justify-between p-6 sm:p-7 hover:bg-[#122A52] transition-colors duration-300">
-                            <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9DB8E8]">Generasi berikutnya</p>
-                            <div>
-                                <p class="text-xl sm:text-2xl font-bold text-white leading-snug">Jadilah bagian dari cerita CSA.</p>
-                                <p class="inline-flex items-center gap-2.5 text-[13px] font-semibold text-[#E8A33D] mt-5">
-                                    Daftar sekarang
-                                    <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform duration-300"></i>
-                                </p>
-                            </div>
-                        </a>
+                        @php
+                            $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+                        @endphp
+                        @if ($regOpen)
+                            <a href="{{ route('register') }}"
+                                class="group relative aspect-[4/5] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#0B1B3B] flex flex-col justify-between p-6 sm:p-7 hover:bg-[#122A52] transition-colors duration-300">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9DB8E8]">Generasi berikutnya</p>
+                                <div>
+                                    <p class="text-xl sm:text-2xl font-bold text-white leading-snug">Jadilah bagian dari cerita CSA.</p>
+                                    <p class="inline-flex items-center gap-2.5 text-[13px] font-semibold text-[#E8A33D] mt-5">
+                                        Daftar sekarang
+                                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    </p>
+                                </div>
+                            </a>
+                        @else
+                            <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                                class="group relative aspect-[4/5] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#0B1B3B] flex flex-col justify-between p-6 sm:p-7 hover:bg-[#122A52] transition-colors duration-300 text-left cursor-pointer">
+                                <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-[#9DB8E8]">Generasi berikutnya</p>
+                                <div>
+                                    <p class="text-xl sm:text-2xl font-bold text-white leading-snug">Jadilah bagian dari cerita CSA.</p>
+                                    <p class="inline-flex items-center gap-2.5 text-[13px] font-semibold text-[#E8A33D] mt-5">
+                                        Daftar sekarang
+                                        <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition-transform duration-300"></i>
+                                    </p>
+                                </div>
+                            </button>
+                        @endif
                     </div>
                 </div>
             </div>

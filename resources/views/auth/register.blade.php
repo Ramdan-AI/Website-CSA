@@ -38,6 +38,16 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label for="whatsapp" class="block text-[13px] font-semibold text-gray-700 mb-1.5">Nomor WhatsApp</label>
+                    <input type="text" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}"
+                        placeholder="Contoh: 081234567890" required
+                        class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 transition-all bg-white/70 @error('whatsapp') border-red-300 @enderror">
+                    @error('whatsapp')
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="relative flex items-center gap-3">
                     <span class="flex-1 border-t border-gray-100"></span>
                     <span class="text-xs text-gray-300 font-medium">keamanan akun</span>

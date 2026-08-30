@@ -62,11 +62,20 @@
                     <span class="flex-1 border-t border-gray-100"></span>
                 </div>
 
+                @php
+                    $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+                @endphp
                 <p class="text-center text-[13px] text-gray-400">
                     Belum punya akun?
-                    <a href="{{ route('register') }}" class="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
-                        Daftar sekarang
-                    </a>
+                    @if ($regOpen)
+                        <a href="{{ route('register') }}" class="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                            Daftar sekarang
+                        </a>
+                    @else
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))" class="font-semibold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer bg-transparent border-0 p-0">
+                            Daftar sekarang
+                        </button>
+                    @endif
                 </p>
             </form>
         </div>

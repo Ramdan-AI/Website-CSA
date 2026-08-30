@@ -61,7 +61,7 @@
     <x-public.footer />
 
     {{-- Global "Registration Closed" modal (lives outside transformed navbar) --}}
-    <div x-data="{ open: false }"
+    <div x-data="{ open: {{ (session('registration_closed') || (session('error') && str_contains(session('error'), 'ditutup'))) ? 'true' : 'false' }} }"
         x-init="window.addEventListener('open-register-modal', () => open = true)">
         <div x-show="open"
             x-transition:enter="transition ease-out duration-300"

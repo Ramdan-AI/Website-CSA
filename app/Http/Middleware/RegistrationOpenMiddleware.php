@@ -16,7 +16,8 @@ class RegistrationOpenMiddleware
 
         if (!$setting) {
             return redirect()->route('home')
-                ->with('error', 'Pendaftaran sedang ditutup. Silakan cek kembali nanti.');
+                ->with('error', 'Pendaftaran sedang ditutup. Silakan cek kembali nanti.')
+                ->with('registration_closed', true);
         }
 
         return $next($request);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Member;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -57,6 +58,7 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'whatsapp' => ['required', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
     }
@@ -70,11 +72,22 @@ class RegisterController extends Controller
     {
         $defaultRoleId = Role::where('slug', 'anggota')->value('id');
 
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
+            'whatsapp' => $data['whatsapp'],
             'password' => Hash::make($data['password']),
             'role_id' => $defaultRoleId,
         ]);
+
+        Member::create([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $data['whatsapp'],
+            'is_active' => true,
+        ]);
+
+        return $user;
     }
 }

@@ -20,12 +20,23 @@
                     Kami mewadahi mahasiswa yang ingin mencipta — aplikasi, visual, dan ekosistem teknologi yang berdampak.
                 </p>
 
+                @php
+                    $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+                @endphp
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('register') }}"
-                       class="group inline-flex items-center gap-2.5 px-7 py-4 bg-gray-900 text-white text-[14px] font-semibold rounded-[18px] shadow-[0_8px_30px_-8px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(255,255,255,0.1)] hover:shadow-[0_14px_40px_-10px_rgba(0,0,0,0.18)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300">
-                        Bergabung sekarang
-                        <span class="group-hover:translate-x-0.5 transition-transform duration-300">&rarr;</span>
-                    </a>
+                    @if ($regOpen)
+                        <a href="{{ route('register') }}"
+                           class="group inline-flex items-center gap-2.5 px-7 py-4 bg-gray-900 text-white text-[14px] font-semibold rounded-[18px] shadow-[0_8px_30px_-8px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(255,255,255,0.1)] hover:shadow-[0_14px_40px_-10px_rgba(0,0,0,0.18)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300">
+                            Bergabung sekarang
+                            <span class="group-hover:translate-x-0.5 transition-transform duration-300">&rarr;</span>
+                        </a>
+                    @else
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                           class="group inline-flex items-center gap-2.5 px-7 py-4 bg-gray-900 text-white text-[14px] font-semibold rounded-[18px] shadow-[0_8px_30px_-8px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(255,255,255,0.1)] hover:shadow-[0_14px_40px_-10px_rgba(0,0,0,0.18)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-300 cursor-pointer">
+                            Bergabung sekarang
+                            <span class="group-hover:translate-x-0.5 transition-transform duration-300">&rarr;</span>
+                        </button>
+                    @endif
                     <a href="#tentang"
                        class="px-7 py-4 text-[14px] font-medium text-gray-500 hover:text-gray-900 rounded-[18px] hover:bg-white/40 transition-all duration-300">
                         Selengkapnya

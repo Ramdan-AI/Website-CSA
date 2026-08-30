@@ -19,11 +19,22 @@
                     CSA adalah komunitas mahasiswa STMIK Mardira Indonesia yang menjadi tempat untuk belajar dan membangun karya bersama.
                 </p>
 
+                @php
+                    $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+                @endphp
+
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full" data-reveal="up" data-reveal-delay="0.6">
-                    <a href="{{ route('register') }}"
-                        class="inline-flex items-center justify-center gap-2 px-7 min-h-[52px] bg-gray-900 text-white text-sm sm:text-[15px] font-semibold rounded-xl hover:bg-gray-800 active:scale-[0.98] transition-all duration-200 w-full sm:w-auto text-center">
-                        Daftar sekarang
-                    </a>
+                    @if ($regOpen)
+                        <a href="{{ route('register') }}"
+                            class="inline-flex items-center justify-center gap-2 px-7 min-h-[52px] bg-gray-900 text-white text-sm sm:text-[15px] font-semibold rounded-xl hover:bg-gray-800 active:scale-[0.98] transition-all duration-200 w-full sm:w-auto text-center">
+                            Daftar sekarang
+                        </a>
+                    @else
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                            class="inline-flex items-center justify-center gap-2 px-7 min-h-[52px] bg-gray-900 text-white text-sm sm:text-[15px] font-semibold rounded-xl hover:bg-gray-800 active:scale-[0.98] transition-all duration-200 w-full sm:w-auto text-center cursor-pointer">
+                            Daftar sekarang
+                        </button>
+                    @endif
                     <a href="#tentang"
                         class="inline-flex items-center justify-center gap-2 px-7 min-h-[52px] sm:min-h-0 sm:py-2 bg-white/70 sm:bg-transparent border border-gray-200 sm:border-0 rounded-xl sm:rounded-none text-sm sm:text-[15px] font-medium text-gray-500 hover:text-gray-900 transition-colors duration-200 w-full sm:w-auto text-center">
                         Pelajari lebih lanjut &rarr;

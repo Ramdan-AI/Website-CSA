@@ -108,12 +108,24 @@
                         </div>
                     @endforeach
 
-                    <a href="{{ route('register') }}"
-                        class="group snap-start flex flex-col justify-between h-72 sm:h-[300px] rounded-[2px] bg-[#0B1B3B] hover:bg-[#122A52] transition-colors duration-300 p-4 overflow-hidden">
-                        <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9DB8E8]">Generasi berikutnya</p>
-                        <p class="flex-1 flex items-center justify-center text-center text-[14px] font-extrabold uppercase leading-[1.2] tracking-[0.08em] text-white [writing-mode:vertical-rl]">Bergabung</p>
-                        <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-[#E8A33D] transition-transform duration-300 group-hover:translate-x-0.5">Daftar &rarr;</p>
-                    </a>
+                    @php
+                        $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+                    @endphp
+                    @if ($regOpen)
+                        <a href="{{ route('register') }}"
+                            class="group snap-start flex flex-col justify-between h-72 sm:h-[300px] rounded-[2px] bg-[#0B1B3B] hover:bg-[#122A52] transition-colors duration-300 p-4 overflow-hidden">
+                            <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9DB8E8]">Generasi berikutnya</p>
+                            <p class="flex-1 flex items-center justify-center text-center text-[14px] font-extrabold uppercase leading-[1.2] tracking-[0.08em] text-white [writing-mode:vertical-rl]">Bergabung</p>
+                            <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-[#E8A33D] transition-transform duration-300 group-hover:translate-x-0.5">Daftar &rarr;</p>
+                        </a>
+                    @else
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                            class="group snap-start flex flex-col justify-between h-72 sm:h-[300px] rounded-[2px] bg-[#0B1B3B] hover:bg-[#122A52] transition-colors duration-300 p-4 overflow-hidden text-left cursor-pointer">
+                            <p class="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#9DB8E8]">Generasi berikutnya</p>
+                            <p class="flex-1 flex items-center justify-center text-center text-[14px] font-extrabold uppercase leading-[1.2] tracking-[0.08em] text-white [writing-mode:vertical-rl]">Bergabung</p>
+                            <p class="text-[9px] font-bold uppercase tracking-[0.18em] text-[#E8A33D] transition-transform duration-300 group-hover:translate-x-0.5">Daftar &rarr;</p>
+                        </button>
+                    @endif
                 </div>
             </div>
             @endif

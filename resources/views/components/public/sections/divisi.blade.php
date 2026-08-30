@@ -25,6 +25,7 @@
                     @php
                         $divisionImg = $imageUrl($division, 320);
                         $total = $divisions->count();
+                        $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
                     @endphp
                     <div class="group flex flex-col rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#3664AF]/25 hover:shadow-[0_20px_48px_-20px_rgba(54,100,175,0.25)] hover:-translate-y-1 transition-all duration-300">
                         {{-- Top row: index + logo --}}
@@ -56,11 +57,19 @@
 
                         <div class="flex items-center justify-between gap-4 mt-6 pt-5 border-t border-gray-100">
                             <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">Divisi {{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }} / {{ str_pad($total, 2, '0', STR_PAD_LEFT) }}</span>
-                            <a href="{{ route('register') }}"
-                                class="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3664AF] hover:text-gray-900 transition-colors duration-200">
-                                Gabung divisi ini
-                                <i class="fas fa-arrow-right text-[10px] transition-transform duration-300 group-hover:translate-x-1"></i>
-                            </a>
+                            @if ($regOpen)
+                                <a href="{{ route('register') }}"
+                                    class="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3664AF] hover:text-gray-900 transition-colors duration-200">
+                                    Gabung divisi ini
+                                    <i class="fas fa-arrow-right text-[10px] transition-transform duration-300 group-hover:translate-x-1"></i>
+                                </a>
+                            @else
+                                <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                                    class="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3664AF] hover:text-gray-900 transition-colors duration-200 cursor-pointer">
+                                    Gabung divisi ini
+                                    <i class="fas fa-arrow-right text-[10px] transition-transform duration-300 group-hover:translate-x-1"></i>
+                                </button>
+                            @endif
                         </div>
                     </div>
                 @endforeach
