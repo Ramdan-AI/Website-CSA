@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class GalleryRequest extends FormRequest
@@ -15,22 +14,27 @@ class GalleryRequest extends FormRequest
     public function rules(): array
     {
         return [
-
-            'album_id' => [
-                'required',
-                'exists:albums,id'
-            ],
-
+            'album_id' => ['required', 'exists:albums,id'],
+            'caption' => ['nullable', 'string', 'max:255'],
             'image' => [
-                'required',
-                'max:255'
+                $this->isMethod('post') ? 'required' : 'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:3020',
             ],
+        ];
+    }
 
-            'caption' => [
-                'nullable',
-                'max:255'
-            ]
-
+    public function messages(): array
+    {
+        return [
+            'album_id.required' => 'Album wajib dipilih.',
+            'album_id.exists' => 'Album tidak valid.',
+            'caption.max' => 'Keterangan maksimal 255 karakter.',
+            'image.required' => 'Foto wajib diupload.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus JPEG, PNG, JPG, atau WEBP.',
+            'image.max' => 'Ukuran gambar maksimal 5MB.',
         ];
     }
 }

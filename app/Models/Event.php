@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -18,9 +19,13 @@ class Event extends Model
         'status'
     ];
 
-    protected $casts = [
-        'event_date' => 'date'
-    ];
+    protected function casts(): array
+    {
+        return [
+            'event_date' => 'date',
+            'status' => 'string',
+        ];
+    }
 
     public function user()
     {
@@ -35,5 +40,10 @@ class Event extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function getBannerUrlAttribute()
+    {
+        return $this->banner ? Storage::disk('public')->url($this->banner) : null;
     }
 }

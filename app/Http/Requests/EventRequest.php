@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EventRequest extends FormRequest
@@ -15,45 +14,47 @@ class EventRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'title' => [
                 'required',
+                'string',
                 'max:255'
             ],
-
-            'slug' => [
-                'required',
-                'max:255'
-            ],
-
             'description' => [
-                'required'
+                'required',
+                'string'
             ],
-
             'location' => [
                 'nullable',
+                'string',
                 'max:255'
             ],
-
             'event_date' => [
                 'required',
                 'date'
             ],
-
             'banner' => [
                 'nullable',
-                'max:255'
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048'
             ],
-
             'registration_link' => [
                 'nullable',
+                'url',
                 'max:255'
             ],
-
             'status' => [
-                'required'
+                'required',
+                'in:draft,published,closed'
             ]
+        ];
+    }
 
+    public function messages(): array
+    {
+        return [
+            'status.in' => 'Status kegiatan harus draft, published, atau closed.',
+            'registration_link.url' => 'Link pendaftaran harus berupa URL yang valid.',
         ];
     }
 }

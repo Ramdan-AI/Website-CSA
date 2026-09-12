@@ -1,337 +1,212 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+
 <head>
     <meta charset="UTF-8">
-
-    <title>CSA Admin</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSA Admin Panel</title>
+    <link rel="icon" href="{{ asset('storage/system/logos/csa.png') }}" type="image/png">
+    <link rel="preconnect" href="https://fonts.bunny.net">
     <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        href="https://fonts.bunny.net/css?family=geist:300,400,500,600,700&family=jetbrains-mono:400,500,600&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
+    @stack('styles')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        @keyframes contentFadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(32px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-content {
+            opacity: 0;
+            animation: contentFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        main {
+            min-height: calc(100vh - 64px);
+        }
+
+        html.sidebar-collapsed .csa-sidebar-root {
+            width: 80px !important;
+        }
+
+        html.sidebar-collapsed .main-content-container {
+            padding-left: 112px !important;
+        }
+
+        html.sidebar-collapsed .csa-sidebar-hideable {
+            opacity: 0 !important;
+            transform: translateX(-16px) !important;
+            pointer-events: none !important;
+            position: relative !important;
+        }
+
+        html.sidebar-collapsed .csa-sidebar-nav-header {
+            opacity: 0 !important;
+        }
+
+        .csa-sidebar-root {
+            width: 280px;
+        }
+
+        body.page-ready .csa-sidebar-root {
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.page-ready .main-content-container {
+            transition: padding-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.page-ready .csa-sidebar-hideable {
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.page-ready .csa-sidebar-nav-header {
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
 </head>
 
-<body>
+<body class="text-gray-900 font-sans antialiased overflow-x-hidden"
+    style="background: linear-gradient(135deg, #EEF2FF 0%, #F1F5F9 50%, #FAF5FF 100%); background-attachment: fixed;"
+    x-data="{
+        sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true')
+    }" @sidebar-toggled.window="sidebarExpanded = $event.detail.expanded">
 
-<nav class="navbar navbar-dark bg-dark">
+    <script>
+        (function() {
+            const isExpanded = JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true');
+            if (!isExpanded) {
+                document.documentElement.classList.add('sidebar-collapsed');
+            }
+            document.addEventListener('alpine:initialized', () => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        document.body.classList.add('page-ready');
+                    });
+                });
+            });
+        })();
+    </script>
 
-    <div class="container-fluid">
+    <x-admin.sidebar />
 
-        <span class="navbar-brand">
+    <div class="main-content-container flex flex-col min-h-screen"
+        :class="sidebarExpanded ? 'pl-[312px]' : 'pl-[112px]'">
 
-            CSA ADMIN PANEL
+        <x-admin.topbar />
 
-        </span>
-
-        <div class="d-flex align-items-center gap-3">
-
-            <span class="text-white">
-
-                {{ auth()->user()->name }}
-                ({{ auth()->user()->role->name }})
-
-            </span>
-
-            <form
-                action="{{ route('logout') }}"
-                method="POST">
-
-                @csrf
-
-                <button
-                    class="btn btn-danger btn-sm">
-
-                    Logout
-
-                </button>
-
-            </form>
-
-        </div>
-
+        <main class="p-8">
+            <div class="page-content">
+                @yield('content')
+            </div>
+        </main>
     </div>
 
-</nav>
-
-<div class="container-fluid">
-
-    <div class="row">
-
-        <div class="col-md-2 bg-light min-vh-100 p-3">
-
-            <h5>Menu</h5>
-
-            <ul class="nav flex-column">
-
-                {{-- Dashboard (Semua Role) --}}
-
-                <li class="nav-item">
-
-                    <a
-                        href="{{ route('admin.dashboard') }}"
-                        class="nav-link">
-
-                        Dashboard
-
-                    </a>
-
-                </li>
-
-                {{-- Super Admin Only --}}
-
-                @if(
-                    auth()->user()->role->slug
-                    === 'super-admin'
-                )
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.divisions.index') }}"
-                            class="nav-link">
-
-                            Divisions
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.positions.index') }}"
-                            class="nav-link">
-
-                            Positions
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.settings.edit') }}"
-                            class="nav-link">
-
-                            Settings
-
-                        </a>
-
-                    </li>
-
-                @endif
-
-                {{-- Sekretaris + Super Admin --}}
-
-                @if(
-                    in_array(
-                        auth()->user()->role->slug,
-                        [
-                            'super-admin',
-                            'sekretaris'
-                        ]
-                    )
-                )
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.news-categories.index') }}"
-                            class="nav-link">
-
-                            News Categories
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.news.index') }}"
-                            class="nav-link">
-
-                            News
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.documents.index') }}"
-                            class="nav-link">
-
-                            Documents
-
-                        </a>
-
-                    </li>
-
-                @endif
-
-                {{-- Bendahara + Super Admin --}}
-
-                @if(
-                    in_array(
-                        auth()->user()->role->slug,
-                        [
-                            'super-admin',
-                            'bendahara'
-                        ]
-                    )
-                )
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.incomes.index') }}"
-                            class="nav-link">
-
-                            Incomes
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.expenses.index') }}"
-                            class="nav-link">
-
-                            Expenses
-
-                        </a>
-
-                    </li>
-
-                @endif
-
-                {{-- Kepala Divisi + Super Admin --}}
-
-                @if(
-                    in_array(
-                        auth()->user()->role->slug,
-                        [
-                            'super-admin',
-                            'kepala-divisi'
-                        ]
-                    )
-                )
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.members.index') }}"
-                            class="nav-link">
-
-                            Members
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.events.index') }}"
-                            class="nav-link">
-
-                            Events
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.event-registrations.index') }}"
-                            class="nav-link">
-
-                            Event Registrations
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.attendances.index') }}"
-                            class="nav-link">
-
-                            Attendances
-
-                        </a>
-
-                    </li>
-
-                @endif
-
-                {{-- Ketua + Super Admin --}}
-
-                @if(
-                    in_array(
-                        auth()->user()->role->slug,
-                        [
-                            'super-admin',
-                            'ketua'
-                        ]
-                    )
-                )
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.albums.index') }}"
-                            class="nav-link">
-
-                            Albums
-
-                        </a>
-
-                    </li>
-
-                    <li class="nav-item">
-
-                        <a
-                            href="{{ route('admin.galleries.index') }}"
-                            class="nav-link">
-
-                            Galleries
-
-                        </a>
-
-                    </li>
-
-                @endif
-
-            </ul>
-
-        </div>
-
-        <div class="col-md-10 p-4">
-
-            @if(session('success'))
-
-                <div class="alert alert-success">
-
-                    {{ session('success') }}
-
-                </div>
-
-            @endif
-
-            @yield('content')
-
-        </div>
-
-    </div>
-
-</div>
-
+    <x-admin.modal.delete id="deleteModal" />
+    <x-admin.modal.image-preview id="imagePreviewModal" />
+    <x-admin.modal.docs-preview />
+
+    <x-admin.toast id="globalToast" />
+
+    <script>
+        function openDeleteModal(modalId, url) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(modalId + 'Content');
+            const form = document.getElementById(modalId + 'Form');
+
+            if (form) form.action = url;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+
+            requestAnimationFrame(() => {
+                modal.style.opacity = '1';
+                content.style.transform = 'scale(1)';
+            });
+        }
+
+        function closeDeleteModal(modalId, event) {
+            if (event && event.target !== document.getElementById(modalId)) return;
+
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(modalId + 'Content');
+
+            modal.style.opacity = '0';
+            content.style.transform = 'scale(0.9)';
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        function openImagePreview(modalId, imageUrl, title) {
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(modalId + 'Content');
+            const img = document.getElementById(modalId + 'Image');
+            const titleEl = document.getElementById(modalId + 'Title');
+            const download = document.getElementById(modalId + 'Download');
+
+            if (img) img.src = imageUrl;
+            if (titleEl) titleEl.textContent = title;
+            if (download) download.href = imageUrl;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+
+            requestAnimationFrame(() => {
+                modal.style.opacity = '1';
+                content.style.transform = 'scale(1)';
+            });
+        }
+
+        function closeImagePreview(modalId, event) {
+            if (event && event.target !== document.getElementById(modalId)) return;
+
+            const modal = document.getElementById(modalId);
+            const content = document.getElementById(modalId + 'Content');
+
+            modal.style.opacity = '0';
+            content.style.transform = 'scale(0.95)';
+
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('[id$="Modal"]').forEach(modal => {
+                    if (!modal.classList.contains('hidden')) {
+                        if (modal.id.includes('delete')) {
+                            closeDeleteModal(modal.id);
+                        } else {
+                            closeImagePreview(modal.id);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+
+    @stack('scripts')
 </body>
+
 </html>

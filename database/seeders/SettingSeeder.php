@@ -14,10 +14,11 @@ class SettingSeeder extends Seeder
             'email' => 'admin@csa.local',
             'phone' => '08123456789',
             'address' => 'Indonesia',
-            'instagram' => 'https://instagram.com/csa',
-            'youtube' => 'https://youtube.com/@csa',
-            'linkedin' => null,
+            'instagram' => 'https://www.instagram.com/csa_stmikmi/',
+            'youtube' => 'https://www.youtube.com/@csaworks143',
+            'linkedin' => 'https://www.linkedin.com/company/creative-student-association/',
             'about' => 'Computer Student Association',
+            'registration_open' => false,
         ]);
     }
 }

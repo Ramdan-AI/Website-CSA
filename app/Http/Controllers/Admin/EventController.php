@@ -6,6 +6,8 @@ use App\Models\Event;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EventRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
@@ -15,43 +17,28 @@ class EventController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.events.index',
+        return view('pages.events.index',
             compact('events')
         );
     }
 
     public function create()
     {
-        return view(
-            'admin.events.create'
-        );
+        $event = new Event();
+        return view('pages.events.form', compact('event'));
     }
 
-    public function store(
-        EventRequest $request
-    ) {
-        Event::create([
+    public function store(EventRequest $request)
+    {
+        $data = $request->validated();
+        $data['user_id'] = Auth::id();
+        $data['slug'] = Str::slug($request->title);
 
-            'user_id' => Auth::id(),
+        if ($request->hasFile('banner')) {
+            $data['banner'] = $request->file('banner')->store('events', 'public');
+        }
 
-            'title' => $request->title,
-
-            'slug' => $request->slug,
-
-            'description' => $request->description,
-
-            'location' => $request->location,
-
-            'event_date' => $request->event_date,
-
-            'banner' => $request->banner,
-
-            'registration_link' => $request->registration_link,
-
-            'status' => $request->status
-
-        ]);
+        Event::create($data);
 
         return redirect()
             ->route('admin.events.index')
@@ -61,38 +48,24 @@ class EventController extends Controller
             );
     }
 
-    public function edit(
-        Event $event
-    ) {
-        return view(
-            'admin.events.edit',
-            compact('event')
-        );
+    public function edit(Event $event)
+    {
+        return view('pages.events.form', compact('event'));
     }
 
-    public function update(
-        EventRequest $request,
-        Event $event
-    ) {
-        $event->update([
+    public function update(EventRequest $request, Event $event)
+    {
+        $data = $request->validated();
+        $data['slug'] = Str::slug($request->title);
 
-            'title' => $request->title,
+        if ($request->hasFile('banner')) {
+            if ($event->banner) {
+                Storage::disk('public')->delete($event->banner);
+            }
+            $data['banner'] = $request->file('banner')->store('events', 'public');
+        }
 
-            'slug' => $request->slug,
-
-            'description' => $request->description,
-
-            'location' => $request->location,
-
-            'event_date' => $request->event_date,
-
-            'banner' => $request->banner,
-
-            'registration_link' => $request->registration_link,
-
-            'status' => $request->status
-
-        ]);
+        $event->update($data);
 
         return redirect()
             ->route('admin.events.index')
@@ -102,9 +75,11 @@ class EventController extends Controller
             );
     }
 
-    public function destroy(
-        Event $event
-    ) {
+    public function destroy(Event $event)
+    {
+        if ($event->banner) {
+            Storage::disk('public')->delete($event->banner);
+        }
         $event->delete();
 
         return back()->with(

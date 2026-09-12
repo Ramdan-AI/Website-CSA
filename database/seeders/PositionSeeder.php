@@ -14,12 +14,41 @@ class PositionSeeder extends Seeder
     public function run(): void
     {
         Position::insert([
-            ['name' => 'Ketua'],
-            ['name' => 'Wakil Ketua'],
-            ['name' => 'Sekretaris'],
-            ['name' => 'Bendahara'],
-            ['name' => 'Kepala Divisi'],
-            ['name' => 'Staff'],
+            [
+                'name' => 'Ketua',
+                'description' => 'Pimpinan tertinggi organisasi',
+                'max_members' => 1
+            ],
+            [
+                'name' => 'Wakil Ketua',
+                'description' => 'Mendampingi ketua',
+                'max_members' => 1
+            ],
+            [
+                'name' => 'Ketua Divisi',
+                'description' => 'Pemimpin divisi',
+                'max_members' => 5
+            ],
+            [
+                'name' => 'Wakil Ketua Divisi',
+                'description' => 'Mendampingi ketua divisi',
+                'max_members' => 5
+            ],
+            [
+                'name' => 'Sekretaris',
+                'description' => 'Mengurus administrasi organisasi',
+                'max_members' => 2
+            ],
+            [
+                'name' => 'Bendahara',
+                'description' => 'Mengurus keuangan organisasi',
+                'max_members' => 2
+            ],
+            [
+                'name' => 'Anggota',
+                'description' => 'Anggota biasa',
+                'max_members' => 150
+            ],
         ]);
     }
 }

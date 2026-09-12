@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class DivisionRequest extends FormRequest
 {
@@ -14,15 +14,51 @@ class DivisionRequest extends FormRequest
 
     public function rules(): array
     {
+        $divisionId = $this->route('division')?->id;
+
         return [
             'name' => [
                 'required',
-                'max:255'
+                'max:255',
+                Rule::unique('divisions', 'name')
+                    ->whereNull('deleted_at')
+                    ->ignore($divisionId),
             ],
-
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+            ],
             'description' => [
-                'nullable'
-            ]
+                'nullable',
+                'string',
+                'max:1000',
+            ],
+            'skills' => [
+                'nullable',
+                'array',
+            ],
+            'skills.*' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+            'is_active' => [
+                'boolean',
+            ],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'Nama divisi wajib diisi.',
+            'name.max' => 'Nama divisi maksimal 255 karakter.',
+            'name.unique' => 'Nama divisi sudah digunakan.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format gambar harus JPEG, PNG, JPG, atau WEBP.',
+            'image.max' => 'Ukuran gambar maksimal 2MB.',
         ];
     }
 }

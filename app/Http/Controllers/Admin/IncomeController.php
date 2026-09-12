@@ -15,16 +15,14 @@ class IncomeController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.incomes.index',
+        return view('pages.incomes.index',
             compact('incomes')
         );
     }
 
     public function create()
     {
-        return view(
-            'admin.incomes.create'
+        return view('pages.incomes.form'
         );
     }
 
@@ -56,8 +54,7 @@ class IncomeController extends Controller
     public function edit(
         Income $income
     ) {
-        return view(
-            'admin.incomes.edit',
+        return view('pages.incomes.form',
             compact('income')
         );
     }

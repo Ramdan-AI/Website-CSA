@@ -21,34 +21,30 @@ return new class extends Migration
                 ->nullOnDelete();
 
             $table->foreignId('division_id')
+                ->nullable()
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
 
             $table->foreignId('position_id')
+                ->nullable()
                 ->constrained()
                 ->cascadeOnUpdate()
-                ->restrictOnDelete();
+                ->nullOnDelete();
 
             $table->string('name');
-
+            $table->string('slug')->unique();
             $table->string('nim')->nullable();
-
+            $table->string('email')->nullable()->unique();
             $table->string('photo')->nullable();
-
             $table->text('bio')->nullable();
-
             $table->string('phone')->nullable();
-
             $table->string('linkedin')->nullable();
-
             $table->string('instagram')->nullable();
-
             $table->string('github')->nullable();
-
             $table->boolean('is_active')->default(true);
-
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

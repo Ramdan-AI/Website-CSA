@@ -13,22 +13,44 @@ class DocumentRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-
+        $rules = [
             'title' => [
                 'required',
+                'string',
                 'max:255'
             ],
-
-            'file' => [
-                'required',
-                'max:255'
-            ],
-
             'description' => [
-                'nullable'
-            ]
+                'nullable',
+                'string'
+            ],
+        ];
 
+        // File is required on create, optional on update
+        if ($this->isMethod('POST')) {
+            $rules['file'] = [
+                'required',
+                'file',
+                'mimes:pdf,doc,docx,xls,xlsx',
+                'max:10240'
+            ];
+        } else {
+            $rules['file'] = [
+                'nullable',
+                'file',
+                'mimes:pdf,doc,docx,xls,xlsx',
+                'max:10240'
+            ];
+        }
+
+        return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'file.required' => 'File dokumen wajib diunggah.',
+            'file.mimes' => 'File harus berupa PDF, DOC, DOCX, XLS, atau XLSX.',
+            'file.max' => 'Ukuran file maksimal 10 MB.',
         ];
     }
 }

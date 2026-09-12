@@ -6,6 +6,29 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+}
+
+@layer base {
+    html {
+        font-family: var(--font-sans);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* Zero hardcode policy — body color is set via utility class on the <body> tag */
+    body {
+        @apply antialiased subpixel-antialiased selection:bg-blue-500 selection:text-white;
+    }
+
+    input[type="checkbox"] {
+        accent-color: #2563eb;
+    }
+
+    /* Hide Alpine-managed elements before the framework boots. */
+    [x-cloak] {
+        display: none !important;
+    }
 }

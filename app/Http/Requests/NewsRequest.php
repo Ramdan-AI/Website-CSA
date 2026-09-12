@@ -14,34 +14,34 @@ class NewsRequest extends FormRequest
     public function rules(): array
     {
         return [
-
             'category_id' => [
                 'required',
                 'exists:news_categories,id'
             ],
-
             'title' => [
                 'required',
+                'string',
                 'max:255'
             ],
-
-            'slug' => [
-                'required',
-                'max:255'
-            ],
-
             'content' => [
-                'required'
+                'required',
+                'string'
             ],
-
             'status' => [
-                'required'
+                'required',
+                'in:draft,published'
             ],
-
             'published_at' => [
-                'nullable'
+                'nullable',
+                'date'
             ]
+        ];
+    }
 
+    public function messages(): array
+    {
+        return [
+            'status.in' => 'Status berita harus draft atau published.',
         ];
     }
 }

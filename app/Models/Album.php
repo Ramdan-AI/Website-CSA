@@ -12,6 +12,14 @@ class Album extends Model
         'cover_image'
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ];
+    }
+
     public function galleries()
     {
         return $this->hasMany(Gallery::class);

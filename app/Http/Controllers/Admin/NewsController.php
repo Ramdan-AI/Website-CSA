@@ -19,8 +19,7 @@ class NewsController extends Controller
             ->latest()
             ->paginate(10);
 
-        return view(
-            'admin.news.index',
+        return view('pages.news.index',
             compact('news')
         );
     }
@@ -29,8 +28,7 @@ class NewsController extends Controller
     {
         $categories = NewsCategory::orderBy('name')->get();
 
-        return view(
-            'admin.news.create',
+        return view('pages.news.create',
             compact('categories')
         );
     }
@@ -45,8 +43,6 @@ class NewsController extends Controller
             'user_id' => Auth::id(),
 
             'title' => $request->title,
-
-            'slug' => $request->slug,
 
             'content' => $request->content,
 
@@ -69,8 +65,7 @@ class NewsController extends Controller
     ) {
         $categories = NewsCategory::orderBy('name')->get();
 
-        return view(
-            'admin.news.edit',
+        return view('pages.news.edit',
             compact(
                 'news',
                 'categories'
@@ -87,8 +82,6 @@ class NewsController extends Controller
             'category_id' => $request->category_id,
 
             'title' => $request->title,
-
-            'slug' => $request->slug,
 
             'content' => $request->content,
 
