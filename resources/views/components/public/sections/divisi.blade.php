@@ -1,79 +1,164 @@
-{{-- DIVISI: clean scannable grid — find your path in one glance --}}
-<section id="divisi" class="relative py-20 md:py-28 lg:py-32 bg-[#fafafa] scroll-mt-24">
-    <div class="max-w-[1200px] mx-auto px-5 sm:px-8">
-        {{-- Header --}}
-        <div class="max-w-[760px] mb-12 sm:mb-16">
-            <p class="text-[11px] sm:text-xs font-semibold text-[#3664AF] tracking-[0.18em] uppercase mb-4 flex items-center gap-2.5" data-reveal="down">
-                <span class="w-2 h-2 rounded-[2px] bg-[#3664AF]"></span>
-                Divisi &middot; <span class="font-mono tabular-nums">{{ $divisions->count() }}</span>
-            </p>
-            <h2 class="text-[clamp(1.8rem,4.5vw,3rem)] font-bold text-gray-900 leading-[1.12] tracking-tight" data-reveal="curtain" data-reveal-delay="0.1">
-                Bidang yang kami <span class="text-[#3664AF]">fokuskan</span>
+<section id="divisi" class="relative overflow-hidden bg-[#f7f8fa] py-24 md:py-32 lg:py-36 scroll-mt-24">
+    <div class="mx-auto max-w-[1240px] px-5 sm:px-8">
+
+        <div class="mb-14 max-w-[720px] md:mb-18">
+            <div class="mb-5 inline-flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#3664AF]"
+                data-reveal="down">
+                <span class="h-1.5 w-1.5 rounded-full bg-[#3664AF]"></span>
+                Divisi
+            </div>
+
+            <h2 class="text-[clamp(2.25rem,5vw,4rem)] font-semibold leading-[1.02] tracking-[-0.055em] text-[#111318]"
+                data-reveal="curtain" data-reveal-delay="0.1">
+                Bidang yang kami
+                <span class="text-[#3664AF]">fokuskan.</span>
             </h2>
-            <p class="text-[15px] sm:text-lg text-gray-500 leading-relaxed mt-5" data-reveal="fade" data-reveal-delay="0.25">
-                {{ $divisions->count() }} jalur pengembangan yang saling melengkapi — setiap anggota menemukan ruang tumbuh yang sesuai minatnya.
+
+            <p class="mt-6 max-w-[620px] text-[15px] leading-7 text-[#6b7079] sm:text-[17px]" data-reveal="fade"
+                data-reveal-delay="0.2">
+                {{ $divisions->count() }} jalur pengembangan yang saling melengkapi —
+                setiap anggota menemukan ruang untuk berkembang sesuai minat dan potensinya.
             </p>
         </div>
 
         @if ($divisions->isEmpty())
-            <div class="rounded-2xl border border-gray-200 bg-white py-20 text-center">
-                <p class="text-sm text-gray-400">Belum ada divisi yang tersedia.</p>
+
+            <div class="rounded-[24px] border border-black/[0.06] bg-white p-16 text-center">
+                <p class="text-sm text-[#8b9099]">
+                    Belum ada divisi yang tersedia.
+                </p>
             </div>
         @else
-            <div class="grid sm:grid-cols-2 gap-5 sm:gap-6" data-reveal-stagger>
-                @foreach ($divisions as $i => $division)
+            <div class="grid gap-4 md:grid-cols-2 lg:gap-5" data-reveal-stagger>
+
+                @foreach ($divisions as $division)
                     @php
                         $divisionImg = $imageUrl($division, 320);
-                        $total = $divisions->count();
-                        $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+
+                        $regOpen = Cache::remember(
+                            'setting.registration_open',
+                            60,
+                            fn() => \App\Models\Setting::first()?->registration_open ?? false,
+                        );
                     @endphp
-                    <div class="group flex flex-col rounded-2xl border border-gray-100 bg-white p-6 sm:p-8 hover:border-[#3664AF]/25 hover:shadow-[0_20px_48px_-20px_rgba(54,100,175,0.25)] hover:-translate-y-1 transition-all duration-300">
-                        {{-- Top row: index + logo --}}
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="flex items-center gap-4">
-                                <span class="font-mono text-xs font-bold text-[#3664AF] tabular-nums">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }}</span>
-                                @if ($divisionImg)
-                                    <img src="{{ $divisionImg }}" alt="{{ $division->name }}" class="h-12 w-12 object-contain" loading="lazy" decoding="async">
-                                @endif
-                            </div>
-                            <span class="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-400 whitespace-nowrap">
+
+                    <article
+                        class="group relative flex min-h-[340px] flex-col overflow-hidden
+                           rounded-[24px]
+                           border border-black/[0.06]
+                           bg-white
+                           p-7
+                           shadow-[0_4px_20px_-12px_rgba(0,0,0,0.12)]
+                           transition-[transform,box-shadow,border-color] duration-500
+                           hover:-translate-y-1
+                           hover:border-[#3664AF]/15
+                           hover:shadow-[0_24px_60px_-28px_rgba(20,40,80,0.22)]
+                           sm:p-8">
+
+                        <div class="flex items-start justify-between gap-6">
+
+                            @if ($divisionImg)
+                                <div
+                                    class="flex h-14 w-14 shrink-0 items-center justify-center
+                                       rounded-2xl
+                                       bg-[#f5f7fb]
+                                       ring-1 ring-black/[0.04]
+                                       transition-transform duration-500
+                                       group-hover:scale-105">
+
+                                    <img src="{{ $divisionImg }}" alt="{{ $division->name }}"
+                                        class="h-9 w-9 object-contain" loading="lazy" decoding="async">
+                                </div>
+                            @endif
+
+                            <span class="pt-1 text-[11px] font-medium text-[#9a9ea6]">
                                 {{ $division->members_count ?? 0 }} anggota
                             </span>
                         </div>
 
-                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight mt-5 group-hover:text-[#3664AF] transition-colors duration-300">{{ $division->name }}</h3>
+                        <div class="mt-7">
+                            <h3
+                                class="text-[24px] font-semibold tracking-[-0.035em] text-[#111318]
+                                   transition-colors duration-300
+                                   group-hover:text-[#3664AF]">
+                                {{ $division->name }}
+                            </h3>
 
-                        <p class="text-sm sm:text-[15px] text-gray-500 leading-relaxed mt-3 flex-1">
-                            {{ $division->description ?? 'Tidak ada deskripsi' }}
-                        </p>
+                            <p class="mt-3 max-w-[560px] text-[14px] leading-6 text-[#737780] sm:text-[15px]">
+                                {{ $division->description ?? 'Tidak ada deskripsi' }}
+                            </p>
+                        </div>
 
                         @if (!empty($division->skills))
-                            <div class="flex flex-wrap gap-2 mt-5">
+                            <div class="mt-6 flex flex-wrap gap-2">
                                 @foreach ($division->skills as $skill)
-                                    <span class="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-gray-500 bg-[#f4f7fd] border border-gray-100 rounded-lg px-2.5 py-1.5">{{ $skill }}</span>
+                                    <span
+                                        class="rounded-full bg-[#f5f6f8] px-3 py-1.5
+                                           text-[10px] font-medium tracking-[0.04em] text-[#747982]
+                                           transition-colors duration-300
+                                           group-hover:bg-[#f0f4fb]">
+                                        {{ $skill }}
+                                    </span>
                                 @endforeach
                             </div>
                         @endif
 
-                        <div class="flex items-center justify-between gap-4 mt-6 pt-5 border-t border-gray-100">
-                            <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-gray-400">Divisi {{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }} / {{ str_pad($total, 2, '0', STR_PAD_LEFT) }}</span>
+                        <div class="mt-auto flex items-center justify-between gap-4 pt-8">
+
+                            <span class="text-[12px] text-[#a0a4ab]">
+                                {{ $division->members_count ?? 0 }} orang sedang berkembang di sini
+                            </span>
+
                             @if ($regOpen)
                                 <a href="{{ route('register') }}"
-                                    class="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3664AF] hover:text-gray-900 transition-colors duration-200">
-                                    Gabung divisi ini
-                                    <i class="fas fa-arrow-right text-[10px] transition-transform duration-300 group-hover:translate-x-1"></i>
+                                    class="inline-flex shrink-0 items-center gap-2
+                                       rounded-full
+                                       bg-[#111318]
+                                       px-4 py-2.5
+                                       text-[12px] font-medium text-white
+                                       transition-all duration-300
+                                       hover:bg-[#3664AF]
+                                       active:scale-[0.97]">
+
+                                    Bergabung
+
+                                    <svg class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+                                        viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.5"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
                                 </a>
                             @else
-                                <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
-                                    class="inline-flex items-center gap-2 text-[13px] font-semibold text-[#3664AF] hover:text-gray-900 transition-colors duration-200 cursor-pointer">
-                                    Gabung divisi ini
-                                    <i class="fas fa-arrow-right text-[10px] transition-transform duration-300 group-hover:translate-x-1"></i>
+                                <button type="button"
+                                    onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                                    class="inline-flex shrink-0 cursor-pointer items-center gap-2
+                                       rounded-full
+                                       bg-[#111318]
+                                       px-4 py-2.5
+                                       text-[12px] font-medium text-white
+                                       transition-all duration-300
+                                       hover:bg-[#3664AF]
+                                       active:scale-[0.97]">
+
+                                    Bergabung
+
+                                    <svg class="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+                                        viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                                        <path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" stroke="currentColor" stroke-width="1.5"
+                                            stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
                                 </button>
                             @endif
+
                         </div>
-                    </div>
+                    </article>
                 @endforeach
+
             </div>
+
         @endif
+
     </div>
+    ```
+
 </section>
