@@ -37,7 +37,7 @@ class AdminNavigation
     public function settings(): array
     {
         return collect(config('admin.settings'))
-            ->filter(fn (array $item) => $this->authorized([$item['permission']]))
+            ->filter(fn (array $item) => $this->authorized(isset($item['permission']) ? Arr::wrap($item['permission']) : []))
             ->values()
             ->all();
     }

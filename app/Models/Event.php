@@ -16,7 +16,12 @@ class Event extends Model
         'event_date',
         'banner',
         'registration_link',
-        'status'
+        'status',
+        'attendance_enabled',
+        'attendance_code',
+        'qr_code',
+        'attendance_opened_at',
+        'attendance_closed_at'
     ];
 
     protected function casts(): array
@@ -24,6 +29,9 @@ class Event extends Model
         return [
             'event_date' => 'date',
             'status' => 'string',
+            'attendance_enabled' => 'boolean',
+            'attendance_opened_at' => 'datetime',
+            'attendance_closed_at' => 'datetime',
         ];
     }
 

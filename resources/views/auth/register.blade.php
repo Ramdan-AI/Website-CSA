@@ -30,24 +30,35 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="email" class="block text-[13px] font-semibold text-gray-700 mb-1.5">Alamat Email</label>
-                        <input type="email" name="email" id="email" value="{{ old('email') }}"
-                            placeholder="kamu@stmikmi.ac.id" autocomplete="email" required
-                            class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 transition-all bg-white/80 @error('email') border-red-300 @enderror">
-                        @error('email')
+                        <label for="nim" class="block text-[13px] font-semibold text-gray-700 mb-1.5">NIM <span class="text-red-500">*</span></label>
+                        <input type="text" name="nim" id="nim" value="{{ old('nim') }}"
+                            placeholder="Contoh: 21130001" required
+                            class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 transition-all bg-white/80 @error('nim') border-red-300 @enderror">
+                        @error('nim')
                             <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
                         <label for="whatsapp" class="block text-[13px] font-semibold text-gray-700 mb-1.5">Nomor WhatsApp</label>
-                        <input type="text" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}"
-                            placeholder="081234567890" required
+                        <input type="tel" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}"
+                            placeholder="081234567890" pattern="[0-9+\-\s]+"
+                            oninput="this.value = this.value.replace(/[^0-9+\-\s]/g, '')" required
                             class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 transition-all bg-white/80 @error('whatsapp') border-red-300 @enderror">
                         @error('whatsapp')
                             <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                <div>
+                    <label for="email" class="block text-[13px] font-semibold text-gray-700 mb-1.5">Alamat Email</label>
+                    <input type="email" name="email" id="email" value="{{ old('email') }}"
+                        placeholder="kamu@stmikmi.ac.id" autocomplete="email" required
+                        class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/15 transition-all bg-white/80 @error('email') border-red-300 @enderror">
+                    @error('email')
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 {{-- PEMILIHAN DIVISI --}}

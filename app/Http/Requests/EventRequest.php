@@ -46,6 +46,9 @@ class EventRequest extends FormRequest
             'status' => [
                 'required',
                 'in:draft,published,closed'
+            ],
+            'attendance_enabled' => [
+                'boolean'
             ]
         ];
     }

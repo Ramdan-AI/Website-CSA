@@ -18,6 +18,9 @@ use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\IncomeController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\AttendanceManagerController;
+use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\RoleController;
 
 use App\Http\Controllers\Frontend\HomeController as FrontendHomeController;
@@ -48,6 +51,13 @@ Route::prefix('{roleSlug}')
     ->group(function () {
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/search', [SearchController::class, 'search'])->name('search');
+
+        Route::middleware(['auth'])->group(function () {
+            Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::put('profile', [ProfileController::class, 'update'])->name('profile.update');
+            Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+        });
 
         Route::middleware(['can:manage-divisions'])->group(function () {
             Route::resource('divisions', DivisionController::class)->except(['show']);
@@ -85,8 +95,22 @@ Route::prefix('{roleSlug}')
 
         // Attendances
         Route::middleware(['can:manage-attendances'])->group(function () {
-            Route::resource('attendances', AttendanceController::class);
+            Route::get('attendances', [AttendanceManagerController::class, 'index'])->name('attendances.index');
+            Route::get('attendances/events/{event}', [AttendanceManagerController::class, 'showEvent'])->name('attendances.event');
+            Route::post('attendances/events/{event}/bulk', [AttendanceManagerController::class, 'bulkManual'])->name('attendances.bulk');
+            Route::post('events/{event}/attendance/toggle', [AttendanceManagerController::class, 'toggleAttendance'])->name('attendance.toggle');
+            Route::post('events/{event}/attendance/open', [AttendanceManagerController::class, 'openAttendance'])->name('attendance.open');
+            Route::post('events/{event}/attendance/close', [AttendanceManagerController::class, 'closeAttendance'])->name('attendance.close');
+            Route::post('events/{event}/attendance/qr', [AttendanceManagerController::class, 'generateQrCode'])->name('attendance.qr');
+            Route::get('attendances/events/{event}/qr', [AttendanceManagerController::class, 'showQr'])->name('attendances.qr');
+            Route::post('events/{event}/attendance/manual', [AttendanceManagerController::class, 'manualAttendance'])->name('attendance.manual');
+            Route::get('events/{event}/attendance/export', [AttendanceManagerController::class, 'exportAttendance'])->name('attendance.export');
+            Route::get('events/{event}/attendance/stats', [AttendanceManagerController::class, 'getStats'])->name('attendance.stats');
         });
+
+        // Self attendance for members
+        Route::post('events/{event}/attend', [AttendanceManagerController::class, 'selfAttendance'])->name('attendance.self');
+        Route::get('events/{event}/scan/{code}', [AttendanceManagerController::class, 'scanAttendance'])->name('attendance.scan');
 
         // News & Documents
         Route::middleware(['can:manage-news'])->group(function () {
@@ -99,10 +123,17 @@ Route::prefix('{roleSlug}')
             Route::resource('documents', DocumentController::class)->except(['show']);
         });
 
+        // Member self-registration for event
+        Route::post('events/{event}/register', [EventRegistrationController::class, 'register'])->name('events.register');
+
         // Events
         Route::middleware(['can:manage-events'])->group(function () {
-            Route::resource('events', EventController::class)->except(['show']);
+            Route::resource('events', EventController::class)->except(['show', 'index']);
         });
+        
+        // Members can view events
+        Route::get('events', [EventRegistrationController::class, 'index'])->name('events.index');
+        Route::get('events/{event}', [EventRegistrationController::class, 'show'])->name('events.show');
 
         Route::middleware(['can:manage-registrations'])->group(function () {
             Route::resource('event-registrations', EventRegistrationController::class);

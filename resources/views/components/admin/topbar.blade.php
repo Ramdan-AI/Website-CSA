@@ -29,19 +29,6 @@
         default => null,
     };
 
-    // Role‑based gradient ring colours
-    $ringMap = [
-        'super-admin' => 'from-blue-400 via-purple-400 to-fuchsia-400',
-        'ketua' => 'from-amber-400 via-orange-400 to-rose-400',
-        'wakil-ketua' => 'from-yellow-400 via-amber-400 to-orange-400',
-        'sekretaris' => 'from-teal-400 via-cyan-400 to-sky-400',
-        'bendahara' => 'from-emerald-400 via-green-400 to-teal-400',
-        'ketua-divisi' => 'from-violet-400 via-purple-400 to-indigo-400',
-        'wakil-ketua-divisi' => 'from-indigo-400 via-blue-400 to-violet-400',
-        'anggota' => 'from-gray-400 via-slate-400 to-zinc-400',
-    ];
-    $userRole = auth()->user()->role->slug ?? 'super-admin';
-    $ringClass = $ringMap[$userRole] ?? 'from-gray-400 via-gray-500 to-gray-600';
     $hasAvatar = !empty(auth()->user()->avatar);
 @endphp
 
@@ -88,21 +75,15 @@
 
     search() {
         if (this.query.trim().length < 2) return;
-        window.location.href = '{{ route('admin.dashboard') }}?search=' + encodeURIComponent(this.query);
+        window.location.href = '{{ route('admin.search') }}?q=' + encodeURIComponent(this.query);
     }
 }" :style="{ left: leftOffset + 'px' }"
-    class="fixed top-4 right-8 z-50 transition-all duration-500 "
-    :class="scrolled ? 'top-2' : 'top-4'">
+    class="fixed top-4 right-8 z-50 transition-all duration-300 "
+    :class="scrolled ? 'top-3' : 'top-4'">
 
-    {{-- Main surface – frosted glass with subtle noise texture overlay --}}
-    <div class="relative rounded-[32px] border border-white/20 bg-white/40 backdrop-blur-2xl shadow-[0_12px_40px_-16px_rgba(0,0,0,0.12),inset_0_0_0_0.5px_rgba(255,255,255,0.6)] transition-shadow duration-500"
-        :class="scrolled ? 'shadow-[0_20px_50px_-20px_rgba(0,0,0,0.18),inset_0_0_0_0.5px_rgba(255,255,255,0.8)]' : ''">
-
-        <div class="absolute inset-0 rounded-[32px] opacity-[0.03] pointer-events-none"
-            style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%221%22/%3E%3C/svg%3E');">
-        </div>
-
-        <div class="relative flex items-center justify-between h-[66px] px-5">
+    <div class="rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow duration-300"
+        :class="scrolled ? 'shadow-md' : ''">
+        <div class="flex items-center justify-between h-16 px-5">
             {{-- Left: page title with subtle coloured accent --}}
             <div class="flex items-center gap-4 min-w-0">
                 <div class="min-w-0">
@@ -139,7 +120,10 @@
                     <button @click="notifOpen = !notifOpen"
                         class="relative w-9 h-9 rounded-2xl flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 transition-colors group">
                         <i class="far fa-bell text-[13px] group-hover:scale-110 transition-transform"></i>
-                        <span class="absolute top-1.5 right-1.5 flex h-2 w-2">
+                        @php
+                            $unreadCount = 0; // Set to actual unread notifications count if available
+                        @endphp
+                        <span class="absolute top-1.5 right-1.5 flex h-2 w-2 @if($unreadCount === 0) hidden @endif">
                             <span
                                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                             <span
@@ -163,13 +147,9 @@
                 <div class="relative ml-2" @click.away="userMenuOpen = false">
                     <button @click="userMenuOpen = !userMenuOpen"
                         class="flex items-center gap-2.5 pl-1 pr-2 py-1 rounded-2xl hover:bg-gray-100/40 transition-colors cursor-pointer group">
-                        {{-- Avatar with role gradient ring --}}
                         <div class="relative shrink-0">
                             <div
-                                class="absolute -inset-[2px] rounded-full bg-gradient-to-br {{ $ringClass }} opacity-70 group-hover:opacity-100 transition-opacity">
-                            </div>
-                            <div
-                                class="relative w-9 h-9 rounded-full bg-white flex items-center justify-center overflow-hidden ring-2 ring-white">
+                                class="relative w-9 h-9 rounded-full bg-white flex items-center justify-center overflow-hidden ring-2 ring-gray-200">
                                 @if ($hasAvatar)
                                     <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
                                         alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
@@ -197,10 +177,7 @@
                             <div class="flex items-center gap-4">
                                 <div class="relative shrink-0">
                                     <div
-                                        class="absolute -inset-[3px] rounded-full bg-gradient-to-br {{ $ringClass }} opacity-70">
-                                    </div>
-                                    <div
-                                        class="relative w-14 h-14 rounded-full bg-white flex items-center justify-center overflow-hidden ring-3 ring-white">
+                                        class="relative w-14 h-14 rounded-full bg-white flex items-center justify-center overflow-hidden ring-2 ring-gray-200">
                                         @if ($hasAvatar)
                                             <img src="{{ asset('storage/' . auth()->user()->avatar) }}"
                                                 alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
@@ -221,7 +198,7 @@
                         </div>
                         <div class="h-px bg-gray-100 mx-5"></div>
                         <div class="py-2 px-2">
-                            <a href="{{ route('admin.settings.edit') }}"
+                            <a href="{{ route('admin.profile.edit') }}"
                                 class="flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm text-gray-700 hover:bg-gray-50 transition-colors group">
                                 <div
                                     class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center group-hover:bg-gray-200">

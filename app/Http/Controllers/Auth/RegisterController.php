@@ -74,10 +74,13 @@ class RegisterController extends Controller
         return Validator::make($data, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'whatsapp' => ['required', 'string', 'max:20'],
+            'nim' => ['required', 'string', 'max:20', 'unique:members'],
+            'whatsapp' => ['required', 'string', 'regex:/^[0-9+\-\s]+$/', 'max:20'],
             'division_id' => ['required', 'exists:divisions,id'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ], [
+            'nim.unique' => 'NIM sudah terdaftar. Silakan gunakan NIM yang berbeda.',
+            'whatsapp.regex' => 'Nomor WhatsApp hanya boleh berisi angka.',
             'division_id.required' => 'Silakan pilih divisi yang ingin kamu ikuti.',
             'division_id.exists' => 'Divisi yang dipilih tidak valid.',
         ]);
@@ -104,6 +107,7 @@ class RegisterController extends Controller
             'user_id' => $user->id,
             'division_id' => $data['division_id'],
             'name' => $user->name,
+            'nim' => $data['nim'],
             'email' => $user->email,
             'phone' => $data['whatsapp'],
             'is_active' => true,

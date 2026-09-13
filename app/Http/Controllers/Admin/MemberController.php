@@ -9,6 +9,7 @@ use App\Models\Position;
 use App\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MemberRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 
@@ -39,13 +40,66 @@ class MemberController extends Controller
         return Role::where('slug', $roleSlug)->first();
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $members = Member::with(['division', 'position', 'user'])
-            ->latest()
-            ->paginate(12);
+        $query = Member::with(['division', 'position', 'user']);
 
-        return view('pages.members.index', compact('members'));
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('nim', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by division
+        if ($request->filled('division_id')) {
+            $query->where('division_id', $request->division_id);
+        }
+
+        // Filter by position
+        if ($request->filled('position_id')) {
+            $query->where('position_id', $request->position_id);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $isActive = $request->status === 'active';
+            $query->where('is_active', $isActive);
+        }
+
+        // Sorting
+        $sort = $request->input('sort', 'newest');
+        match ($sort) {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'nim_asc' => $query->orderBy('nim'),
+            'nim_desc' => $query->orderByDesc('nim'),
+            'division_asc' => $query->orderBy(
+                Division::select('name')->whereColumn('divisions.id', 'members.division_id')
+            ),
+            'division_desc' => $query->orderByDesc(
+                Division::select('name')->whereColumn('divisions.id', 'members.division_id')
+            ),
+            'position_asc' => $query->orderBy(
+                Position::select('name')->whereColumn('positions.id', 'members.position_id')
+            ),
+            'position_desc' => $query->orderByDesc(
+                Position::select('name')->whereColumn('positions.id', 'members.position_id')
+            ),
+            'oldest' => $query->oldest(),
+            default => $query->latest(), // newest
+        };
+
+        $members = $query->paginate(12)->withQueryString();
+
+        $divisions = Division::active()->orderBy('name')->get();
+        $positions = Position::orderBy('name')->get();
+
+        return view('pages.members.index', compact('members', 'divisions', 'positions', 'request'));
     }
 
     public function create()

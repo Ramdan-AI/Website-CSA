@@ -105,7 +105,7 @@
                                 <input type="text" name="skills" id="skills"
                                     value="{{ old('skills', $isEdit && !empty($division->skills) ? implode(', ', $division->skills) : '') }}"
                                     class="w-full h-12 px-4 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition-all bg-white/50"
-                                    placeholder="HTML/CSS, PHP, JavaScript, Laravel">
+                                    placeholder="Canva, Blender, Photoshop, HTML/CSS, Laravel">
                                 <p class="text-[11px] text-gray-400 mt-1.5 font-medium">Pisahkan setiap keterampilan
                                     dengan koma.</p>
                                 @error('skills')

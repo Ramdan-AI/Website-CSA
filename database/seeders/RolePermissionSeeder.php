@@ -18,9 +18,11 @@ class RolePermissionSeeder extends Seeder
             'ketua' => [
                 'manage-members',
                 'manage-attendances',
+                'view-attendances',
                 'manage-news',
                 'manage-documents',
                 'manage-events',
+                'view-events',
                 'manage-registrations',
                 'manage-finance',
                 'view-finance',
@@ -30,9 +32,11 @@ class RolePermissionSeeder extends Seeder
             'wakil-ketua' => [
                 'manage-members',
                 'manage-attendances',
+                'view-attendances',
                 'manage-news',
                 'manage-documents',
                 'manage-events',
+                'view-events',
                 'manage-registrations',
                 'manage-finance',
                 'view-finance',
@@ -42,7 +46,9 @@ class RolePermissionSeeder extends Seeder
             'ketua-divisi' => [
                 'manage-members',
                 'manage-attendances',
+                'view-attendances',
                 'manage-events',
+                'view-events',
                 'manage-registrations',
                 'view-finance',
                 'manage-media',
@@ -50,7 +56,9 @@ class RolePermissionSeeder extends Seeder
 
             'wakil-ketua-divisi' => [
                 'manage-attendances',
+                'view-attendances',
                 'manage-events',
+                'view-events',
                 'manage-registrations',
                 'view-finance',
                 'manage-media',
@@ -60,18 +68,23 @@ class RolePermissionSeeder extends Seeder
                 'manage-news',
                 'manage-documents',
                 'manage-attendances',
+                'view-attendances',
+                'view-events',
                 'manage-media',
             ],
 
             'bendahara' => [
                 'manage-finance',
                 'view-finance',
+                'view-events',
                 'manage-media',
             ],
 
             'anggota' => [
+                'view-events',
+                'view-attendances',
                 'view-finance',
-                'manage-media',
+                // manage-media HAPUS - anggota tidak boleh upload album/galeri
             ],
         ];
 

@@ -8,6 +8,7 @@ use App\Models\Position;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PositionRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PositionController extends Controller
 {
@@ -45,11 +46,25 @@ class PositionController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $positions = Position::withCount('members')->latest()->paginate(10);
+        $search = $request->input('search');
 
-        return view('pages.positions.index', compact('positions'));
+        $query = Position::with(['members' => function ($query) {
+            $query->select('id', 'name', 'photo', 'division_id', 'position_id')
+                ->with('division:id,name');
+        }]);
+
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                 ->orWhere('description', 'like', "%{$search}%");
+        }
+
+        $positions = $query->latest()
+            ->paginate(12);
+
+        return view('pages.positions.index', compact('positions', 'search'))
+            ->with('prev_cursor', $positions->previousPageUrl());
     }
 
     public function create()
@@ -109,26 +124,28 @@ class PositionController extends Controller
 
         $member = Member::with('user')->findOrFail($request->member_id);
 
-        $currentCount = Member::where('position_id', $position->id)
-            ->where('id', '!=', $member->id)
-            ->count();
-
-        if ($currentCount >= $position->max_members) {
+        if ($position->max_members <= $position->members()->count()) {
             return back()->with('error', 'Jabatan ' . $position->name . ' sudah penuh (maksimal ' . $position->max_members . ' orang).');
         }
 
-        $oldPositionName = $member->position?->name;
-        $member->position_id = $position->id;
-        $member->save();
-        $member->load('position');
-        $this->syncMemberRole($member);
+        DB::transaction(function () use ($request, $member, $position) {
+            $currentCount = Member::where('position_id', $position->id)
+                ->where('id', '!=', $member->id)
+                ->lockForUpdate()
+                ->count();
 
-        $message = 'Anggota berhasil ditambahkan ke jabatan ' . $position->name;
-        if ($oldPositionName) {
-            $message .= ' (sebelumnya: ' . $oldPositionName . ')';
-        }
+            if ($currentCount >= $position->max_members) {
+                throw new \Exception('Jabatan sudah penuh.');
+            }
 
-        return back()->with('success', $message);
+            $oldPositionName = $member->position?->name;
+            $member->position_id = $position->id;
+            $member->save();
+            $member->load('position');
+            $this->syncMemberRole($member);
+        });
+
+        return back()->with('success', 'Anggota berhasil ditambahkan ke jabatan ' . $position->name);
     }
 
     public function removeMember(Position $position, $memberId)

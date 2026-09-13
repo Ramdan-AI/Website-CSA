@@ -78,8 +78,7 @@
     </style>
 </head>
 
-<body class="text-gray-900 font-sans antialiased overflow-x-hidden"
-    style="background: linear-gradient(135deg, #EEF2FF 0%, #F1F5F9 50%, #FAF5FF 100%); background-attachment: fixed;"
+<body class="text-gray-900 font-sans antialiased overflow-x-hidden bg-gray-50"
     x-data="{
         sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true')
     }" @sidebar-toggled.window="sidebarExpanded = $event.detail.expanded">

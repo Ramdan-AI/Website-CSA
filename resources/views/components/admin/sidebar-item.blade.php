@@ -18,8 +18,7 @@
     :class="expanded ? '' : 'justify-center px-0 w-11 mx-auto'">
 
     @if ($active)
-        <span class="absolute inset-0 rounded-[14px] bg-gradient-to-r {{ $palette['bg'] }} opacity-90"
-            style="box-shadow: 0 4px 16px {{ $palette['glow'] }};"></span>
+        <span class="absolute inset-0 rounded-[14px] bg-blue-600"></span>
     @endif
 
     <span class="absolute inset-0 rounded-[14px] bg-gray-50 opacity-0 group-hover/nav:opacity-100 transition-opacity duration-200 {{ $active ? '!opacity-0' : '' }}"></span>

@@ -22,6 +22,12 @@ class EventController extends Controller
         );
     }
 
+    public function show(Event $event)
+    {
+        $event->load(['attendances.member', 'registrations.member']);
+        return view('pages.events.show', compact('event'));
+    }
+
     public function create()
     {
         $event = new Event();

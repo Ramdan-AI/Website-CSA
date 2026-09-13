@@ -79,9 +79,9 @@ return [
             'id'          => 'events',
             'label'       => 'Kegiatan',
             'color'       => 'cyan',
-            'permissions' => ['manage-events', 'manage-registrations'],
+            'permissions' => ['manage-events', 'manage-registrations', 'view-events'],
             'items'       => [
-                ['icon' => 'fa-calendar-alt', 'label' => 'Acara', 'route' => 'admin.events.index', 'pattern' => 'admin.events.*', 'permission' => 'manage-events'],
+                ['icon' => 'fa-calendar-alt', 'label' => 'Acara', 'route' => 'admin.events.index', 'pattern' => 'admin.events.*'],
                 ['icon' => 'fa-clipboard-list', 'label' => 'Pendaftaran', 'route' => 'admin.event-registrations.index', 'pattern' => 'admin.event-registrations.*', 'permission' => 'manage-registrations'],
             ],
         ],
@@ -113,6 +113,12 @@ return [
      | Fixed footer links in the sidebar (settings section).
      */
     'settings' => [
+        [
+            'label'      => 'Profile',
+            'icon'       => 'fa-user-circle',
+            'route'      => 'admin.profile.edit',
+            'pattern'    => 'admin.profile.*',
+        ],
         [
             'label'      => 'Pengaturan',
             'icon'       => 'fa-cog',

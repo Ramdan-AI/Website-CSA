@@ -29,16 +29,18 @@ class MemberRequest extends FormRequest
                 'exists:positions,id',
                 function ($attribute, $value, $fail) {
                     $position = \App\Models\Position::find($value);
-                    $uniquePositions = ['Ketua', 'Wakil Ketua', 'Ketua Divisi', 'Wakil Ketua Divisi', 'Sekretaris', 'Bendahara'];
 
-                    if ($position && in_array($position->name, $uniquePositions)) {
-                        $exists = \App\Models\Member::where('position_id', $value)
-                            ->when($this->route('member'), fn($q) => $q->where('id', '!=', $this->route('member')->id))
-                            ->exists();
+                    if (!$position) {
+                        return;
+                    }
 
-                        if ($exists) {
-                            $fail('Jabatan ' . $position->name . ' sudah terisi oleh anggota lain.');
-                        }
+                    $memberId = $this->route('member')?->id;
+                    $currentCount = \App\Models\Member::where('position_id', $value)
+                        ->when($memberId, fn($q) => $q->where('id', '!=', $memberId))
+                        ->count();
+
+                    if ($currentCount >= $position->max_members) {
+                        $fail('Jabatan ' . $position->name . ' sudah penuh (maksimal ' . $position->max_members . ' orang).');
                     }
                 },
             ],

@@ -17,8 +17,8 @@ class DivisionController extends Controller
                 ->with('position:id,name');
         }])
             ->withCount('members')
-            ->latest()
-            ->paginate(12);
+            ->oldest('id')
+            ->get();
 
         $divisions->each(function ($division) {
             $leader = $division->members->first(function ($member) {
@@ -30,7 +30,9 @@ class DivisionController extends Controller
             $division->leader_name = $leader ? $leader->name : null;
         });
 
-        return view('pages.divisions.index', compact('divisions'));
+        $canCreate = $divisions->count() < 5;
+
+        return view('pages.divisions.index', compact('divisions', 'canCreate'));
     }
 
     public function create()
@@ -43,6 +45,13 @@ class DivisionController extends Controller
     public function store(DivisionRequest $request)
     {
         $data = $request->validated();
+
+        if (Division::count() >= 5) {
+            return redirect()
+                ->route('admin.divisions.index')
+                ->with('error', 'Maksimal 5 divisi sudah tercapai.');
+        }
+
         $data['skills'] = $this->normalizeSkills($request->input('skills'));
 
         if ($request->hasFile('image')) {
@@ -66,10 +75,8 @@ class DivisionController extends Controller
     {
         $data = $request->validated();
 
-        if ($request->has('remove_image') && $request->remove_image == '1') {
-            if ($division->image) {
-                Storage::disk('public')->delete($division->image);
-            }
+        if ($division->image && $request->has('remove_image') && $request->remove_image == '1') {
+            Storage::disk('public')->delete($division->image);
             $data['image'] = null;
         }
 
@@ -123,14 +130,15 @@ class DivisionController extends Controller
 
     private function normalizeSkills($skills)
     {
+        if (is_string($skills)) {
+            $skills = array_filter(array_map('trim', explode(',', $skills)));
+        }
+
         if (!is_array($skills)) {
             return null;
         }
 
-        $cleaned = array_values(array_filter(array_map(
-            fn ($skill) => trim((string) $skill),
-            $skills
-        )));
+        $cleaned = array_values(array_filter($skills, fn ($s) => $s !== ''));
 
         return $cleaned === [] ? null : $cleaned;
     }

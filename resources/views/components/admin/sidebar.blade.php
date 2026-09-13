@@ -22,15 +22,18 @@
     x-effect="localStorage.setItem('sidebar-expanded', expanded)">
 
     <button @click="toggle()"
-        class="absolute top-1/2 -translate-y-1/2 -right-3 w-6 h-12 rounded-full bg-white/90 backdrop-blur-xl border border-black/5 flex items-center justify-center cursor-pointer z-50 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 focus:outline-none group/toggle">
-        <span class="w-1 h-3 rounded-full bg-gray-300 group-hover/toggle:bg-gray-500 group-hover/toggle:h-4 transition-all duration-300"></span>
+        class="absolute top-1/2 -translate-y-1/2 -right-3 w-6 h-12 rounded-full bg-white border border-gray-200 flex items-center justify-center cursor-pointer z-50 shadow-sm hover:bg-gray-50 transition-colors duration-200 focus:outline-none group/toggle">
+        <span class="w-1 h-3 rounded-full bg-gray-300 group-hover/toggle:bg-gray-500 transition-colors duration-200"></span>
     </button>
 
-    <div class="relative shrink-0 rounded-[22px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] h-[72px] flex items-center overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-400/[0.04] to-purple-400/[0.04] pointer-events-none"></div>
-        <a href="{{ route('admin.dashboard') }}" class="relative flex items-center gap-3.5 px-4 w-full">
+    <div class="shrink-0 rounded-2xl bg-white border border-gray-200 shadow-sm h-[72px] flex items-center overflow-hidden">
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3.5 px-4 w-full">
             <div class="w-10 h-10 flex items-center justify-center shrink-0 rounded-xl bg-white/70 shadow-sm">
-                <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-7 h-7 object-contain">
+                @php
+                    $appSetting = \App\Models\Setting::first();
+                    $logoPath = ($appSetting && $appSetting->logo) ? asset('storage/' . $appSetting->logo) : asset('storage/system/logos/csa-logo.png');
+                @endphp
+                <img src="{{ $logoPath }}" alt="CSA" class="w-7 h-7 object-contain">
             </div>
             <div class="csa-sidebar-hideable overflow-hidden whitespace-nowrap"
                 x-show="expanded" x-transition:enter="transition delay-75" x-transition:leave="transition duration-150">
@@ -42,12 +45,10 @@
 
     <nav id="csa-sidebar-nav"
         onscroll="sessionStorage.setItem('csa_sidebar_scroll', this.scrollTop)"
-        class="relative flex-1 overflow-y-auto no-scrollbar rounded-[22px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-3"
+        class="flex-1 overflow-y-auto no-scrollbar rounded-2xl bg-white border border-gray-200 shadow-sm p-3"
         data-lenis-prevent>
 
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-400/[0.03] to-purple-400/[0.03] rounded-[22px] pointer-events-none"></div>
-
-        <div class="relative z-10 flex flex-col gap-5 py-1">
+        <div class="flex flex-col gap-5 py-1">
             @foreach ($groups as $group)
                 <div>
                     <div class="csa-sidebar-nav-header px-3 h-5 overflow-hidden mb-1.5"
@@ -72,9 +73,7 @@
     </nav>
 
     @if (count($settings) > 0)
-        <div class="relative shrink-0 rounded-[22px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col items-stretch overflow-hidden pt-1 pb-1.5">
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-400/[0.04] to-purple-400/[0.04] pointer-events-none"></div>
-
+        <div class="shrink-0 rounded-2xl bg-white border border-gray-200 shadow-sm flex flex-col items-stretch overflow-hidden pt-1 pb-1.5">
             @foreach ($settings as $item)
                 <x-admin.sidebar-item
                     :href="route($item['route'])"
@@ -102,6 +101,9 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
 
     .csa-sidebar-root {
-        transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        transition: width 0.3s ease;
+    }
+    .csa-sidebar-hideable {
+        transition: opacity 0.2s ease, transform 0.2s ease;
     }
 </style>
