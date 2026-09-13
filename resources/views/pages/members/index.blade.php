@@ -26,7 +26,7 @@
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
             </div>
 
-            <select name="division_id" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
+            <select name="division_id" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
                 <option value="">Semua Divisi</option>
                 @foreach($divisions as $division)
                     <option value="{{ $division->id }}" {{ request('division_id') == $division->id ? 'selected' : '' }}>
@@ -35,7 +35,7 @@
                 @endforeach
             </select>
 
-            <select name="position_id" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
+            <select name="position_id" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
                 <option value="">Semua Jabatan</option>
                 @foreach($positions as $position)
                     <option value="{{ $position->id }}" {{ request('position_id') == $position->id ? 'selected' : '' }}>
@@ -44,13 +44,13 @@
                 @endforeach
             </select>
 
-            <select name="status" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
+            <select name="status" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
                 <option value="">Semua Status</option>
                 <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
                 <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Nonaktif</option>
             </select>
 
-            <select name="sort" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
+            <select name="sort" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
                 <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Terbaru</option>
                 <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Nama A-Z</option>
                 <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Nama Z-A</option>

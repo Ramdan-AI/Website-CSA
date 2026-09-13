@@ -10,11 +10,29 @@ class NewsCategoryController extends Controller
 {
     public function index()
     {
-        $categories = NewsCategory::latest()
-            ->paginate(10);
+        $categories = NewsCategory::withCount([
+            'news',
+            'news as published_news_count' => fn ($query) => $query->where('status', 'published'),
+            'news as draft_news_count' => fn ($query) => $query->where('status', 'draft'),
+        ])
+            ->with(['news' => fn ($query) => $query->latest()->take(3)])
+            ->latest()
+            ->get();
 
         return view('pages.news-categories.index',
             compact('categories')
+        );
+    }
+
+    public function show(NewsCategory $newsCategory)
+    {
+        $news = $newsCategory->news()
+            ->with(['category', 'author'])
+            ->latest()
+            ->paginate(12);
+
+        return view('pages.news-categories.show',
+            compact('newsCategory', 'news')
         );
     }
 

@@ -5,26 +5,65 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\Member;
+use App\Models\EventRegistration;
 use App\Models\Attendance;
+use App\Http\Requests\EventRegistrationRequest;
 use Illuminate\Http\Request;
 
 class EventRegistrationController extends Controller
 {
-    // View all events (for members)
+    // View all registrations (admin)
     public function index()
     {
-        $events = Event::where('status', 'published')
-            ->orderBy('event_date', 'desc')
+        $registrations = EventRegistration::with(['event', 'member'])
+            ->latest()
             ->paginate(12);
 
-        return view('pages.events.index', compact('events'));
+        return view('pages.event-registrations.index', compact('registrations'));
     }
 
-    // View single event details
-    public function show(Event $event)
+    public function create()
     {
-        $event->load(['attendances.member', 'registrations.member']);
-        return view('pages.events.show', compact('event'));
+        $events = Event::orderBy('title')->get();
+        $members = Member::orderBy('name')->get();
+
+        return view('pages.event-registrations.create', compact('events', 'members'));
+    }
+
+    public function store(EventRegistrationRequest $request)
+    {
+        EventRegistration::create([
+            'event_id' => $request->event_id,
+            'member_id' => $request->member_id,
+            'registered_at' => now(),
+        ]);
+
+        return redirect()->route('admin.event-registrations.index')->with('success', 'Pendaftaran berhasil dibuat.');
+    }
+
+    public function edit(EventRegistration $eventRegistration)
+    {
+        $events = Event::orderBy('title')->get();
+        $members = Member::orderBy('name')->get();
+
+        return view('pages.event-registrations.edit', compact('eventRegistration', 'events', 'members'));
+    }
+
+    public function update(EventRegistrationRequest $request, EventRegistration $eventRegistration)
+    {
+        $eventRegistration->update([
+            'event_id' => $request->event_id,
+            'member_id' => $request->member_id,
+        ]);
+
+        return redirect()->route('admin.event-registrations.index')->with('success', 'Pendaftaran berhasil diperbarui.');
+    }
+
+    public function destroy(EventRegistration $eventRegistration)
+    {
+        $eventRegistration->delete();
+
+        return back()->with('success', 'Pendaftaran berhasil dihapus.');
     }
 
     // Register for event (self-service)

@@ -13,7 +13,7 @@
         <div class="absolute inset-0 bg-gradient-to-br from-teal-400/5 to-cyan-400/5 pointer-events-none"></div>
 
         <div class="relative p-6">
-            <form action="{{ route('admin.news.store') }}" method="POST" class="space-y-6">
+            <form action="{{ route('admin.news.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
 
                 <div class="bg-gray-50/40 rounded-[24px] p-5">
@@ -96,6 +96,37 @@
                     </div>
                 </div>
 
+                <div class="bg-gray-50/40 rounded-[24px] p-5">
+                    <h3 class="text-[13px] font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <span class="w-1.5 h-5 rounded-full bg-teal-500"></span>
+                        Gambar Berita (Maks 8 gambar)
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-[11px] font-semibold text-gray-500 mb-1.5">
+                                Upload Gambar <span class="text-gray-400 font-normal">(opsional)</span>
+                            </label>
+                            <div class="relative">
+                                <div class="border-2 border-dashed border-gray-200/80 rounded-[14px] p-6 flex flex-col items-center justify-center hover:border-teal-300 transition-colors cursor-pointer"
+                                     onclick="document.getElementById('news-images-input').click()">
+                                    <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
+                                    <p class="text-sm text-gray-500">Klik atau drag & drop gambar</p>
+                                    <p class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP. Maks 2MB per file, total 8 file.</p>
+                                </div>
+                                <input type="file" name="images[]" id="news-images-input" accept="image/jpeg,image/png,image/webp" multiple class="hidden" onchange="previewNewsImages(event)">
+                            </div>
+                            @error('images')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div id="news-images-preview" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 hidden">
+                            {{-- Preview images will be inserted here --}}
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit"
                             class="relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-[13px] font-semibold rounded-[18px] shadow-[0_4px_16px_-4px_rgba(20,184,166,0.3)] hover:shadow-[0_8px_24px_-4px_rgba(20,184,166,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
@@ -115,3 +146,39 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function previewNewsImages(event) {
+    const files = event.target.files;
+    if (!files.length) return;
+
+    const container = document.getElementById('news-images-preview');
+    container.classList.remove('hidden');
+    container.innerHTML = '';
+
+    Array.from(files).forEach((file, index) => {
+        if (!file.type.match('image.*')) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'relative aspect-square bg-white border border-gray-200 rounded-lg overflow-hidden';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="Preview ${index}" class="w-full h-full object-cover">
+                <button type="button" onclick="this.parentElement.remove(); checkEmptyPreview();" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600">×</button>
+            `;
+            container.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+function checkEmptyPreview() {
+    const container = document.getElementById('news-images-preview');
+    if (!container.children.length) {
+        container.classList.add('hidden');
+    }
+}
+</script>
+@endpush

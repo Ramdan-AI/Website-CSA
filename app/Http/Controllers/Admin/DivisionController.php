@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Division;
 use App\Models\Member;
 use App\Http\Requests\DivisionRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class DivisionController extends Controller
@@ -108,22 +109,60 @@ class DivisionController extends Controller
         return back()->with('success', 'Divisi berhasil dihapus.');
     }
 
-    public function members(Division $division)
+    public function members(Request $request, Division $division)
     {
         $members = $division->members()
             ->with('position')
-            ->latest()
-            ->paginate(10);
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->search;
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('nim', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name')
+            ->paginate(12)
+            ->withQueryString();
 
-        return view('pages.divisions.members', compact('division', 'members'));
+        $availableMembers = Member::with('position')
+            ->where('is_active', true)
+            ->whereNull('division_id')
+            ->when($request->filled('candidate_search'), function ($query) use ($request) {
+                $search = $request->candidate_search;
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('name', 'like', "%{$search}%")
+                        ->orWhere('nim', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('name')
+            ->limit(50)
+            ->get();
+
+        return view('pages.divisions.members', compact('division', 'members', 'availableMembers'));
     }
 
-    public function removeMember(Division $division, $memberId)
+    public function addMembers(Request $request, Division $division)
     {
-        $member = Member::findOrFail($memberId);
+        $validated = $request->validate([
+            'member_ids' => ['required', 'array', 'min:1'],
+            'member_ids.*' => ['integer', 'exists:members,id'],
+        ]);
+
+        $updated = Member::whereIn('id', $validated['member_ids'])
+            ->whereNull('division_id')
+            ->update(['division_id' => $division->id]);
+
+        return back()->with('success', $updated . ' anggota berhasil ditambahkan ke ' . $division->name . '.');
+    }
+
+    public function removeMember(Division $division, Member $member)
+    {
+        abort_unless($member->division_id === $division->id, 404);
+
         $memberName = $member->name;
-        $member->division_id = null;
-        $member->save();
+        $member->update(['division_id' => null]);
 
         return back()->with('success', $memberName . ' berhasil dikeluarkan dari ' . $division->name);
     }

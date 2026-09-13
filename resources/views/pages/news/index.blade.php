@@ -7,80 +7,108 @@
         <div>
             <p class="text-xs font-semibold text-teal-400 uppercase tracking-widest">Publikasi</p>
             <h1 class="text-3xl font-bold text-gray-900 mt-1">Berita</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola seluruh berita dan publikasi konten dalam sistem.</p>
+            <p class="text-sm text-gray-400 mt-1.5 font-medium">Klik kartu berita untuk melihat detail lengkap dan galeri gambar.</p>
         </div>
         <a href="{{ route('admin.news.create') }}"
-           class="relative inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-semibold rounded-2xl shadow-[0_4px_20px_rgba(20,184,166,0.3)] hover:shadow-[0_4px_25px_rgba(20,184,166,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
-            <div class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <span class="relative flex items-center gap-2">
-                <i class="fas fa-plus text-xs"></i>
-                Tambah Berita
-            </span>
+           class="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-xl hover:bg-teal-700 transition-colors shadow-sm">
+            <i class="fas fa-plus text-xs"></i>
+            Tambah Berita
         </a>
     </div>
 
-    <x-admin.table :headers="[
-        ['label' => 'Judul', 'width' => ''],
-        ['label' => 'Kategori', 'width' => ''],
-        ['label' => 'Author', 'width' => ''],
-        ['label' => 'Status', 'width' => ''],
-        ['label' => 'Aksi', 'width' => 'w-24'],
-    ]" :hasPages="$news->hasPages()" :paginator="$news">
+    <form method="GET" class="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+            <div class="relative lg:col-span-2">
+                <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau isi berita..."
+                    class="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-400 transition-all">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+            </div>
+            <select name="category_id" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-400 text-gray-600">
+                <option value="">Semua Kategori</option>
+                @foreach($categories as $category)
+                    <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>{{ $category->name }}</option>
+                @endforeach
+            </select>
+            <select name="status" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-400 text-gray-600">
+                <option value="">Semua Status</option>
+                <option value="published" @selected(request('status') === 'published')>Terbit</option>
+                <option value="draft" @selected(request('status') === 'draft')>Draf</option>
+            </select>
+            <div class="flex gap-2">
+                <select name="sort" onchange="this.form.submit()" class="flex-1 h-11 px-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-400 text-gray-600">
+                    <option value="newest" @selected(request('sort', 'newest') === 'newest')>Terbaru</option>
+                    <option value="oldest" @selected(request('sort') === 'oldest')>Terlama</option>
+                    <option value="title_asc" @selected(request('sort') === 'title_asc')>Judul A-Z</option>
+                    <option value="title_desc" @selected(request('sort') === 'title_desc')>Judul Z-A</option>
+                    <option value="published_desc" @selected(request('sort') === 'published_desc')>Terbit terbaru</option>
+                </select>
+                <a href="{{ route('admin.news.index') }}" class="h-11 px-4 bg-gray-100 text-gray-600 text-xs font-semibold rounded-xl hover:bg-gray-200 flex items-center">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         @forelse($news as $item)
-            <tr class="hover:bg-teal-50/30 transition-colors duration-200">
-                <td class="py-4 px-6">
-                    <p class="text-sm font-bold text-gray-900 truncate max-w-[280px]">{{ $item->title }}</p>
-                </td>
-                <td class="py-4 px-6">
-                    @if($item->category)
-                        <span class="inline-flex px-2.5 py-1 rounded-lg bg-teal-50 text-[11px] font-semibold text-teal-700 border border-teal-100/50">
-                            {{ $item->category->name }}
-                        </span>
-                    @else
-                        <span class="text-xs text-gray-300">-</span>
-                    @endif
-                </td>
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white shrink-0 shadow-sm">
-                            <img src="{{ $item->author?->avatar ? asset('storage/' . $item->author->avatar) : asset('storage/profile/profile-placeholder.png') }}" alt="{{ $item->author?->name }}" class="w-full h-full object-cover">
+            <article class="group bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md hover:border-gray-300 transition-all overflow-hidden">
+                <a href="{{ route('admin.news.show', $item) }}" class="block">
+                    @if($item->thumbnail_url)
+                        <div class="h-48 w-full bg-gray-100 overflow-hidden relative">
+                            <img src="{{ $item->thumbnail_url }}" alt="{{ $item->title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                            @if(count($item->images ?? []) > 1)
+                                <span class="absolute top-3 right-3 px-2 py-1 rounded-lg bg-black/60 text-white text-[11px] font-semibold">
+                                    <i class="fas fa-images mr-1"></i>{{ count($item->images) }}
+                                </span>
+                            @endif
                         </div>
-                        <span class="text-xs text-gray-600">{{ $item->author?->name ?? '-' }}</span>
-                    </div>
-                </td>
-                <td class="py-4 px-6">
-                    @if($item->status === 'published')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-[11px] font-semibold text-emerald-600 border border-emerald-100/50">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]"></span>
-                            Published
-                        </span>
                     @else
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-[11px] font-semibold text-amber-600 border border-amber-100/50">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                            Draft
-                        </span>
+                        <div class="h-28 w-full bg-gray-50 flex items-center justify-center text-gray-300 border-b border-gray-100">
+                            <i class="fas fa-newspaper text-3xl"></i>
+                        </div>
                     @endif
-                </td>
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-1">
-                        <a href="{{ route('admin.news.edit', $item) }}"
-                           class="w-8 h-8 rounded-lg flex items-center justify-center bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(20,184,166,0.3)]"
-                           title="Edit">
-                            <i class="fas fa-pen text-[10px]"></i>
-                        </a>
-                        <button onclick="openDeleteModal('deleteModal', '{{ route('admin.news.destroy', $item) }}')"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
-                                title="Hapus">
-                            <i class="fas fa-trash text-[10px]"></i>
-                        </button>
+
+                    <div class="p-5">
+                        <div class="flex items-center justify-between gap-2 mb-2">
+                            <span class="px-2 py-0.5 rounded-lg bg-teal-50 text-teal-700 text-[11px] font-semibold">
+                                {{ $item->category?->name ?? 'Tanpa kategori' }}
+                            </span>
+                            <span class="px-2 py-0.5 rounded-lg text-[11px] font-semibold {{ $item->status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' }}">
+                                {{ ucfirst($item->status) }}
+                            </span>
+                        </div>
+
+                        <h2 class="text-base font-bold text-gray-900 line-clamp-2 group-hover:text-teal-700 transition-colors">
+                            {{ $item->title }}
+                        </h2>
+                        <p class="text-xs text-gray-500 line-clamp-2 mt-2 leading-relaxed">
+                            {{ Str::limit(strip_tags($item->content), 130) }}
+                        </p>
+
+                        <div class="mt-4 flex items-center justify-between text-xs text-gray-400">
+                            <span>{{ $item->author?->name ?? '-' }}</span>
+                            <span>{{ $item->published_at?->format('d M Y') ?: $item->created_at->format('d M Y') }}</span>
+                        </div>
                     </div>
-                </td>
-            </tr>
+                </a>
+
+                <div class="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-1">
+                    <a href="{{ route('admin.news.edit', $item) }}" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors" title="Edit">
+                        <i class="fas fa-pen text-[10px]"></i>
+                    </a>
+                    <button onclick="openDeleteModal('deleteModal', '{{ route('admin.news.destroy', $item) }}')" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white border border-gray-200 text-red-500 hover:bg-red-50 transition-colors" title="Hapus">
+                        <i class="fas fa-trash text-[10px]"></i>
+                    </button>
+                </div>
+            </article>
         @empty
-            <x-admin.empty-state icon="fa-newspaper" title="Belum ada berita"
-                description="Belum ada berita yang dipublikasikan." :createRoute="route('admin.news.create')" createLabel="Tambah Berita"
-                :colspan="5" />
+            <div class="col-span-full bg-white border border-gray-200 rounded-2xl p-12 text-center">
+                <i class="fas fa-newspaper text-4xl text-gray-300 mb-3"></i>
+                <p class="text-sm font-semibold text-gray-500">Tidak ada berita ditemukan.</p>
+                <p class="text-xs text-gray-400 mt-1">Coba ubah kriteria pencarian.</p>
+            </div>
         @endforelse
-    </x-admin.table>
+    </div>
+
+    {{ $news->links() }}
+
 </div>
 @endsection

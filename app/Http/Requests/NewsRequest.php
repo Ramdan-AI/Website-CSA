@@ -27,6 +27,24 @@ class NewsRequest extends FormRequest
                 'required',
                 'string'
             ],
+            'images' => [
+                'nullable',
+                'array',
+                'max:8',
+            ],
+            'images.*' => [
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+            ],
+            'removed_images' => [
+                'nullable',
+                'array',
+            ],
+            'removed_images.*' => [
+                'string',
+                'max:255',
+            ],
             'status' => [
                 'required',
                 'in:draft,published'

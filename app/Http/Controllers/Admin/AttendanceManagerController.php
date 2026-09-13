@@ -14,17 +14,40 @@ use Illuminate\Support\Str;
 
 class AttendanceManagerController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::withCount([
-            'attendances',
-            'attendances as present_count' => fn ($q) => $q->where('status', 'present'),
-            'attendances as permit_count' => fn ($q) => $q->where('status', 'permit'),
-            'attendances as sick_count' => fn ($q) => $q->where('status', 'sick'),
-            'attendances as absent_count' => fn ($q) => $q->where('status', 'absent'),
-        ])
-            ->orderByDesc('event_date')
-            ->paginate(12);
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'date_from' => ['nullable', 'date'],
+            'date_to' => ['nullable', 'date', 'after_or_equal:date_from'],
+            'sort' => ['nullable', 'in:date_asc,date_desc,title_asc,title_desc'],
+        ]);
+
+        $sort = $validated['sort'] ?? 'date_desc';
+
+        $events = Event::query()
+            ->withCount([
+                'attendances',
+                'attendances as present_count' => fn ($q) => $q->where('status', 'present'),
+                'attendances as permit_count' => fn ($q) => $q->where('status', 'permit'),
+                'attendances as sick_count' => fn ($q) => $q->where('status', 'sick'),
+                'attendances as absent_count' => fn ($q) => $q->where('status', 'absent'),
+            ])
+            ->when($validated['search'] ?? null, fn ($query, $search) =>
+                $query->where('title', 'like', "%{$search}%")
+            )
+            ->when($validated['date_from'] ?? null, fn ($query, $date) =>
+                $query->whereDate('event_date', '>=', $date)
+            )
+            ->when($validated['date_to'] ?? null, fn ($query, $date) =>
+                $query->whereDate('event_date', '<=', $date)
+            )
+            ->when($sort === 'date_asc', fn ($query) => $query->orderBy('event_date'))
+            ->when($sort === 'date_desc', fn ($query) => $query->orderByDesc('event_date'))
+            ->when($sort === 'title_asc', fn ($query) => $query->orderBy('title'))
+            ->when($sort === 'title_desc', fn ($query) => $query->orderByDesc('title'))
+            ->paginate(15)
+            ->withQueryString();
 
         return view('pages.attendances.index', compact('events'));
     }

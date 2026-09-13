@@ -13,6 +13,7 @@ class News extends Model
         'title',
         'content',
         'thumbnail',
+        'images',
         'status',
         'published_at'
     ];
@@ -21,6 +22,7 @@ class News extends Model
     {
         return [
             'published_at' => 'datetime',
+            'images' => 'array',
         ];
     }
 
@@ -70,5 +72,12 @@ class News extends Model
             User::class,
             'user_id'
         );
+    }
+
+    public function getThumbnailUrlAttribute()
+    {
+        $firstImage = $this->thumbnail ?? $this->images[0] ?? null;
+
+        return $firstImage ? asset('storage/' . $firstImage) : null;
     }
 }

@@ -24,7 +24,7 @@
                 <div>
                     @if($event->banner_url)
                         <div class="h-44 w-full bg-gray-100 overflow-hidden">
-                            <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
+                            <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover" loading="lazy" onerror="this.closest('div').innerHTML='<div class=\'h-44 w-full bg-gray-50 flex items-center justify-center text-gray-300 border-b border-gray-100\'><i class=\'fas fa-calendar-alt text-4xl\'></i></div>'">
                         </div>
                     @else
                         <div class="h-44 w-full bg-gray-50 flex items-center justify-center text-gray-300 border-b border-gray-100">

@@ -87,6 +87,14 @@
                             </div>
                         @endif
                     @endif
+
+                    @can('manage-attendances')
+                    <div class="pt-4 border-t border-gray-100">
+                        <a href="{{ route('admin.attendances.event', $event) }}" class="inline-flex items-center justify-center gap-2 w-full py-2 px-4 bg-gray-900 text-white text-xs font-semibold rounded-xl hover:bg-gray-800 transition-colors">
+                            <i class="fas fa-user-check mr-1"></i> Kelola Presensi & Export
+                        </a>
+                    </div>
+                    @endcan
                 </div>
             </div>
         </div>

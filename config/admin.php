@@ -79,10 +79,9 @@ return [
             'id'          => 'events',
             'label'       => 'Kegiatan',
             'color'       => 'cyan',
-            'permissions' => ['manage-events', 'manage-registrations', 'view-events'],
+            'permissions' => ['manage-events', 'view-events'],
             'items'       => [
                 ['icon' => 'fa-calendar-alt', 'label' => 'Acara', 'route' => 'admin.events.index', 'pattern' => 'admin.events.*'],
-                ['icon' => 'fa-clipboard-list', 'label' => 'Pendaftaran', 'route' => 'admin.event-registrations.index', 'pattern' => 'admin.event-registrations.*', 'permission' => 'manage-registrations'],
             ],
         ],
 

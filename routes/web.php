@@ -62,6 +62,7 @@ Route::prefix('{roleSlug}')
         Route::middleware(['can:manage-divisions'])->group(function () {
             Route::resource('divisions', DivisionController::class)->except(['show']);
             Route::get('divisions/{division}/members', [DivisionController::class, 'members'])->name('divisions.members');
+            Route::post('divisions/{division}/members', [DivisionController::class, 'addMembers'])->name('divisions.add-members');
             Route::delete('divisions/{division}/remove/{member}', [DivisionController::class, 'removeMember'])->name('divisions.remove-member');
         });
 
@@ -115,7 +116,7 @@ Route::prefix('{roleSlug}')
         // News & Documents
         Route::middleware(['can:manage-news'])->group(function () {
             Route::resource('news-categories', NewsCategoryController::class);
-            Route::resource('news', NewsController::class)->except(['show']);
+            Route::resource('news', NewsController::class);
         });
 
         Route::middleware(['can:manage-documents'])->group(function () {
@@ -123,17 +124,17 @@ Route::prefix('{roleSlug}')
             Route::resource('documents', DocumentController::class)->except(['show']);
         });
 
+        // Events (admin)
+        Route::middleware(['can:manage-events'])->group(function () {
+            Route::resource('events', EventController::class)->except(['show']);
+        });
+
+        // Members can view events
+        Route::get('events', [EventController::class, 'index'])->name('events.index');
+        Route::get('events/{event}', [EventController::class, 'show'])->name('events.show');
+
         // Member self-registration for event
         Route::post('events/{event}/register', [EventRegistrationController::class, 'register'])->name('events.register');
-
-        // Events
-        Route::middleware(['can:manage-events'])->group(function () {
-            Route::resource('events', EventController::class)->except(['show', 'index']);
-        });
-        
-        // Members can view events
-        Route::get('events', [EventRegistrationController::class, 'index'])->name('events.index');
-        Route::get('events/{event}', [EventRegistrationController::class, 'show'])->name('events.show');
 
         Route::middleware(['can:manage-registrations'])->group(function () {
             Route::resource('event-registrations', EventRegistrationController::class);

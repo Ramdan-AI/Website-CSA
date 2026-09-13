@@ -52,6 +52,6 @@ class Event extends Model
 
     public function getBannerUrlAttribute()
     {
-        return $this->banner ? Storage::disk('public')->url($this->banner) : null;
+        return $this->banner ? asset('storage/' . $this->banner) : null;
     }
 }

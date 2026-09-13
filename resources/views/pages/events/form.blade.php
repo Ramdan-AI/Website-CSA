@@ -159,25 +159,23 @@
                                     </div>
                                 @endif
 
-                                <div class="relative">
-                                    <div class="w-full aspect-[21/9] max-h-[200px] rounded-[24px] border-2 border-dashed border-gray-200/80 flex items-center justify-center overflow-hidden bg-gray-50/30 hover:border-cyan-300 transition-colors cursor-pointer"
-                                        onclick="document.getElementById('banner-input').click()">
-                                        <img id="banner-preview" src="#" class="hidden w-full h-full object-cover">
-                                        <div id="banner-placeholder" class="flex flex-col items-center">
-                                            <div
-                                                class="w-12 h-12 rounded-full bg-cyan-50 flex items-center justify-center mb-3 shadow-[0_2px_8px_-2px_rgba(6,182,212,0.1)]">
-                                                <i class="fas fa-camera text-lg text-cyan-400"></i>
-                                            </div>
-                                            <span class="text-xs text-gray-400 font-medium">
-                                                {{ $hasBanner ? 'Klik untuk ganti banner' : 'Klik untuk upload banner' }}
-                                            </span>
-                                            <span class="text-[10px] text-gray-300 mt-1">JPG, PNG, WEBP. Maks 2MB.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="file" name="banner" id="banner-input"
-                                    accept="image/jpeg,image/png,image/webp" class="hidden"
-                                    onchange="previewBanner(event)">
+                                <label for="banner-input"
+                                    class="block w-full aspect-[21/9] max-h-[200px] rounded-[24px] border-2 border-dashed border-gray-200/80 overflow-hidden bg-gray-50/30 hover:border-cyan-300 transition-colors cursor-pointer">
+                                    <img id="banner-preview" src="#" class="hidden w-full h-full object-cover" alt="Pratinjau banner">
+                                    <span id="banner-placeholder" class="flex flex-col items-center justify-center h-full">
+                                        <span
+                                            class="w-12 h-12 rounded-full bg-cyan-50 flex items-center justify-center mb-3 shadow-[0_2px_8px_-2px_rgba(6,182,212,0.1)]">
+                                            <i class="fas fa-camera text-lg text-cyan-400"></i>
+                                        </span>
+                                        <span class="text-xs text-gray-400 font-medium">
+                                            {{ $hasBanner ? 'Klik untuk ganti banner' : 'Klik untuk upload banner' }}
+                                        </span>
+                                        <span class="text-[10px] text-gray-300 mt-1">JPG, PNG, WEBP. Maks 2MB.</span>
+                                    </span>
+                                    <input type="file" name="banner" id="banner-input"
+                                        accept="image/jpeg,image/png,image/webp" class="sr-only"
+                                        onchange="previewBanner(event)">
+                                </label>
                                 @error('banner')
                                     <p class="text-xs text-red-500 mt-2">{{ $message }}</p>
                                 @enderror
