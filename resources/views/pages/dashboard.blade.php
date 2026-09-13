@@ -10,6 +10,29 @@
                 ini.</p>
         </div>
 
+        @php
+            $waLink = \App\Models\Setting::first()?->whatsapp_group_link;
+        @endphp
+        @if ($waLink)
+            <div class="relative overflow-hidden bg-gradient-to-r from-emerald-500/10 via-emerald-500/5 to-transparent rounded-[24px] border border-emerald-500/20 p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center text-xl shrink-0 shadow-sm">
+                        <i class="fab fa-whatsapp"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-900 leading-tight">Grup WhatsApp Resmi UKM CSA</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Dapatkan info kegiatan, jadwal pertemuan, dan koordinasi divisi terbaru.</p>
+                    </div>
+                </div>
+                <a href="{{ $waLink }}" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-xl shadow-[0_4px_12px_rgba(16,185,129,0.25)] hover:scale-105 transition-all shrink-0">
+                    <i class="fab fa-whatsapp text-sm"></i>
+                    <span>Buka Grup WA</span>
+                    <i class="fas fa-arrow-up-right-from-square text-[10px] opacity-80"></i>
+                </a>
+            </div>
+        @endif
+
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
             <div

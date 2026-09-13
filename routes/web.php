@@ -40,6 +40,8 @@ Route::middleware(['registration.open'])->group(function () {
     Route::post('register', 'App\Http\Controllers\Auth\RegisterController@register');
 });
 
+Route::get('register/success', 'App\Http\Controllers\Auth\RegisterController@success')->name('register.success');
+
 Route::prefix('{roleSlug}')
     ->name('admin.')
     ->middleware(['auth', 'role.match'])

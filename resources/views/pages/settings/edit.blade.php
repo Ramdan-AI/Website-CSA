@@ -159,7 +159,7 @@
                         <div class="bg-gray-50/40 rounded-[24px] p-5">
                             <h3 class="text-[13px] font-semibold text-gray-900 mb-4 flex items-center gap-2">
                                 <span class="w-1.5 h-5 rounded-full bg-amber-500"></span>
-                                Kontrol Pendaftaran
+                                Kontrol Pendaftaran & Komunitas
                             </h3>
                             <label class="flex items-center justify-between cursor-pointer">
                                 <div>
@@ -174,6 +174,25 @@
                                     <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
                                 </div>
                             </label>
+
+                            <div class="mt-5 pt-4 border-t border-gray-100">
+                                <label for="whatsapp_group_link" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
+                                    <i class="fab fa-whatsapp text-emerald-500 mr-1"></i> Link Grup WhatsApp CSA
+                                </label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-500">
+                                        <i class="fab fa-whatsapp text-sm"></i>
+                                    </div>
+                                    <input type="url" name="whatsapp_group_link" id="whatsapp_group_link" 
+                                           value="{{ old('whatsapp_group_link', $setting->whatsapp_group_link) }}"
+                                           class="w-full h-[44px] pl-10 pr-4 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15 transition-all bg-white/60 @error('whatsapp_group_link') border-red-300 @enderror"
+                                           placeholder="https://chat.whatsapp.com/...">
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-1.5">Link grup WhatsApp ini akan diberikan kepada anggota baru setelah berhasil mendaftar.</p>
+                                @error('whatsapp_group_link')
+                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
                         </div>
                     </div>
                 </div>

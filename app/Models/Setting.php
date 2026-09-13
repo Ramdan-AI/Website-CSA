@@ -16,7 +16,8 @@ class Setting extends Model
         'youtube',
         'linkedin',
         'about',
-        'registration_open'
+        'registration_open',
+        'whatsapp_group_link',
     ];
 
     protected function casts(): array
