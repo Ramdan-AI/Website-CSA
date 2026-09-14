@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\IncomeController;
 use App\Http\Controllers\Admin\ExpenseController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\MemberPageController;
 use App\Http\Controllers\Admin\AttendanceManagerController;
 use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\RoleController;
@@ -52,6 +53,25 @@ Route::prefix('{roleSlug}')
 
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/search', [SearchController::class, 'search'])->name('search');
+
+        // Member access pages (open to all authenticated roles, content scoped to member)
+        Route::get('my-attendance', [MemberPageController::class, 'attendance'])->name('member.attendance');
+        Route::get('my-news', [MemberPageController::class, 'news'])->name('member.news');
+        Route::get('my-documents', [MemberPageController::class, 'documents'])->name('member.documents');
+        Route::get('my-calendar', [MemberPageController::class, 'calendar'])->name('member.calendar');
+        Route::get('my-division', [MemberPageController::class, 'division'])->name('member.division');
+        Route::get('my-gallery', [MemberPageController::class, 'gallery'])->name('member.gallery');
+        Route::get('my-settings', [MemberPageController::class, 'settings'])->name('member.settings');
+
+        // Member Attendance Actions
+        Route::post('events/{event}/attend/self', [MemberPageController::class, 'selfAttendance'])->name('member.attendance.self');
+        Route::post('events/{event}/attend/scan', [MemberPageController::class, 'scanAttendance'])->name('member.attendance.scan');
+        Route::post('events/{event}/attend/sick', [MemberPageController::class, 'sickAttendance'])->name('member.attendance.sick');
+        Route::post('events/{event}/attend/permit', [MemberPageController::class, 'permitAttendance'])->name('member.attendance.permit');
+        Route::post('events/{event}/attend/alfa', [MemberPageController::class, 'alfaAttendance'])->name('member.attendance.alfa');
+
+        // Notifications
+        Route::post('notifications/seen', [MemberPageController::class, 'markNotificationsSeen'])->name('notifications.seen');
 
         Route::middleware(['auth'])->group(function () {
             Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -91,7 +111,7 @@ Route::prefix('{roleSlug}')
 
         // Members
         Route::middleware(['can:manage-members'])->group(function () {
-            Route::resource('members', MemberController::class)->except(['show']);
+            Route::resource('members', MemberController::class);
         });
 
         // Attendances
@@ -114,9 +134,12 @@ Route::prefix('{roleSlug}')
         Route::get('events/{event}/scan/{code}', [AttendanceManagerController::class, 'scanAttendance'])->name('attendance.scan');
 
         // News & Documents
+        Route::resource('news-categories', NewsCategoryController::class)->only(['show']);
+        Route::resource('news', NewsController::class)->only(['show']);
+
         Route::middleware(['can:manage-news'])->group(function () {
-            Route::resource('news-categories', NewsCategoryController::class);
-            Route::resource('news', NewsController::class);
+            Route::resource('news-categories', NewsCategoryController::class)->except(['show']);
+            Route::resource('news', NewsController::class)->except(['show']);
         });
 
         Route::middleware(['can:manage-documents'])->group(function () {
@@ -154,7 +177,7 @@ Route::prefix('{roleSlug}')
 
         // Media
         Route::middleware(['can:manage-media'])->group(function () {
-            Route::resource('albums', AlbumController::class)->except(['show']);
+            Route::resource('albums', AlbumController::class);
             Route::resource('galleries', GalleryController::class);
             Route::put('galleries/{gallery}/toggle-hero', [GalleryController::class, 'toggleHero'])->name('galleries.toggle-hero');
         });

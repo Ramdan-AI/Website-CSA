@@ -30,6 +30,31 @@
     };
 
     $hasAvatar = !empty(auth()->user()->avatar);
+    $notifications = collect();
+    $lastSeen = session('notifications_seen_at', 0);
+    $unreadCount = 0;
+    $newNews = \App\Models\News::where('status', 'published')->where('created_at', '>', now()->setTimestamp($lastSeen))->latest('published_at')->take(5)->get();
+    foreach ($newNews as $news) {
+        $notifications->push([
+            'icon' => 'fa-newspaper',
+            'color' => 'bg-teal-50 text-teal-600',
+            'title' => 'Berita Baru: ' . $news->title,
+            'time' => $news->published_at?->diffForHumans() ?? $news->created_at->diffForHumans(),
+            'link' => route('admin.news.show', $news),
+        ]);
+    }
+    $newEvents = \App\Models\Event::where('status', 'published')->where('event_date', '>=', now()->toDateString())->where('created_at', '>', now()->setTimestamp($lastSeen))->latest('event_date')->take(5)->get();
+    foreach ($newEvents as $event) {
+        $notifications->push([
+            'icon' => 'fa-calendar-alt',
+            'color' => 'bg-cyan-50 text-cyan-600',
+            'title' => 'Acara: ' . $event->title,
+            'time' => $event->event_date?->format('d M Y') ?? '-',
+            'link' => route('admin.events.show', $event),
+        ]);
+    }
+    $notifications = $notifications->take(10);
+    $unreadCount = $notifications->count();
 @endphp
 
 <header x-data="{
@@ -65,6 +90,7 @@
                 this.userMenuOpen = false;
             }
         });
+
     },
 
     get leftOffset() {
@@ -117,13 +143,11 @@
 
                 {{-- Notifications --}}
                 <div class="relative" @click.away="notifOpen = false">
-                    <button @click="notifOpen = !notifOpen"
+                    <button @click="notifOpen = !notifOpen; localStorage.setItem('notifications-seen-at', Date.now())"
                         class="relative w-9 h-9 rounded-2xl flex items-center justify-center text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 transition-colors group">
                         <i class="far fa-bell text-[13px] group-hover:scale-110 transition-transform"></i>
-                        @php
-                            $unreadCount = 0; // Set to actual unread notifications count if available
-                        @endphp
-                        <span class="absolute top-1.5 right-1.5 flex h-2 w-2 @if($unreadCount === 0) hidden @endif">
+
+<span class="absolute top-1.5 right-1.5 flex h-2 w-2 {{ $unreadCount > 0 ? 'block' : 'hidden' }}">
                             <span
                                 class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
                             <span
@@ -133,13 +157,33 @@
                     <div x-show="notifOpen" x-transition
                         class="absolute right-0 top-full mt-3 w-80 bg-white/95 backdrop-blur-2xl rounded-3xl shadow-[0_24px_64px_-16px_rgba(0,0,0,0.15)] border border-white/20 overflow-hidden z-50"
                         style="display: none;">
-                        <div class="p-5 border-b border-gray-100/50">
+                        <div class="p-5 border-b border-gray-100/50 flex items-center justify-between">
                             <h3 class="text-sm font-semibold text-gray-900">Notifications</h3>
+                            @if($unreadCount > 0)
+                                <span class="px-2 py-0.5 rounded-full bg-red-500 text-white text-[10px] font-bold">{{ $unreadCount }}</span>
+                            @endif
                         </div>
-                        <div class="py-10 text-center text-gray-400">
-                            <i class="far fa-bell text-3xl mb-3"></i>
-                            <p class="text-sm font-medium">No new notifications</p>
-                        </div>
+                        @if($notifications->isNotEmpty())
+                            <div class="max-h-80 overflow-y-auto">
+                                @foreach($notifications as $notification)
+                                    <a href="{{ $notification['link'] }}" class="flex items-center gap-3 px-5 py-3 hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0">
+                                        <div class="w-9 h-9 rounded-xl {{ $notification['color'] }} flex items-center justify-center shrink-0">
+                                            <i class="fas {{ $notification['icon'] }} text-sm"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-xs font-semibold text-gray-900 truncate">{{ $notification['title'] }}</p>
+                                            <p class="text-[10px] text-gray-400 mt-0.5">{{ $notification['time'] }}</p>
+                                        </div>
+                                        <span class="w-2 h-2 rounded-full bg-red-500 shrink-0" title="Belum dibaca"></span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <div class="py-10 text-center text-gray-400">
+                                <i class="far fa-bell text-3xl mb-3"></i>
+                                <p class="text-sm font-medium">No new notifications</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
 

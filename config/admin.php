@@ -42,6 +42,22 @@ return [
         ],
 
         [
+            'id'          => 'member-services',
+            'label'       => 'Layanan Anggota',
+            'color'       => 'gray',
+            'permissions' => [],
+            'items'       => [
+                ['icon' => 'fa-calendar-alt', 'label' => 'Kegiatan & Presensi', 'route' => 'admin.member.calendar', 'pattern' => 'admin.member.calendar'],
+                ['icon' => 'fa-user-check', 'label' => 'Riwayat Kehadiran', 'route' => 'admin.member.attendance', 'pattern' => 'admin.member.attendance'],
+                ['icon' => 'fa-newspaper', 'label' => 'Berita', 'route' => 'admin.member.news', 'pattern' => 'admin.member.news'],
+                ['icon' => 'fa-folder-open', 'label' => 'Dokumen', 'route' => 'admin.member.documents', 'pattern' => 'admin.member.documents'],
+                ['icon' => 'fa-users', 'label' => 'Anggota Divisi', 'route' => 'admin.member.division', 'pattern' => 'admin.member.division'],
+                ['icon' => 'fa-images', 'label' => 'Galeri', 'route' => 'admin.member.gallery', 'pattern' => 'admin.member.gallery'],
+                ['icon' => 'fa-cog', 'label' => 'Pengaturan', 'route' => 'admin.member.settings', 'pattern' => 'admin.member.settings'],
+            ],
+        ],
+
+        [
             'id'          => 'master-data',
             'label'       => 'Data Master',
             'color'       => 'purple',
@@ -112,12 +128,6 @@ return [
      | Fixed footer links in the sidebar (settings section).
      */
     'settings' => [
-        [
-            'label'      => 'Profile',
-            'icon'       => 'fa-user-circle',
-            'route'      => 'admin.profile.edit',
-            'pattern'    => 'admin.profile.*',
-        ],
         [
             'label'      => 'Pengaturan',
             'icon'       => 'fa-cog',
