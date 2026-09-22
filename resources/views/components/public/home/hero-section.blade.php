@@ -17,7 +17,7 @@
                 </h1>
 
                 <p class="text-[17px] text-gray-500 leading-relaxed mb-12 max-w-[460px]">
-                    Kami mewadahi mahasiswa yang ingin mencipta — aplikasi, visual, dan ekosistem teknologi yang berdampak.
+                    Tempat mahasiswa membangun aplikasi, karya visual, dan produk teknologi nyata.
                 </p>
 
                 @php

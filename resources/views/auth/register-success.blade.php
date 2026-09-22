@@ -40,7 +40,7 @@
                     {{-- Selected Division --}}
                     @if ($member && $member->division)
                         <div class="flex items-center gap-3.5 bg-white rounded-2xl p-3 border border-gray-100 shadow-sm">
-                            <div class="w-12 h-12 rounded-xl bg-[#3664AF]/5 border border-[#3664AF]/10 p-2 flex items-center justify-center shrink-0">
+                            <div class="w-12 h-12 rounded-xl bg-[#1a73e8]/5 border border-[#1a73e8]/10 p-2 flex items-center justify-center shrink-0">
                                 @if ($member->division->image)
                                     <img src="{{ asset('storage/' . $member->division->image) }}" alt="{{ $member->division->name }}" class="w-full h-full object-contain">
                                 @else

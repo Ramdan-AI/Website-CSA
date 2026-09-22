@@ -7,7 +7,7 @@
     <meta name="description" content="Organisasi berbasis IT di STMIK Mardira Indonesia. Pemrograman, Multimedia, dan segala hal tentang teknologi kreatif.">
     <link rel="icon" href="{{ asset('storage/system/logos/csa-logo.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900&family=jetbrains-mono:400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|inter:400,500,600,700&family=jetbrains-mono:400,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -20,6 +20,9 @@
             color: #0f172a;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
         }
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
@@ -37,24 +40,29 @@
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
-        .glass {
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border: 0.5px solid rgba(255, 255, 255, 0.8);
+        [data-slider-track] {
+            touch-action: pan-x pan-y;
+            -webkit-overflow-scrolling: touch;
         }
-        .glow-blue {
-            box-shadow: 0 0 60px -10px rgba(59, 130, 246, 0.15), 0 0 120px -20px rgba(59, 130, 246, 0.08);
+        [data-slider-track].is-dragging {
+            cursor: grabbing;
+            user-select: none;
         }
-        .glow-emerald {
-            box-shadow: 0 0 60px -10px rgba(16, 185, 129, 0.15), 0 0 120px -20px rgba(16, 185, 129, 0.08);
+        [data-slider-track]:not(.is-dragging) {
+            cursor: grab;
+        }
+        [data-marquee] {
+            overflow: hidden;
+        }
+        [data-marquee-track] {
+            will-change: transform;
         }
     </style>
 </head>
 <body class="antialiased">
     <x-public.navigation.navbar />
 
-    <main>
+    <main class="pt-16">
         @yield('content')
     </main>
 

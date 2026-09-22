@@ -8,7 +8,6 @@ use App\Models\Attendance;
 use App\Models\Document;
 use App\Models\Event;
 use App\Models\Gallery;
-use App\Models\Member;
 use App\Models\News;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
@@ -16,22 +15,48 @@ use Illuminate\Support\Facades\Auth;
 
 class MemberPageController extends Controller
 {
+    /**
+     * Resolve the member profile linked to the authenticated user.
+     */
     private function member()
     {
         return Auth::user()->member;
     }
 
-    public function attendance(Request $request)
+    /**
+     * Some pages only make sense for users with a member profile.
+     * Non-member staff (e.g. pure admin accounts) get redirected instead of a 500.
+     */
+    private function requireMember()
     {
         $member = $this->member();
 
-        $stats = Attendance::where('member_id', $member->id)
+        if (!$member) {
+            abort(redirect()->route('admin.dashboard')
+                ->with('error', 'Akun Anda belum terhubung dengan data anggota.'));
+        }
+
+        return $member;
+    }
+
+    public function attendance(Request $request)
+    {
+        $member = $this->requireMember();
+
+        $statsRow = Attendance::where('member_id', $member->id)
             ->selectRaw("COUNT(*) as total")
             ->selectRaw("SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present")
             ->selectRaw("SUM(CASE WHEN status = 'permit' THEN 1 ELSE 0 END) as permit")
             ->selectRaw("SUM(CASE WHEN status = 'sick' THEN 1 ELSE 0 END) as sick")
             ->selectRaw("SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent")
             ->first();
+
+        $stats = [
+            'present' => (int) ($statsRow->present ?? 0),
+            'permit' => (int) ($statsRow->permit ?? 0),
+            'sick' => (int) ($statsRow->sick ?? 0),
+            'absent' => (int) ($statsRow->absent ?? 0),
+        ];
 
         $validated = $request->validate([
             'search' => ['nullable', 'string', 'max:100'],
@@ -110,6 +135,7 @@ class MemberPageController extends Controller
         $sort = $validated['sort'] ?? 'newest';
 
         $documents = Document::query()
+            ->with('user')
             ->when($validated['search'] ?? null, fn ($query, $search) =>
                 $query->where('title', 'like', "%{$search}%")
             )
@@ -125,17 +151,37 @@ class MemberPageController extends Controller
 
     public function calendar()
     {
-        $events = Event::whereIn('status', ['published', 'closed'])
-            ->get(['id', 'title', 'description', 'location', 'event_date', 'status', 'attendance_enabled', 'attendance_code']);
+        $member = $this->member();
 
-        return view('pages.member.calendar.index', compact('events'));
+        $events = Event::whereIn('status', ['published', 'closed'])
+            ->orderBy('event_date')
+            ->get([
+                'id',
+                'title',
+                'description',
+                'location',
+                'event_date',
+                'status',
+                'attendance_enabled',
+                'attendance_code',
+                'attendance_closed_at',
+            ]);
+
+        $attendanceByEvent = $member
+            ? Attendance::where('member_id', $member->id)
+                ->whereIn('event_id', $events->pluck('id'))
+                ->get()
+                ->keyBy('event_id')
+            : collect();
+
+        return view('pages.member.calendar.index', compact('events', 'attendanceByEvent'));
     }
 
     public function division(Request $request)
     {
-        $member = $this->member();
+        $member = $this->requireMember();
 
-        if (!$member?->division) {
+        if (!$member->division) {
             return redirect()->route('admin.dashboard')->with('error', 'Anda belum memiliki divisi.');
         }
 
@@ -160,13 +206,13 @@ class MemberPageController extends Controller
     {
         $albums = Album::withCount('galleries')->latest()->get();
 
-        $heroGalleries = Gallery::where('is_hero', true)->latest()->get();
-        $recentGalleries = Gallery::latest()->take(12)->get();
+        $heroGalleries = Gallery::with('album')->where('is_hero', true)->latest()->get();
+        $recentGalleries = Gallery::with('album')->latest()->take(12)->get();
 
         return view('pages.member.gallery.index', compact('albums', 'heroGalleries', 'recentGalleries'));
     }
 
-public function settings()
+    public function settings()
     {
         $user = Auth::user();
         $member = $this->member();
@@ -177,6 +223,7 @@ public function settings()
     public function markNotificationsSeen(Request $request)
     {
         session(['notifications_seen_at' => now()->timestamp]);
+
         return response()->json(['success' => true]);
     }
 
@@ -184,36 +231,17 @@ public function settings()
 
     public function selfAttendance(Request $request, Event $event)
     {
-        $member = $this->member();
+        $member = $this->requireMember();
 
-        if (!$event->attendance_enabled) {
-            return back()->with('error', 'Presensi mandiri belum dibuka untuk kegiatan ini.');
+        if ($error = $this->attendanceGuard($event, requireClosed: false)) {
+            return back()->with('error', $error);
         }
 
-        if ($event->attendance_closed_at) {
-            return back()->with('error', 'Sesi presensi sudah ditutup.');
-        }
-
-        if ($event->event_date->isPast()) {
+        if ($this->attendanceTodayPassed($event)) {
             return back()->with('error', 'Kegiatan sudah lewat, tidak bisa presensi mandiri.');
         }
 
-        $existing = Attendance::where('event_id', $event->id)
-            ->where('member_id', $member->id)
-            ->first();
-
-        if ($existing) {
-            return back()->with('info', 'Anda sudah tercatat hadir pada kegiatan ini.');
-        }
-
-        Attendance::create([
-            'event_id' => $event->id,
-            'member_id' => $member->id,
-            'status' => 'present',
-            'check_in_at' => now(),
-        ]);
-
-        return back()->with('success', 'Presensi mandiri berhasil! Anda tercatat HADIR.');
+        return $this->recordPresence($event, $member, 'present', 'Presensi mandiri berhasil! Anda tercatat HADIR.');
     }
 
     public function scanAttendance(Request $request, Event $event)
@@ -222,7 +250,7 @@ public function settings()
             'code' => ['required', 'string', 'size:6'],
         ]);
 
-        $member = $this->member();
+        $member = $this->requireMember();
 
         if (!$event->attendance_enabled || $event->attendance_code !== $request->code) {
             return back()->with('error', 'Kode QR tidak valid atau tidak sesuai dengan kegiatan ini.');
@@ -232,99 +260,38 @@ public function settings()
             return back()->with('error', 'Sesi presensi sudah ditutup.');
         }
 
-        if ($event->event_date->isPast()) {
+        if ($this->attendanceTodayPassed($event)) {
             return back()->with('error', 'Kegiatan sudah lewat, tidak bisa presensi via QR.');
         }
 
-        $existing = Attendance::where('event_id', $event->id)
-            ->where('member_id', $member->id)
-            ->first();
-
-        if ($existing) {
-            return back()->with('info', 'Anda sudah tercatat hadir pada kegiatan ini.');
-        }
-
-        Attendance::create([
-            'event_id' => $event->id,
-            'member_id' => $member->id,
-            'status' => 'present',
-            'check_in_at' => now(),
-        ]);
-
-        return back()->with('success', 'Scan QR berhasil! Anda tercatat HADIR.');
+        return $this->recordPresence($event, $member, 'present', 'Scan QR berhasil! Anda tercatat HADIR.');
     }
 
     public function sickAttendance(Request $request, Event $event)
     {
-        $member = $this->member();
+        $member = $this->requireMember();
 
-        if (!$event->attendance_enabled) {
-            return back()->with('error', 'Presensi belum dibuka untuk kegiatan ini.');
+        if ($error = $this->attendanceGuard($event)) {
+            return back()->with('error', $error);
         }
 
-        if ($event->attendance_closed_at) {
-            return back()->with('error', 'Sesi presensi sudah ditutup.');
-        }
-
-        $existing = Attendance::where('event_id', $event->id)
-            ->where('member_id', $member->id)
-            ->first();
-
-        if ($existing) {
-            $existing->update([
-                'status' => 'sick',
-                'check_in_at' => null,
-            ]);
-            return back()->with('success', 'Status diubah menjadi SAKIT.');
-        }
-
-        Attendance::create([
-            'event_id' => $event->id,
-            'member_id' => $member->id,
-            'status' => 'sick',
-            'check_in_at' => null,
-        ]);
-
-        return back()->with('success', 'Status dicatat sebagai SAKIT.');
+        return $this->recordPresence($event, $member, 'sick', 'Status dicatat sebagai SAKIT.');
     }
 
     public function permitAttendance(Request $request, Event $event)
     {
-        $member = $this->member();
+        $member = $this->requireMember();
 
-        if (!$event->attendance_enabled) {
-            return back()->with('error', 'Presensi belum dibuka untuk kegiatan ini.');
+        if ($error = $this->attendanceGuard($event)) {
+            return back()->with('error', $error);
         }
 
-        if ($event->attendance_closed_at) {
-            return back()->with('error', 'Sesi presensi sudah ditutup.');
-        }
-
-        $existing = Attendance::where('event_id', $event->id)
-            ->where('member_id', $member->id)
-            ->first();
-
-        if ($existing) {
-            $existing->update([
-                'status' => 'permit',
-                'check_in_at' => null,
-            ]);
-            return back()->with('success', 'Status diubah menjadi IZIN.');
-        }
-
-        Attendance::create([
-            'event_id' => $event->id,
-            'member_id' => $member->id,
-            'status' => 'permit',
-            'check_in_at' => null,
-        ]);
-
-        return back()->with('success', 'Status dicatat sebagai IZIN.');
+        return $this->recordPresence($event, $member, 'permit', 'Status dicatat sebagai IZIN.');
     }
 
     public function alfaAttendance(Request $request, Event $event)
     {
-        $member = $this->member();
+        $member = $this->requireMember();
 
         if (!$event->attendance_enabled) {
             return back()->with('error', 'Presensi belum dibuka untuk kegiatan ini.');
@@ -334,25 +301,71 @@ public function settings()
             return back()->with('error', 'Sesi presensi belum ditutup, tidak bisa menandai Alfa.');
         }
 
+        return $this->recordPresence($event, $member, 'absent', 'Status dicatat sebagai ALFA.');
+    }
+
+    // ==================== HELPERS ====================
+
+    /**
+     * Shared preconditions for member-driven attendance actions.
+     */
+    private function attendanceGuard(Event $event, bool $requireClosed = false): ?string
+    {
+        if (!$event->attendance_enabled) {
+            return 'Presensi belum dibuka untuk kegiatan ini.';
+        }
+
+        if ($requireClosed) {
+            return !$event->attendance_closed_at
+                ? 'Sesi presensi belum ditutup.'
+                : null;
+        }
+
+        if ($event->attendance_closed_at) {
+            return 'Sesi presensi sudah ditutup.';
+        }
+
+        return null;
+    }
+
+    /**
+     * An event counts as "passed" only after the end of its scheduled day,
+     * not at 00:00 of that same day.
+     */
+    private function attendanceTodayPassed(Event $event): bool
+    {
+        return $event->event_date && $event->event_date->isBefore(now()->startOfDay());
+    }
+
+    /**
+     * Create or update the single attendance row for this member/event pair.
+     */
+    private function recordPresence(Event $event, $member, string $status, string $message)
+    {
         $existing = Attendance::where('event_id', $event->id)
             ->where('member_id', $member->id)
             ->first();
 
+        $attributes = [
+            'status' => $status,
+            'check_in_at' => $status === 'present' ? now() : null,
+        ];
+
         if ($existing) {
-            $existing->update([
-                'status' => 'absent',
-                'check_in_at' => null,
-            ]);
-            return back()->with('success', 'Status diubah menjadi ALFA.');
+            if ($existing->status === $status && $status === 'present') {
+                return back()->with('info', 'Anda sudah tercatat hadir pada kegiatan ini.');
+            }
+
+            $existing->update($attributes);
+
+            return back()->with('success', $message);
         }
 
-        Attendance::create([
+        Attendance::create(array_merge($attributes, [
             'event_id' => $event->id,
             'member_id' => $member->id,
-            'status' => 'absent',
-            'check_in_at' => null,
-        ]);
+        ]));
 
-        return back()->with('success', 'Status dicatat sebagai ALFA.');
+        return back()->with('success', $message);
     }
 }

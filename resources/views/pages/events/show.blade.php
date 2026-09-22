@@ -1,104 +1,79 @@
 @extends('layouts.admin')
 
-@section('content')
-<div class="space-y-6">
+@php
+    $attendanceChip = match (true) {
+        $event->attendance_enabled && !$event->attendance_closed_at => ['Presensi Dibuka', 'csa-chip-green'],
+        (bool) $event->attendance_closed_at => ['Presensi Ditutup', 'csa-chip-red'],
+        default => ['Belum Dibuka', 'csa-chip-amber'],
+    };
+@endphp
 
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+@section('content')
+<div class="space-y-4 sm:space-y-5">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <a href="{{ route('admin.events.index') }}" class="text-xs text-gray-400 hover:text-gray-600 font-semibold mb-2 inline-block">
-                <i class="fas fa-arrow-left mr-1"></i> Kembali ke Daftar Event
+            <a href="{{ route('admin.events.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+                <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Acara
             </a>
-            <h1 class="text-3xl font-bold text-gray-900">{{ $event->title }}</h1>
-            <p class="text-sm text-gray-400 mt-1 font-medium">
-                <i class="fas fa-calendar mr-1 text-cyan-500"></i> {{ $event->event_date?->format('d M Y') }}
+            <h1 class="text-[22px] sm:text-[26px] font-bold text-[var(--text-primary)] tracking-[-0.03em] mt-2">{{ $event->title }}</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1 inline-flex items-center gap-3 flex-wrap">
+                <span class="inline-flex items-center gap-1.5"><x-admin.icon name="calendar-days" :size="14" /> {{ $event->event_date?->translatedFormat('d M Y') }}</span>
                 @if($event->location)
-                    <span class="mx-2">•</span>
-                    <i class="fas fa-map-marker-alt mr-1 text-cyan-500"></i> {{ $event->location }}
+                    <span class="inline-flex items-center gap-1.5"><x-admin.icon name="map-pin" :size="14" /> {{ $event->location }}</span>
                 @endif
             </p>
         </div>
-
         @can('manage-events')
-            <div class="flex items-center gap-2">
-                <a href="{{ route('admin.events.edit', $event) }}" class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition-colors">
-                    <i class="fas fa-pen mr-1"></i> Edit Event
-                </a>
-            </div>
+            <a href="{{ route('admin.events.edit', $event) }}" class="csa-btn csa-btn-ghost">
+                <x-admin.icon name="pen" :size="16" /> Edit Acara
+            </a>
         @endcan
     </div>
 
     @if($event->banner_url)
-        <div class="w-full max-h-[300px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-gray-100">
+        <div class="w-full max-h-[300px] rounded-2xl overflow-hidden bg-[var(--bg-muted)]">
             <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover">
         </div>
     @endif
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h3 class="text-base font-bold text-gray-900 mb-4">Deskripsi Kegiatan</h3>
-                <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed">
-                    {!! nl2br(e($event->description)) !!}
-                </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <section class="lg:col-span-2 csa-card p-5">
+            <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-3">Deskripsi Kegiatan</h3>
+            <div class="text-[13px] text-[var(--text-secondary)] leading-relaxed">{!! nl2br(e($event->description)) !!}</div>
+        </section>
+
+        <section class="csa-card p-5 space-y-4 h-fit">
+            <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Pendaftaran & Presensi</h3>
+
+            <div>
+                <p class="text-[11px] text-[var(--text-muted)] mb-1.5">Status Acara</p>
+                <span class="csa-chip {{ $event->status === 'published' ? 'csa-chip-green' : '' }}">{{ ucfirst($event->status) }}</span>
             </div>
-        </div>
 
-        <div class="space-y-6">
-            <div class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-                <h3 class="text-base font-bold text-gray-900 mb-4">Pendaftaran & Presensi</h3>
-
-                <div class="space-y-4">
-                    <div>
-                        <p class="text-xs text-gray-400 font-semibold mb-1">STATUS EVENT</p>
-                        <span class="px-3 py-1 rounded-lg text-xs font-semibold 
-                            {{ $event->status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500' }}">
-                            {{ ucfirst($event->status) }}
-                        </span>
-                    </div>
-
-                    <div>
-                        <p class="text-xs text-gray-400 font-semibold mb-1">STATUS PRESENSI</p>
-                        @if($event->attendance_enabled && !$event->attendance_closed_at)
-                            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-600">Presensi Dibuka</span>
-                        @elseif($event->attendance_closed_at)
-                            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-red-50 text-red-500">Presensi Ditutup</span>
-                        @else
-                            <span class="px-3 py-1 rounded-lg text-xs font-semibold bg-amber-50 text-amber-600">Belum Dibuka</span>
-                        @endif
-                    </div>
-
-                    @if($event->registration_link)
-                        <div class="pt-2">
-                            <a href="{{ $event->registration_link }}" target="_blank" class="w-full py-2.5 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
-                                <i class="fas fa-external-link-alt"></i>
-                                Link Pendaftaran Eksternal
-                            </a>
-                        </div>
-                    @else
-                        @if($event->attendance_enabled && !$event->attendance_closed_at)
-                            <div class="pt-2">
-                                <form action="{{ route('admin.events.register', $event) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors">
-                                        <i class="fas fa-user-plus"></i>
-                                        Daftar / Check-In Kehadiran
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-                    @endif
-
-                    @can('manage-attendances')
-                    <div class="pt-4 border-t border-gray-100">
-                        <a href="{{ route('admin.attendances.event', $event) }}" class="inline-flex items-center justify-center gap-2 w-full py-2 px-4 bg-gray-900 text-white text-xs font-semibold rounded-xl hover:bg-gray-800 transition-colors">
-                            <i class="fas fa-user-check mr-1"></i> Kelola Presensi & Export
-                        </a>
-                    </div>
-                    @endcan
-                </div>
+            <div>
+                <p class="text-[11px] text-[var(--text-muted)] mb-1.5">Status Presensi</p>
+                <span class="csa-chip {{ $attendanceChip[1] }}">{{ $attendanceChip[0] }}</span>
             </div>
-        </div>
+
+            @if($event->registration_link)
+                <a href="{{ $event->registration_link }}" target="_blank" rel="noopener" class="csa-btn csa-btn-ghost w-full">
+                    <x-admin.icon name="external-link" :size="16" /> Link Pendaftaran Eksternal
+                </a>
+            @elseif($event->attendance_enabled && !$event->attendance_closed_at)
+                <form action="{{ route('admin.events.register', $event) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="csa-btn csa-btn-primary w-full">
+                        <x-admin.icon name="user-plus" :size="16" /> Daftar / Check-In
+                    </button>
+                </form>
+            @endif
+
+            @can('manage-attendances')
+                <a href="{{ route('admin.attendances.event', $event) }}" class="csa-btn csa-btn-ghost w-full">
+                    <x-admin.icon name="clipboard-check" :size="16" /> Kelola Presensi & Export
+                </a>
+            @endcan
+        </section>
     </div>
-
 </div>
 @endsection

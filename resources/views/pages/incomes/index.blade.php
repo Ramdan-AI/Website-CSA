@@ -1,87 +1,60 @@
-{{-- resources/views/pages/admin/incomes/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('content')
-    <div class="space-y-6">
-
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-            <div>
-                <p class="text-xs font-semibold text-emerald-400 uppercase tracking-widest">Keuangan</p>
-                <h1 class="text-3xl font-bold text-gray-900 mt-1">Pemasukan</h1>
-                <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola data pemasukan dan keuangan organisasi CSA.</p>
-            </div>
-            <a href="{{ route('admin.incomes.create') }}"
-                class="relative inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold rounded-2xl shadow-[0_4px_20px_rgba(16,185,129,0.3)] hover:shadow-[0_4px_25px_rgba(16,185,129,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
-                <div
-                    class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                </div>
-                <span class="relative flex items-center gap-2">
-                    <i class="fas fa-plus text-xs"></i>
-                    Tambah Pemasukan
-                </span>
-            </a>
+<div class="space-y-4 sm:space-y-5">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Pemasukan</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola data pemasukan dan keuangan organisasi CSA.</p>
         </div>
-
-        <x-admin.table :headers="[
-            ['label' => 'Keterangan', 'width' => ''],
-            ['label' => 'Jumlah', 'width' => ''],
-            ['label' => 'Tanggal', 'width' => ''],
-            ['label' => 'Dicatat Oleh', 'width' => ''],
-            ['label' => 'Aksi', 'width' => 'w-24'],
-        ]" :hasPages="$incomes->hasPages()" :paginator="$incomes">
-            @forelse($incomes as $income)
-                <tr class="hover:bg-emerald-50/30 transition-colors duration-200">
-                    <td class="py-4 px-6">
-                        <div class="min-w-0">
-                            <p class="text-sm font-bold text-gray-900 truncate">{{ $income->title }}</p>
-                            @if ($income->description)
-                                <p class="text-[11px] text-gray-400 line-clamp-1 mt-0.5">{{ $income->description }}</p>
-                            @endif
-                        </div>
-                    </td>
-
-                    <td class="py-4 px-6">
-                        <span class="inline-flex items-center gap-1 text-sm font-bold text-emerald-600">
-                            <span class="text-[10px]">Rp</span>
-                            {{ number_format($income->amount, 0, ',', '.') }}
-                        </span>
-                    </td>
-
-                    <td class="py-4 px-6">
-                        <span class="text-xs text-gray-600">{{ $income->transaction_date->format('d M Y') }}</span>
-                    </td>
-
-                    <td class="py-4 px-6">
-                        <div class="flex items-center gap-2">
-                            <div
-                                class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white shrink-0 shadow-sm">
-                                <img src="{{ $income->user->avatar ? asset('storage/' . $income->user->avatar) : asset('storage/profile/profile-placeholder.png') }}" alt="{{ $income->user->name }}" class="w-full h-full object-cover">
-                            </div>
-                            <span class="text-xs text-gray-600">{{ $income->user->name }}</span>
-                        </div>
-                    </td>
-
-                    <td class="py-4 px-6">
-                        <div class="flex items-center gap-1">
-                            <a href="{{ route('admin.incomes.edit', $income) }}"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(16,185,129,0.3)]"
-                                title="Edit">
-                                <i class="fas fa-pen text-[10px]"></i>
-                            </a>
-                            <button
-                                onclick="openDeleteModal('deleteModal', '{{ route('admin.incomes.destroy', $income) }}')"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
-                                title="Hapus">
-                                <i class="fas fa-trash text-[10px]"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            @empty
-                <x-admin.empty-state icon="fa-arrow-trend-up" title="Belum ada pemasukan"
-                    description="Tambahkan data pemasukan pertama" :createRoute="route('admin.incomes.create')" createLabel="Tambah Pemasukan"
-                    :colspan="5" />
-            @endforelse
-        </x-admin.table>
+        <a href="{{ route('admin.incomes.create') }}" class="csa-btn csa-btn-primary">
+            <x-admin.icon name="plus" :size="16" /> Tambah Pemasukan
+        </a>
     </div>
+
+    <x-admin.table :headers="[
+        ['label' => 'Keterangan'],
+        ['label' => 'Jumlah'],
+        ['label' => 'Tanggal'],
+        ['label' => 'Dicatat Oleh'],
+        ['label' => 'Aksi', 'width' => 'w-24'],
+    ]"
+        empty-icon="trending-up"
+        empty-title="Belum ada pemasukan"
+        empty-description="Tambahkan data pemasukan pertama."
+        :create-route="route('admin.incomes.create')"
+        create-label="Tambah Pemasukan"
+        :has-pages="$incomes->hasPages()"
+        :paginator="$incomes">
+        @forelse($incomes as $income)
+            <tr class="csa-table-row">
+                <td class="csa-table-td">
+                    <p class="text-[13px] font-medium text-[var(--text-primary)]">{{ $income->title }}</p>
+                    @if ($income->description)
+                        <p class="text-[11px] text-[var(--text-muted)] line-clamp-1 mt-0.5">{{ $income->description }}</p>
+                    @endif
+                </td>
+                <td class="csa-table-td font-medium text-emerald-600 dark:text-emerald-400 whitespace-nowrap">Rp {{ number_format($income->amount, 0, ',', '.') }}</td>
+                <td class="csa-table-td whitespace-nowrap">{{ $income->transaction_date->translatedFormat('d M Y') }}</td>
+                <td class="csa-table-td">
+                    <div class="flex items-center gap-2">
+                        <img src="{{ $income->user->avatar ? asset('storage/' . $income->user->avatar) : asset('storage/profile/profile-placeholder.png') }}" alt="{{ $income->user->name }}" class="w-7 h-7 rounded-full object-cover shrink-0">
+                        <span class="text-[12px] text-[var(--text-secondary)]">{{ $income->user->name }}</span>
+                    </div>
+                </td>
+                <td class="csa-table-td">
+                    <div class="flex items-center gap-1">
+                        <a href="{{ route('admin.incomes.edit', $income) }}" class="csa-icon-btn" title="Edit" aria-label="Edit pemasukan">
+                            <x-admin.icon name="pen" :size="16" />
+                        </a>
+                        <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.incomes.destroy', $income) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus pemasukan">
+                            <x-admin.icon name="trash-2" :size="16" />
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        @empty
+        @endforelse
+    </x-admin.table>
+</div>
 @endsection

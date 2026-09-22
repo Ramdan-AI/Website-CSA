@@ -1,184 +1,88 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
-
+<div class="space-y-4 sm:space-y-5 max-w-3xl">
     <div>
-        <p class="text-xs font-semibold text-teal-400 uppercase tracking-widest">Publikasi</p>
-        <h1 class="text-3xl font-bold text-gray-900 mt-1">Tambah Berita</h1>
-        <p class="text-sm text-gray-400 mt-1.5 font-medium">Publikasikan berita baru ke dalam sistem konten.</p>
+        <a href="{{ route('admin.news.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+            <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Berita
+        </a>
+        <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em] mt-2">Tambah Berita</h1>
+        <p class="text-[13px] text-[var(--text-muted)] mt-1">Publikasikan berita baru ke dalam sistem konten.</p>
     </div>
 
-    <div class="relative bg-white/70 backdrop-blur-xl rounded-[30px] border border-white/50 shadow-[0_2px_16px_-4px_rgba(20,184,166,0.08)] overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-teal-400/5 to-cyan-400/5 pointer-events-none"></div>
+    <form action="{{ route('admin.news.store') }}" method="POST" enctype="multipart/form-data" class="csa-card p-5 sm:p-6 space-y-4">
+        @csrf
 
-        <div class="relative p-6">
-            <form action="{{ route('admin.news.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                @csrf
-
-                <div class="bg-gray-50/40 rounded-[24px] p-5">
-                    <h3 class="text-[13px] font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <span class="w-1.5 h-5 rounded-full bg-teal-500"></span>
-                        Informasi Berita
-                    </h3>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="category_id" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
-                                Kategori <span class="text-red-400">*</span>
-                            </label>
-                            <select name="category_id" id="category_id" required
-                                    class="w-full h-[44px] px-4 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all bg-white/60">
-                                <option value="">Pilih Kategori</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('category_id')
-                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="title" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
-                                Judul <span class="text-red-400">*</span>
-                            </label>
-                            <input type="text" name="title" id="title"
-                                   value="{{ old('title') }}"
-                                   class="w-full h-[44px] px-4 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all bg-white/60"
-                                   placeholder="Judul berita" required autofocus>
-                            @error('title')
-                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="content" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
-                                Konten <span class="text-red-400">*</span>
-                            </label>
-                            <textarea name="content" id="content" rows="10"
-                                      class="w-full px-4 py-3 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all resize-y bg-white/60"
-                                      placeholder="Tuliskan isi berita..." required>{{ old('content') }}</textarea>
-                            @error('content')
-                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="status" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
-                                    Status <span class="text-red-400">*</span>
-                                </label>
-                                <select name="status" id="status" required
-                                        class="w-full h-[44px] px-4 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all bg-white/60">
-                                    <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Published</option>
-                                </select>
-                                @error('status')
-                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <div>
-                                <label for="published_at" class="block text-[11px] font-semibold text-gray-500 mb-1.5">
-                                    Tanggal Publish <span class="text-gray-400 font-normal">(opsional)</span>
-                                </label>
-                                <input type="datetime-local" name="published_at" id="published_at"
-                                       value="{{ old('published_at') }}"
-                                       class="w-full h-[44px] px-4 rounded-[14px] border border-gray-200/80 text-[13px] focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-400/15 transition-all bg-white/60">
-                                @error('published_at')
-                                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50/40 rounded-[24px] p-5">
-                    <h3 class="text-[13px] font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <span class="w-1.5 h-5 rounded-full bg-teal-500"></span>
-                        Gambar Berita (Maks 8 gambar)
-                    </h3>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-[11px] font-semibold text-gray-500 mb-1.5">
-                                Upload Gambar <span class="text-gray-400 font-normal">(opsional)</span>
-                            </label>
-                            <div class="relative">
-                                <div class="border-2 border-dashed border-gray-200/80 rounded-[14px] p-6 flex flex-col items-center justify-center hover:border-teal-300 transition-colors cursor-pointer"
-                                     onclick="document.getElementById('news-images-input').click()">
-                                    <i class="fas fa-cloud-upload-alt text-2xl text-gray-400 mb-2"></i>
-                                    <p class="text-sm text-gray-500">Klik atau drag & drop gambar</p>
-                                    <p class="text-xs text-gray-400 mt-1">JPG, PNG, WEBP. Maks 2MB per file, total 8 file.</p>
-                                </div>
-                                <input type="file" name="images[]" id="news-images-input" accept="image/jpeg,image/png,image/webp" multiple class="hidden" onchange="previewNewsImages(event)">
-                            </div>
-                            @error('images')
-                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div id="news-images-preview" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 hidden">
-                            {{-- Preview images will be inserted here --}}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center gap-3 pt-2">
-                    <button type="submit"
-                            class="relative inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-[13px] font-semibold rounded-[18px] shadow-[0_4px_16px_-4px_rgba(20,184,166,0.3)] hover:shadow-[0_8px_24px_-4px_rgba(20,184,166,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
-                        <div class="absolute inset-0 bg-white/20 rounded-[18px] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        <span class="relative flex items-center gap-2">
-                            <i class="fas fa-plus text-[10px]"></i>
-                            Tambah Berita
-                        </span>
-                    </button>
-                    <a href="{{ route('admin.news.index') }}"
-                       class="px-5 py-2.5 bg-gray-100 text-gray-700 text-[13px] font-semibold rounded-[18px] hover:bg-gray-200 transition-colors">
-                        Batal
-                    </a>
-                </div>
-            </form>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="category_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Kategori</label>
+                <select name="category_id" id="category_id" required class="csa-input">
+                    <option value="">Pilih Kategori</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>
+                    @endforeach
+                </select>
+                @error('category_id')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
+            </div>
+            <div>
+                <label for="status" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Status</label>
+                <select name="status" id="status" required class="csa-input">
+                    <option value="draft" @selected(old('status') == 'draft')>Draft</option>
+                    <option value="published" @selected(old('status') == 'published')>Published</option>
+                </select>
+                @error('status')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
+            </div>
         </div>
-    </div>
+
+        <x-form.input name="title" id="title" label="Judul" :value="old('title')" placeholder="Judul berita" required autofocus />
+        <x-form.textarea name="content" id="content" label="Konten" :value="old('content')" placeholder="Tuliskan isi berita..." rows="10" required />
+        <x-form.input name="published_at" id="published_at" type="datetime-local" label="Tanggal Publish" :value="old('published_at')" />
+
+        <div>
+            <label class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Gambar Berita <span class="text-[var(--text-muted)] font-normal">· Maks 8 gambar</span></label>
+            <div class="border border-dashed border-[var(--border-strong)] rounded-xl p-6 flex flex-col items-center justify-center hover:border-[var(--accent)] transition-colors cursor-pointer text-[var(--text-muted)]"
+                onclick="document.getElementById('news-images-input').click()">
+                <x-admin.icon name="upload" :size="22" />
+                <p class="text-[13px] font-medium mt-2">Klik untuk upload gambar</p>
+                <p class="text-[11px] mt-0.5">JPG, PNG, WEBP. Maks 2MB per file, total 8 file.</p>
+            </div>
+            <input type="file" name="images[]" id="news-images-input" accept="image/jpeg,image/png,image/webp" multiple class="hidden" onchange="previewNewsImages(event)">
+            @error('images')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
+
+            <div id="news-images-preview" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 hidden mt-3"></div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2 border-t border-[var(--border-soft)]">
+            <button type="submit" class="csa-btn csa-btn-primary">
+                <x-admin.icon name="plus" :size="16" /> Tambah Berita
+            </button>
+            <a href="{{ route('admin.news.index') }}" class="csa-btn csa-btn-ghost">Batal</a>
+        </div>
+    </form>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-function previewNewsImages(event) {
-    const files = event.target.files;
-    if (!files.length) return;
+    function previewNewsImages(event) {
+        const files = event.target.files;
+        if (!files.length) return;
 
-    const container = document.getElementById('news-images-preview');
-    container.classList.remove('hidden');
-    container.innerHTML = '';
+        const container = document.getElementById('news-images-preview');
+        container.classList.remove('hidden');
+        container.innerHTML = '';
 
-    Array.from(files).forEach((file, index) => {
-        if (!file.type.match('image.*')) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const div = document.createElement('div');
-            div.className = 'relative aspect-square bg-white border border-gray-200 rounded-lg overflow-hidden';
-            div.innerHTML = `
-                <img src="${e.target.result}" alt="Preview ${index}" class="w-full h-full object-cover">
-                <button type="button" onclick="this.parentElement.remove(); checkEmptyPreview();" class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs hover:bg-red-600">×</button>
-            `;
-            container.appendChild(div);
-        };
-        reader.readAsDataURL(file);
-    });
-}
-
-function checkEmptyPreview() {
-    const container = document.getElementById('news-images-preview');
-    if (!container.children.length) {
-        container.classList.add('hidden');
+        Array.from(files).forEach((file) => {
+            if (!file.type.match('image.*')) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const div = document.createElement('div');
+                div.className = 'relative aspect-square rounded-lg overflow-hidden bg-[var(--bg-muted)]';
+                div.innerHTML = `<img src="${e.target.result}" alt="Pratinjau" class="w-full h-full object-cover">`;
+                container.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
     }
-}
 </script>
 @endpush

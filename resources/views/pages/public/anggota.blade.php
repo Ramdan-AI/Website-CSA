@@ -1,63 +1,47 @@
 {{-- resources/views/pages/public/anggota.blade.php --}}
 @extends('layouts.landing')
 
-@section('content')
-
 @php
     $baseUrl = route('anggota');
     $filtered = $q !== '' || $divisionSlug !== '';
 @endphp
 
-{{-- HERO: editorial masthead --}}
-<section class="relative overflow-hidden bg-[#fcfcfc]">
-    <div class="absolute top-32 left-[-140px] w-[420px] h-[420px] rounded-full bg-[radial-gradient(circle,rgba(54,100,175,0.06)_0%,transparent_70%)] pointer-events-none hidden lg:block" data-parallax="-80"></div>
-    <div class="absolute bottom-0 right-[-100px] w-[320px] h-[320px] rounded-full bg-[radial-gradient(circle,rgba(54,100,175,0.05)_0%,transparent_70%)] pointer-events-none hidden lg:block" data-parallax="60"></div>
+@section('content')
 
-    {{-- Ghost word --}}
-    <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden="true">
-        <p class="text-[22vw] font-extrabold leading-none tracking-[-0.04em] text-[#3664AF]/[0.035] whitespace-nowrap" data-parallax="-150">ANGGOTA</p>
-    </div>
+{{-- Hero --}}
+<section class="bg-white border-b border-gray-200">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-14 sm:py-20">
+        <h1 class="text-[clamp(1.9rem,4.4vw,2.75rem)] font-bold text-gray-900 leading-[1.2]">
+            Anggota CSA
+        </h1>
+        <p class="text-[16px] sm:text-[17px] text-gray-600 leading-[1.7] mt-4 max-w-[560px]">
+            Daftar anggota aktif Creative Student Association di STMIK Mardira Indonesia.
+        </p>
 
-    <div class="relative max-w-[1200px] mx-auto px-5 sm:px-8 w-full pt-32 sm:pt-40 pb-14 sm:pb-20">
-        <div class="max-w-[820px]" data-parallax="-26">
-            <p class="text-[11px] sm:text-xs font-semibold text-[#3664AF] tracking-[0.22em] uppercase mb-5 sm:mb-6" data-reveal="down">Direktori Anggota</p>
-            <h1 class="text-[clamp(2.2rem,7.5vw,4.5rem)] font-bold text-gray-900 leading-[0.98] tracking-[-0.04em]" data-reveal="curtain" data-reveal-delay="0.1">
-                Wajah-wajah di balik<br><span class="text-[#3664AF]">setiap karya</span>
-            </h1>
-            <p class="text-[15px] sm:text-lg text-gray-500 leading-relaxed mt-6 max-w-[560px]" data-reveal="fade" data-reveal-delay="0.25">
-                Builder dan creator yang aktif membangun ekosistem kreatif di STMIK Mardira Indonesia.
-            </p>
-        </div>
-
-        {{-- Mono stat strip --}}
-        <div class="mt-14 sm:mt-20 border-t-2 border-gray-900 max-w-[640px]" data-reveal-stagger>
-            <div class="flex items-baseline justify-between gap-6 py-5 sm:py-6 border-b border-gray-200">
-                <p class="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 tabular-nums">
-                    {{ $totalMembers }}<span class="text-[#E8A33D]">+</span>
-                </p>
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 text-right">Total Anggota<br class="sm:hidden"><span class="text-gray-500">Aktif berkarya</span></p>
+        <dl class="grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-4 mt-10 max-w-[640px]">
+            <div>
+                <dt class="text-[13px] text-gray-500">Anggota aktif</dt>
+                <dd class="text-[28px] font-bold text-gray-900 mt-1">{{ $totalMembers }}</dd>
             </div>
-            <div class="flex items-baseline justify-between gap-6 py-5 sm:py-6 border-b border-gray-200">
-                <p class="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 tabular-nums">{{ $divisions->count() }}</p>
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 text-right">Divisi Aktif<br class="sm:hidden"><span class="text-gray-500">Cabang minat</span></p>
+            <div>
+                <dt class="text-[13px] text-gray-500">Divisi</dt>
+                <dd class="text-[28px] font-bold text-gray-900 mt-1">{{ $divisions->count() }}</dd>
             </div>
-            <div class="flex items-baseline justify-between gap-6 py-5 sm:py-6 border-b border-gray-200">
-                <p class="text-4xl sm:text-5xl font-semibold tracking-tight text-gray-900 tabular-nums">2017</p>
-                <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 text-right">Berdiri Sejak<br class="sm:hidden"><span class="text-gray-500">STMIK Mardira Indonesia</span></p>
+            <div>
+                <dt class="text-[13px] text-gray-500">Berdiri sejak</dt>
+                <dd class="text-[28px] font-bold text-gray-900 mt-1">2017</dd>
             </div>
-        </div>
+        </dl>
     </div>
 </section>
 
-{{-- DIRECTORY: sticky filter rail + editorial roster --}}
-<section class="relative py-16 md:py-24 lg:py-28 bg-white overflow-hidden">
-    <div class="absolute top-24 right-[-120px] w-[380px] h-[380px] rounded-full bg-[radial-gradient(circle,rgba(54,100,175,0.05)_0%,transparent_70%)] pointer-events-none hidden lg:block" data-parallax="-120"></div>
+{{-- Direktori --}}
+<section class="bg-[#f8f9fa] py-14 sm:py-16">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-8">
+        <div class="grid lg:grid-cols-[260px_1fr] gap-10 lg:gap-14 items-start">
 
-    <div class="relative max-w-[1200px] mx-auto px-5 sm:px-8">
-        <div class="grid lg:grid-cols-[280px_1fr] gap-12 lg:gap-16 items-start">
-            {{-- Filter rail (sticky) --}}
-            <aside
-                class="lg:sticky lg:top-28"
+            {{-- Filter --}}
+            <aside class="lg:sticky lg:top-24"
                 x-data="{
                     q: {{ Illuminate\Support\Js::from($q) }},
                     divisi: {{ Illuminate\Support\Js::from($divisionSlug) }},
@@ -74,81 +58,86 @@
                     let qTimer = null;
                     $watch('q', (val) => { clearTimeout(qTimer); qTimer = setTimeout(() => go(), 500); });
                 ">
-                <p class="text-[11px] sm:text-xs font-semibold text-[#3664AF] tracking-[0.22em] uppercase mb-5" data-reveal="down">Filter</p>
+                <h2 class="text-[15px] font-semibold text-gray-900 mb-4">Filter</h2>
 
-                <div class="relative mb-8" data-reveal="fade" data-reveal-delay="0.15">
-                    <i class="fas fa-search absolute left-0 top-1/2 -translate-y-1/2 text-gray-300 text-sm pointer-events-none"></i>
-                    <input type="text" x-model="q" placeholder="Cari nama..."
-                        class="w-full bg-transparent border-b-2 border-gray-900 pb-3 pl-7 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none transition-colors duration-200">
+                <div class="relative mb-6">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-[14px] pointer-events-none"></i>
+                    <input type="text" x-model="q" placeholder="Cari nama"
+                        class="w-full h-12 pl-11 pr-4 rounded-lg bg-white text-[15px] text-gray-900 placeholder:text-gray-400 border border-gray-300 focus:border-[#1a73e8] focus:outline-none transition-colors">
                 </div>
 
-                <nav class="flex flex-col" data-reveal-stagger>
-                    <button type="button" @click="divisi = ''" class="w-full text-left group">
-                        <div class="flex items-baseline gap-5 py-3.5 border-b-2 transition-colors duration-300"
-                            :class="divisi === '' ? 'border-gray-900' : 'border-gray-200 group-hover:border-gray-300'">
-                            <span class="font-mono text-[12px] font-bold tabular-nums transition-colors duration-300"
-                                :class="divisi === '' ? 'text-[#E8A33D]' : 'text-gray-200 group-hover:text-gray-300'">ALL</span>
-                            <span class="text-base sm:text-lg font-bold tracking-tight transition-colors duration-300"
-                                :class="divisi === '' ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'">Semua Divisi</span>
-                        </div>
+                <nav class="flex flex-col gap-1">
+                    <button type="button" @click="divisi = ''"
+                        class="text-left px-4 py-2.5 rounded-lg text-[15px] transition-colors"
+                        :class="divisi === '' ? 'bg-[#e8f0fe] text-[#1a73e8] font-medium' : 'text-gray-700 hover:bg-gray-200'">
+                        Semua divisi
                     </button>
                     @foreach ($divisions as $division)
-                        <button type="button" @click="divisi = {{ Illuminate\Support\Js::from($division->slug) }}" class="w-full text-left group">
-                            <div class="flex items-baseline gap-5 py-3.5 border-b-2 transition-colors duration-300"
-                                :class="divisi === {{ Illuminate\Support\Js::from($division->slug) }} ? 'border-gray-900' : 'border-gray-200 group-hover:border-gray-300'">
-                                <span class="font-mono text-[12px] font-bold tabular-nums transition-colors duration-300"
-                                    :class="divisi === {{ Illuminate\Support\Js::from($division->slug) }} ? 'text-[#E8A33D]' : 'text-gray-200 group-hover:text-gray-300'">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</span>
-                                <span class="text-base sm:text-lg font-bold tracking-tight transition-colors duration-300"
-                                    :class="divisi === {{ Illuminate\Support\Js::from($division->slug) }} ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-600'">{{ $division->name }}</span>
-                            </div>
+                        <button type="button" @click="divisi = {{ Illuminate\Support\Js::from($division->slug) }}"
+                            class="text-left px-4 py-2.5 rounded-lg text-[15px] transition-colors"
+                            :class="divisi === {{ Illuminate\Support\Js::from($division->slug) }} ? 'bg-[#e8f0fe] text-[#1a73e8] font-medium' : 'text-gray-700 hover:bg-gray-200'">
+                            {{ $division->name }}
                         </button>
                     @endforeach
                 </nav>
 
                 @if ($filtered)
-                    <a href="{{ $baseUrl }}" class="inline-flex items-center gap-2 mt-6 text-[12px] font-semibold text-[#3664AF] hover:underline" data-reveal="fade" data-reveal-delay="0.2">
-                        <i class="fas fa-rotate-left text-[10px]"></i> Reset filter
+                    <a href="{{ $baseUrl }}" class="inline-flex items-center gap-2 mt-6 text-[14px] font-medium text-[#1a73e8] hover:underline">
+                        Reset filter
                     </a>
                 @endif
             </aside>
 
-            {{-- Roster --}}
+            {{-- Daftar --}}
             <div>
-                <div class="flex items-baseline justify-between gap-4 mb-6 sm:mb-8" data-reveal="fade">
-                    <p class="font-mono text-[11px] uppercase tracking-[0.22em] text-gray-400">
-                        Menampilkan <span class="text-gray-900 font-bold">{{ $members->total() }}</span>
-                        @if ($filtered) hasil filter @else dari {{ $totalMembers }} anggota @endif
+                <div class="flex items-center justify-between gap-4 mb-6">
+                    <p class="text-[14px] text-gray-600">
+                        <span class="font-semibold text-gray-900">{{ $members->total() }}</span>
+                        @if ($filtered) hasil filter @else anggota aktif @endif
                     </p>
                     @if ($filtered)
-                        <a href="{{ $baseUrl }}" class="text-[12px] font-semibold text-[#3664AF] hover:underline lg:hidden">Reset filter</a>
+                        <a href="{{ $baseUrl }}" class="text-[14px] font-medium text-[#1a73e8] hover:underline lg:hidden">Reset</a>
                     @endif
                 </div>
 
                 @if ($members->isEmpty())
-                    <div class="relative border-t-2 border-gray-900 py-24 text-center" data-reveal="fade">
-                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden="true">
-                            <p class="text-[30vw] lg:text-[16vw] font-extrabold leading-none tracking-[-0.04em] text-[#3664AF]/[0.04]">0</p>
-                        </div>
-                        <div class="relative">
-                            <p class="font-mono text-[10px] uppercase tracking-[0.22em] text-[#3664AF] mb-3">Tidak ditemukan</p>
-                            <p class="text-xl font-bold text-gray-900 tracking-tight">Tidak ada anggota yang cocok dengan pencarianmu.</p>
-                            <a href="{{ $baseUrl }}" class="inline-flex items-center gap-2 mt-6 text-[12px] font-semibold text-[#3664AF] hover:underline">
-                                <i class="fas fa-rotate-left text-[10px]"></i> Reset filter
-                            </a>
-                        </div>
+                    <div class="rounded-xl bg-white border border-gray-200 py-20 text-center">
+                        <p class="text-[16px] font-medium text-gray-600">Tidak ada anggota yang cocok</p>
+                        <p class="text-[14px] text-gray-500 mt-1">Coba ubah kata kunci atau filter divisi.</p>
+                        <a href="{{ $baseUrl }}" class="inline-flex items-center gap-2 mt-5 text-[14px] font-medium text-[#1a73e8] hover:underline">
+                            Reset filter
+                        </a>
                     </div>
                 @else
-                    <div class="border-t-2 border-gray-900" data-reveal-stagger>
+                    <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         @foreach ($members as $member)
-                            <x-public.member-row :member="$member" :index="str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT)" />
+                            <article class="bg-white rounded-xl border border-gray-200 p-5">
+                                <div class="flex items-center gap-4">
+                                    <span class="w-12 h-12 rounded-full overflow-hidden bg-gray-100 shrink-0">
+                                        <img src="{{ $member->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+                                            alt="{{ $member->name }}" width="48" height="48" class="w-full h-full object-cover" loading="lazy" decoding="async">
+                                    </span>
+                                    <div class="min-w-0">
+                                        <h3 class="text-[15px] font-semibold text-gray-900 truncate">{{ $member->name }}</h3>
+                                        <p class="text-[13px] text-gray-500 truncate mt-0.5">
+                                            {{ $member->position?->name ?? 'Anggota' }}
+                                            @if ($member->division?->name) · {{ $member->division->name }} @endif
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-gray-100">
+                                    @include('components.public.partials.member-socials', ['member' => $member])
+                                </div>
+                            </article>
                         @endforeach
                     </div>
 
-                    <div class="mt-10 sm:mt-14">
-                        {{ $members->links() }}
-                    </div>
+                    @if ($members->hasPages())
+                        <div class="mt-10">{{ $members->links() }}</div>
+                    @endif
                 @endif
             </div>
+
         </div>
     </div>
 </section>

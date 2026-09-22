@@ -1,199 +1,112 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
-
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+<div class="space-y-4 sm:space-y-5">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Keanggotaan</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Anggota</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola data anggota dan struktur keanggotaan CSA.</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Anggota</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola data anggota dan struktur keanggotaan CSA.</p>
         </div>
-        <a href="{{ route('admin.members.create') }}"
-           class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
-            <i class="fas fa-plus text-xs"></i>
-            Tambah Anggota
-        </a>
+        @can('manage-members')
+            <a href="{{ route('admin.members.create') }}" class="csa-btn csa-btn-primary">
+                <x-admin.icon name="plus" :size="16" /> Tambah Anggota
+            </a>
+        @endcan
     </div>
 
-    {{-- Search & Filters --}}
-    <form method="GET" class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-        <div class="flex flex-col sm:flex-row gap-3">
-            <div class="relative flex-1">
-                <input type="text" name="search" value="{{ request('search') }}"
-                    placeholder="Cari nama, NIM, email..."
-                    class="w-full h-11 px-4 pl-11 rounded-xl border border-gray-200 text-sm focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200 bg-gray-50 focus:bg-white transition-all">
-                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-            </div>
-
-            <select name="division_id" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
-                <option value="">Semua Divisi</option>
-                @foreach($divisions as $division)
-                    <option value="{{ $division->id }}" {{ request('division_id') == $division->id ? 'selected' : '' }}>
-                        {{ $division->name }}
-                    </option>
-                @endforeach
-            </select>
-
-            <select name="position_id" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
-                <option value="">Semua Jabatan</option>
-                @foreach($positions as $position)
-                    <option value="{{ $position->id }}" {{ request('position_id') == $position->id ? 'selected' : '' }}>
-                        {{ $position->name }}
-                    </option>
-                @endforeach
-            </select>
-
-            <select name="status" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
-                <option value="">Semua Status</option>
-                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
-                <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Nonaktif</option>
-            </select>
-
-            <select name="sort" onchange="this.form.submit()" class="h-11 px-3 rounded-xl border border-gray-200 text-sm text-gray-600 focus:outline-none focus:border-gray-400 bg-gray-50 focus:bg-white">
-                <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Terbaru</option>
-                <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Nama A-Z</option>
-                <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Nama Z-A</option>
-                <option value="nim_asc" {{ request('sort') == 'nim_asc' ? 'selected' : '' }}>NIM Naik</option>
-                <option value="nim_desc" {{ request('sort') == 'nim_desc' ? 'selected' : '' }}>NIM Turun</option>
-                <option value="division_asc" {{ request('sort') == 'division_asc' ? 'selected' : '' }}>Divisi A-Z</option>
-                <option value="position_asc" {{ request('sort') == 'position_asc' ? 'selected' : '' }}>Jabatan A-Z</option>
-            </select>
-
-            <a href="{{ route('admin.members.index') }}" class="h-11 px-4 rounded-xl bg-gray-100 text-gray-600 text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center">
-                Reset
-            </a>
+    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto] gap-3">
+        <div class="relative">
+            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, email..." class="csa-input pl-10" aria-label="Cari anggota">
         </div>
+        <select name="division_id" onchange="this.form.submit()" class="csa-input" aria-label="Filter divisi">
+            <option value="">Semua Divisi</option>
+            @foreach($divisions as $division)
+                <option value="{{ $division->id }}" @selected(request('division_id') == $division->id)>{{ $division->name }}</option>
+            @endforeach
+        </select>
+        <select name="position_id" onchange="this.form.submit()" class="csa-input" aria-label="Filter jabatan">
+            <option value="">Semua Jabatan</option>
+            @foreach($positions as $position)
+                <option value="{{ $position->id }}" @selected(request('position_id') == $position->id)>{{ $position->name }}</option>
+            @endforeach
+        </select>
+        <select name="status" onchange="this.form.submit()" class="csa-input" aria-label="Filter status">
+            <option value="">Semua Status</option>
+            <option value="active" @selected(request('status') == 'active')>Aktif</option>
+            <option value="inactive" @selected(request('status') == 'inactive')>Nonaktif</option>
+        </select>
+        <select name="sort" onchange="this.form.submit()" class="csa-input" aria-label="Urutkan">
+            <option value="newest" @selected(request('sort') == 'newest')>Terbaru</option>
+            <option value="name_asc" @selected(request('sort') == 'name_asc')>Nama A-Z</option>
+            <option value="name_desc" @selected(request('sort') == 'name_desc')>Nama Z-A</option>
+        </select>
+        <a href="{{ route('admin.members.index') }}" class="csa-btn csa-btn-ghost">Reset</a>
     </form>
 
     <x-admin.table
         :headers="[
-            ['label' => 'Anggota', 'width' => ''],
-            ['label' => 'Kontak', 'width' => ''],
-            ['label' => 'Divisi', 'width' => ''],
-            ['label' => 'Jabatan', 'width' => ''],
-            ['label' => 'Status', 'width' => ''],
+            ['label' => 'Anggota'],
+            ['label' => 'Kontak'],
+            ['label' => 'Divisi'],
+            ['label' => 'Jabatan'],
+            ['label' => 'Status'],
             ['label' => 'Aksi', 'width' => 'w-24'],
         ]"
-        :hasPages="$members->hasPages()"
+        empty-icon="users"
+        empty-title="Belum ada anggota"
+        empty-description="Tambahkan anggota pertama untuk memulai."
+        :create-route="route('admin.members.create')"
+        create-label="Tambah Anggota"
+        :has-pages="$members->hasPages()"
         :paginator="$members"
     >
         @forelse($members as $member)
-            <tr class="hover:bg-gray-50 transition-colors duration-200">
-                {{-- Kolom Anggota --}}
-                <td class="py-4 px-6">
+            <tr class="csa-table-row">
+                <td class="csa-table-td">
                     <div class="flex items-center gap-3">
-                        <div class="relative shrink-0 {{ $member->photo_url ? 'cursor-pointer' : '' }}"
-                             @if($member->photo_url)
-                             onclick="openImagePreview('imagePreviewModal', '{{ $member->photo_url }}', '{{ $member->name }}')"
-                             @endif>
-                            <div class="w-11 h-11 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-gray-600 font-bold text-sm ring-2 ring-white shadow-sm">
-                                @if($member->photo_url)
-                                    <img src="{{ $member->photo_url }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
-                                @else
-                                    <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
-                                @endif
-                            </div>
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-muted)] shrink-0 {{ $member->photo_url ? 'cursor-pointer' : '' }}"
+                             @if($member->photo_url) onclick="openImagePreview('imagePreviewModal', '{{ $member->photo_url }}', '{{ $member->name }}')" @endif>
+                            <img src="{{ $member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                         </div>
                         <div class="min-w-0">
-                            <p class="text-sm font-bold text-gray-900 truncate">{{ $member->name }}</p>
+                            <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $member->name }}</p>
                             @if($member->nim)
-                                <p class="text-[10px] text-gray-400 font-mono tracking-wide">{{ $member->nim }}</p>
+                                <p class="text-[11px] text-[var(--text-muted)] font-mono">{{ $member->nim }}</p>
                             @endif
                         </div>
                     </div>
                 </td>
-
-                {{-- Kolom Kontak --}}
-                <td class="py-4 px-6">
-                    <div class="space-y-1">
+                <td class="csa-table-td">
+                    <div class="space-y-1 text-[12px]">
                         @if($member->email)
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <i class="fas fa-envelope text-gray-400 w-3.5 text-[10px]"></i>
-                                <span class="text-gray-600 truncate">{{ $member->email }}</span>
-                            </div>
+                            <p class="text-[var(--text-secondary)] truncate">{{ $member->email }}</p>
                         @endif
                         @if($member->phone)
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <i class="fas fa-phone text-gray-400 w-3.5 text-[10px]"></i>
-                                <span class="text-gray-600">{{ $member->phone }}</span>
-                            </div>
+                            <p class="text-[var(--text-muted)]">{{ $member->phone }}</p>
                         @endif
                         @if(!$member->email && !$member->phone)
-                            <span class="text-xs text-gray-300">-</span>
+                            <span class="text-[var(--text-muted)]">-</span>
                         @endif
                     </div>
                 </td>
-
-                {{-- Kolom Divisi --}}
-                <td class="py-4 px-6">
-                    @if($member->division)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-gray-50 text-xs font-semibold text-gray-700 border border-gray-100">
-                            {{ $member->division->name }}
-                        </span>
-                    @else
-                        <span class="text-xs text-gray-300">-</span>
-                    @endif
+                <td class="csa-table-td">{{ $member->division->name ?? '-' }}</td>
+                <td class="csa-table-td">{{ $member->position->name ?? 'Belum ada' }}</td>
+                <td class="csa-table-td">
+                    <span class="csa-chip {{ $member->is_active ? 'csa-chip-green' : '' }}">{{ $member->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                 </td>
-
-                {{-- Kolom Jabatan --}}
-                <td class="py-4 px-6">
-                    @if($member->position)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-gray-50 text-xs font-semibold text-gray-700 border border-gray-100">
-                            {{ $member->position->name }}
-                        </span>
-                    @else
-                        <span class="text-xs text-gray-300">Belum ada</span>
-                    @endif
-                </td>
-
-                {{-- Kolom Status --}}
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-2">
-                        @if($member->is_active)
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 text-xs font-semibold text-gray-700 border border-gray-100">
-                                <span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
-                                Aktif
-                            </span>
-                        @else
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 text-xs font-semibold text-gray-500 border border-gray-100">
-                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                Nonaktif
-                            </span>
-                        @endif
-                        @if($member->user_id)
-                            <span class="text-[10px] text-gray-400" title="Terhubung dengan akun">
-                                <i class="fas fa-link"></i>
-                            </span>
-                        @endif
-                    </div>
-                </td>
-
-                {{-- Kolom Aksi --}}
-                <td class="py-4 px-6">
+                <td class="csa-table-td">
                     <div class="flex items-center gap-1">
-                        <a href="{{ route('admin.members.edit', $member) }}"
-                           class="w-8 h-8 rounded-lg flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
-                           title="Edit">
-                            <i class="fas fa-pen text-[10px]"></i>
+                        <a href="{{ route('admin.members.edit', $member) }}" class="csa-icon-btn" title="Edit" aria-label="Edit anggota">
+                            <x-admin.icon name="pen" :size="16" />
                         </a>
-                        <button onclick="openDeleteModal('deleteModal', '{{ route('admin.members.destroy', $member) }}')"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
-                                title="Hapus">
-                            <i class="fas fa-trash text-[10px]"></i>
+                        <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.members.destroy', $member) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus anggota">
+                            <x-admin.icon name="trash-2" :size="16" />
                         </button>
                     </div>
                 </td>
             </tr>
         @empty
-            <x-admin.empty-state
-                icon="fa-users"
-                title="Belum ada anggota"
-                description="Tambahkan anggota pertama untuk memulai"
-                :createRoute="route('admin.members.create')"
-                createLabel="Tambah Anggota Pertama"
-                :colspan="6"
-            />
         @endforelse
     </x-admin.table>
 </div>

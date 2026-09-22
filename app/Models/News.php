@@ -80,4 +80,17 @@ class News extends Model
 
         return $firstImage ? asset('storage/' . $firstImage) : null;
     }
+
+    /**
+     * Short plain-text teaser for listing cards. Returns null when the
+     * content column was not selected (list queries stay lightweight).
+     */
+    public function getExcerptAttribute(): ?string
+    {
+        if (!array_key_exists('content', $this->attributes) || !$this->attributes['content']) {
+            return null;
+        }
+
+        return Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags($this->attributes['content']))), 120);
+    }
 }

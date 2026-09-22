@@ -1,69 +1,59 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-4 sm:space-y-5">
 
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Keanggotaan</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Anggota Divisi {{ $division->name }}</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Daftar anggota yang tergabung dalam divisi Anda.</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Divisi {{ $division->name }}</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Daftar anggota yang tergabung dalam divisi Anda.</p>
         </div>
-        <a href="{{ route('admin.events.index') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white text-xs font-semibold rounded-xl hover:bg-gray-800 transition-colors">
-            <i class="fas fa-calendar mr-1"></i> Kegiatan Divisi
-        </a>
+        <form method="GET" class="flex gap-2">
+            <div class="relative">
+                <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+                <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama / NIM..." class="csa-input pl-10 sm:w-64" aria-label="Cari anggota">
+            </div>
+            <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
+        </form>
     </div>
 
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-        <div class="p-5 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div>
-                <h2 class="text-base font-bold text-gray-900">Daftar Anggota ({{ $members->total() }})</h2>
-                <p class="text-xs text-gray-400 mt-1">Klik nama untuk melihat profil</p>
-            </div>
-            <form method="GET" class="flex gap-2">
-                <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="h-10 px-3 rounded-xl border border-gray-200 text-sm bg-gray-50 focus:bg-white focus:outline-none focus:border-gray-400">
-                <button class="h-10 px-3 rounded-lg bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">Cari</button>
-            </form>
+    <div class="csa-card overflow-hidden">
+        <div class="px-4 py-3 border-b border-[var(--border-soft)]">
+            <p class="text-[13px] font-medium text-[var(--text-secondary)]">{{ $members->total() }} anggota</p>
         </div>
 
-        <div class="divide-y divide-gray-100">
+        <div class="divide-y divide-[var(--border-soft)]">
             @forelse($members as $member)
-                <a href="{{ route('admin.members.show', $member) }}" class="block p-4 flex items-center gap-4 hover:bg-gray-50 transition-colors">
+                <div class="flex items-center gap-3.5 p-4">
                     <div class="relative shrink-0">
-                        <div class="w-12 h-12 rounded-full overflow-hidden border border-gray-100 bg-gray-100 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-muted)] flex items-center justify-center">
                             @if($member->photo)
                                 <img src="{{ asset('storage/' . $member->photo) }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                             @else
-                                <span class="text-2xl font-bold text-gray-400">{{ substr($member->name, 0, 1) }}</span>
+                                <span class="text-[15px] font-semibold text-[var(--text-muted)]">{{ substr($member->name, 0, 1) }}</span>
                             @endif
                         </div>
                         @if($member->is_active)
-                            <span class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+                            <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-[var(--bg-card)]"></span>
                         @endif
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-bold text-gray-900 truncate">{{ $member->name }}</p>
-                        <p class="text-xs text-gray-400 truncate">{{ $member->nim ?? 'Belum ada NIM' }}</p>
+                        <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $member->name }}</p>
+                        <p class="text-[12px] text-[var(--text-muted)] truncate">{{ $member->nim ?? 'Belum ada NIM' }}</p>
                     </div>
-                    <div class="flex items-center gap-2 text-right shrink-0">
-                        <span class="px-2 py-1 rounded-lg text-xs font-semibold bg-teal-50 text-teal-700">{{ $member->position?->name ?? 'Anggota' }}</span>
-                        <i class="fas fa-chevron-right text-gray-300 text-xs"></i>
-                    </div>
-                </a>
+                    <span class="text-[12px] text-[var(--text-secondary)] shrink-0">{{ $member->position?->name ?? 'Anggota' }}</span>
+                </div>
             @empty
-                <div class="p-10 text-center text-sm text-gray-400">
-                    <i class="fas fa-users text-3xl mb-2"></i>
-                    <p>Belum ada anggota di divisi ini.</p>
+                <div class="p-12 text-center">
+                    <x-admin.icon name="users" :size="30" class="mx-auto text-[var(--text-muted)]" />
+                    <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada anggota di divisi ini</p>
                 </div>
             @endforelse
         </div>
 
         @if($members->hasPages())
-            <div class="p-5 border-t border-gray-100">
-                {{ $members->links() }}
-            </div>
+            <div class="px-4 py-3 border-t border-[var(--border-soft)]">{{ $members->links() }}</div>
         @endif
     </div>
-
 </div>
 @endsection

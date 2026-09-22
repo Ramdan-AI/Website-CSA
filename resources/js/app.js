@@ -113,59 +113,6 @@ const runReveal = () => {
     });
 };
 
-// ---------------------------------------------------------------
-// Hero entrance: text lines rise in sequence, photo tiles assemble
-// from different directions with a springy pop, then a gentle
-// parallax takes over while the visitor scrolls away.
-// ---------------------------------------------------------------
-const initHero = () => {
-    const hero = document.querySelector("[data-hero]");
-    if (!hero || reducedMotion) return;
-
-    const tiles = gsap.utils.toArray("[data-hero-tile]", hero);
-    const art = hero.querySelector("[data-hero-art]");
-
-    if (tiles.length) {
-        gsap.fromTo(
-            tiles,
-            { opacity: 0, x: (i) => (i % 2 === 0 ? -44 : 44), y: (i) => (i % 3 === 0 ? -36 : 36), scale: 0.92 },
-            {
-                opacity: 1,
-                x: 0,
-                y: 0,
-                scale: 1,
-                duration: 1,
-                delay: 0.35,
-                stagger: 0.09,
-                ease: "back.out(1.4)",
-                clearProps: "transform,opacity",
-                scrollTrigger: {
-                    trigger: hero,
-                    start: "top 80%",
-                    once: true,
-                },
-            }
-        );
-    }
-
-    if (art) {
-        gsap.fromTo(
-            art,
-            { y: 0 },
-            {
-                y: -56,
-                ease: "none",
-                scrollTrigger: {
-                    trigger: hero,
-                    start: "top top",
-                    end: "bottom top",
-                    scrub: 0.6,
-                },
-            }
-        );
-    }
-};
-
 // Gentle parallax for [data-parallax] elements (e.g. the Tentang image).
 const initParallax = () => {
     if (reducedMotion) return;
@@ -241,14 +188,101 @@ const initDeepParallax = () => {
     });
 };
 
+// Drag-to-scroll + arrow navigation for horizontal card sliders ([data-slider]).
+const initSliders = () => {
+    gsap.utils.toArray("[data-slider]").forEach((slider) => {
+        const track = slider.querySelector("[data-slider-track]");
+        if (!track) return;
+
+        let down = false;
+        let startX = 0;
+        let startScroll = 0;
+        let moved = false;
+
+        track.addEventListener("pointerdown", (e) => {
+            if (e.pointerType === "mouse" && e.button !== 0) return;
+            down = true;
+            moved = false;
+            startX = e.clientX;
+            startScroll = track.scrollLeft;
+            track.classList.add("is-dragging");
+        });
+
+        track.addEventListener("pointermove", (e) => {
+            if (!down) return;
+            const delta = e.clientX - startX;
+            if (Math.abs(delta) > 4) moved = true;
+            track.scrollLeft = startScroll - delta;
+        });
+
+        const end = () => {
+            down = false;
+            track.classList.remove("is-dragging");
+        };
+
+        track.addEventListener("pointerup", end);
+        track.addEventListener("pointerleave", end);
+        track.addEventListener("pointercancel", end);
+        track.addEventListener("click", (e) => {
+            if (moved) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+
+        // Arrow buttons: scroll by one card width, smoothly.
+        const scrollByCard = (direction) => {
+            const firstCard = track.querySelector("article, a, div");
+            const step = (firstCard?.getBoundingClientRect().width ?? 240) + 16;
+            track.scrollBy({ left: direction * step, behavior: "smooth" });
+        };
+
+        const container = slider.closest("div")?.parentElement ?? slider.parentElement;
+        container?.querySelectorAll("[data-slider-prev]").forEach((btn) =>
+            btn.addEventListener("click", () => scrollByCard(-1))
+        );
+        container?.querySelectorAll("[data-slider-next]").forEach((btn) =>
+            btn.addEventListener("click", () => scrollByCard(1))
+        );
+    });
+};
+
+// Continuous marquee: photos slide horizontally in a seamless loop.
+// Duplicated content in the markup lets it wrap without a visible jump.
+const initMarquee = () => {
+    gsap.utils.toArray("[data-marquee]").forEach((marquee) => {
+        const track = marquee.querySelector("[data-marquee-track]");
+        if (!track) return;
+
+        const half = track.scrollWidth / 2;
+        if (!half || reducedMotion) return;
+
+        const tween = gsap.fromTo(
+            track,
+            { x: 0 },
+            {
+                x: -half,
+                duration: half / 60,
+                ease: "none",
+                repeat: -1,
+            }
+        );
+
+        // Only the marquee slows down while the pointer is over it.
+        marquee.addEventListener("pointerenter", () => gsap.to(tween, { timeScale: 0.2, duration: 0.3 }));
+        marquee.addEventListener("pointerleave", () => gsap.to(tween, { timeScale: 1, duration: 0.3 }));
+    });
+};
+
 // Start animations as soon as the DOM is ready (avoids waiting for all
 // hero images to finish loading, which made the landing feel slow).
 const init = () => {
     runReveal();
-    initHero();
     initParallax();
     initSectionProgress();
     initDeepParallax();
+    initSliders();
+    initMarquee();
 };
 
 if (document.readyState === "loading") {

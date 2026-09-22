@@ -1,123 +1,105 @@
-<nav x-data="{ scrolled: false, mobileOpen: false }" x-init="window.addEventListener('scroll', () => { scrolled = window.scrollY > 20 })"
-    class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-32px)] max-w-6xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-    :class="scrolled ? 'top-2' : 'top-4'">
+@php
+    $menus = [
+        ['label' => 'Beranda', 'url' => route('home')],
+        ['label' => 'Tentang', 'url' => url('/') . '#tentang'],
+        ['label' => 'Divisi', 'url' => url('/') . '#divisi'],
+        ['label' => 'Berita', 'url' => route('berita')],
+        ['label' => 'Anggota', 'url' => route('anggota')],
+        ['label' => 'Cerita', 'url' => url('/') . '#cerita'],
+    ];
+    $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+@endphp
 
-    <div class="relative rounded-[28px] border border-white/20 bg-white/40 backdrop-blur-2xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.08),0_0_0_0.5px_rgba(255,255,255,0.4),inset_0_0.5px_0_rgba(255,255,255,0.6)] transition-all duration-700"
-        :class="scrolled ?
-            'bg-white/60 shadow-[0_16px_48px_-12px_rgba(0,0,0,0.12),0_0_0_0.5px_rgba(255,255,255,0.6),inset_0_0.5px_0_rgba(255,255,255,0.8)]' :
-            ''">
+<header x-data="{ mobileOpen: false }" class="fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-8">
+        <div class="flex items-center justify-between h-16">
 
-        <div
-            class="absolute inset-0 rounded-[28px] bg-gradient-to-b from-white/30 via-transparent to-transparent pointer-events-none">
-        </div>
-
-        <div class="relative flex items-center justify-between h-[60px] sm:h-[64px] px-4 sm:px-6">
-
-            <a href="{{ route('home') }}" class="flex items-center gap-2.5 shrink-0 min-h-[44px]">
-                <div
-                    class="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-white/80 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06),inset_0_0.5px_0_rgba(255,255,255,0.8)] flex items-center justify-center">
-                    <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA"
-                        class="w-6 h-6 sm:w-7 sm:h-7 object-contain">
-                </div>
-                <div class="hidden sm:block leading-tight">
-                    <span class="text-[15px] font-bold text-gray-900 tracking-tight">CSA</span>
-                    <span class="block text-[9px] text-gray-400 font-medium -mt-0.5">STMIK Mardira Indonesia</span>
-                </div>
+            {{-- Logo --}}
+            <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
+                <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-8 h-8 object-contain">
+                <span class="hidden sm:block text-[15px] font-semibold text-gray-900">CSA</span>
             </a>
 
-            <div class="hidden lg:flex items-center gap-6">
-                @php
-                    $menus = [
-                        ['label' => 'Beranda', 'url' => route('home')],
-                        ['label' => 'Tentang', 'url' => '#tentang'],
-                        ['label' => 'Divisi', 'url' => '#divisi'],
-                        ['label' => 'Kegiatan', 'url' => '#kegiatan'],
-                        ['label' => 'Anggota', 'url' => route('anggota')],
-                        ['label' => 'Kontak', 'url' => '#kontak'],
-                    ];
-                @endphp
-
+            {{-- Menu desktop --}}
+            <nav class="hidden lg:flex items-center gap-1">
                 @foreach ($menus as $menu)
                     <a href="{{ $menu['url'] }}"
-                        class="relative text-[13px] font-medium text-gray-500 hover:text-gray-900 transition-colors duration-200 py-2">
+                        class="px-3 py-2 text-[14px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
                         {{ $menu['label'] }}
                     </a>
                 @endforeach
-            </div>
+            </nav>
 
+            {{-- Aksi desktop --}}
             <div class="hidden lg:flex items-center gap-2">
                 @auth
                     <a href="{{ route('admin.dashboard', ['roleSlug' => auth()->user()->role->slug ?? 'anggota']) }}"
-                        class="px-5 py-2.5 bg-gray-900 text-white text-[13px] font-semibold rounded-2xl shadow-[0_4px_16px_-4px_rgba(0,0,0,0.15),0_0_0_0.5px_rgba(255,255,255,0.2)] hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                        class="px-4 py-2 text-[14px] font-medium text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-lg transition-colors">
                         Dashboard
                     </a>
                 @else
-                    @php
-                    $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
-@endphp
-                    @if ($regOpen)
-                        <a href="{{ route('register') }}"
-                            class="px-5 py-2.5 bg-gray-900 text-white text-[13px] font-semibold rounded-2xl shadow-[0_4px_16px_-4px_rgba(0,0,0,0.15),0_0_0_0.5px_rgba(255,255,255,0.2)] hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                            Bergabung
-                        </a>
-                    @else
-                        <button @click="window.dispatchEvent(new CustomEvent('open-register-modal'))"
-                            class="px-5 py-2.5 bg-gray-100 text-gray-400 text-[13px] font-semibold rounded-2xl border border-dashed border-gray-200 cursor-pointer hover:bg-gray-200/50 transition-all duration-300">
-                            Bergabung
-                        </button>
-                    @endif
                     <a href="{{ route('login') }}"
-                        class="px-5 py-2.5 bg-gray-900 text-white text-[13px] font-semibold rounded-2xl shadow-[0_4px_16px_-4px_rgba(0,0,0,0.15),0_0_0_0.5px_rgba(255,255,255,0.2)] hover:shadow-[0_8px_24px_-6px_rgba(0,0,0,0.25)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                        class="px-4 py-2 text-[14px] font-medium text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition-colors">
                         Masuk
                     </a>
+                    @if ($regOpen)
+                        <a href="{{ route('register') }}"
+                            class="px-4 py-2 text-[14px] font-medium text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-lg transition-colors">
+                            Daftar
+                        </a>
+                    @else
+                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
+                            class="px-4 py-2 text-[14px] font-medium text-gray-400 bg-gray-100 rounded-lg cursor-pointer">
+                            Daftar
+                        </button>
+                    @endif
                 @endauth
             </div>
 
-            <button @click="mobileOpen = !mobileOpen"
-                :aria-expanded="mobileOpen.toString()"
-                aria-label="Buka menu navigasi"
-                class="lg:hidden w-11 h-11 flex items-center justify-center rounded-2xl bg-white/60 shadow-sm hover:bg-white/80 active:scale-95 transition-all">
-                <i class="fas text-sm text-gray-600" :class="mobileOpen ? 'fa-times' : 'fa-bars'"></i>
+            {{-- Toggle mobile --}}
+            <button type="button" @click="mobileOpen = !mobileOpen"
+                :aria-expanded="mobileOpen.toString()" aria-controls="mobile-menu" aria-label="Menu"
+                class="lg:hidden w-10 h-10 flex items-center justify-center rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
+                <i class="fas text-[17px]" :class="mobileOpen ? 'fa-xmark' : 'fa-bars'"></i>
             </button>
         </div>
     </div>
 
-    <div x-show="mobileOpen" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 -translate-y-2"
-        class="mt-2 rounded-[28px] border border-white/20 bg-white/60 backdrop-blur-2xl shadow-[0_16px_48px_-12px_rgba(0,0,0,0.1)] p-3 lg:hidden"
-        style="display: none;">
-        <div class="space-y-1">
+    {{-- Menu mobile --}}
+    <div id="mobile-menu" x-show="mobileOpen" x-cloak class="lg:hidden border-t border-gray-200 bg-white" style="display: none;">
+        <nav class="max-w-[1200px] mx-auto px-5 sm:px-8 py-3">
             @foreach ($menus as $menu)
+                @php $isActive = $menu['url'] === url()->current(); @endphp
                 <a href="{{ $menu['url'] }}" @click="mobileOpen = false"
-                    class="block px-4 py-3 min-h-[48px] flex items-center text-[14px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50/50 rounded-2xl transition-colors">
+                    class="block px-3 py-3 rounded-lg text-[15px] font-medium transition-colors {{ $isActive ? 'text-[#1a73e8] bg-[#e8f0fe]' : 'text-gray-700 hover:bg-gray-100' }}">
                     {{ $menu['label'] }}
                 </a>
             @endforeach
-            <div class="h-px bg-gray-100 my-2"></div>
-            @auth
-                <a href="{{ route('admin.dashboard', ['roleSlug' => auth()->user()->role->slug ?? 'anggota']) }}" @click="mobileOpen = false"
-                    class="block px-4 py-3.5 min-h-[52px] flex items-center justify-center text-center text-[14px] font-semibold text-white bg-gray-900 rounded-2xl shadow-lg active:scale-[0.98] transition-transform">
-                    Dashboard
-                </a>
-            @else
-                @if ($regOpen)
-                    <a href="{{ route('register') }}" @click="mobileOpen = false"
-                        class="block px-4 py-3.5 min-h-[52px] flex items-center justify-center text-center text-[14px] font-semibold text-white bg-gray-900 rounded-2xl shadow-lg active:scale-[0.98] transition-transform">
-                        Bergabung
+
+            <div class="mt-3 pt-3 border-t border-gray-200 flex flex-col gap-2">
+                @auth
+                    <a href="{{ route('admin.dashboard', ['roleSlug' => auth()->user()->role->slug ?? 'anggota']) }}" @click="mobileOpen = false"
+                        class="w-full text-center px-4 py-3 rounded-lg text-[15px] font-medium text-white bg-[#1a73e8]">
+                        Buka Dashboard
                     </a>
                 @else
-                    <button @click="window.dispatchEvent(new CustomEvent('open-register-modal')); mobileOpen = false"
-                        class="w-full block px-4 py-3.5 min-h-[52px] flex items-center justify-center text-center text-[14px] font-semibold text-gray-400 bg-gray-100 rounded-2xl border border-dashed border-gray-200 cursor-pointer active:scale-[0.98] transition-transform">
-                        Bergabung
-                    </button>
-                @endif
-                <a href="{{ route('login') }}" @click="mobileOpen = false"
-                    class="block px-4 py-3.5 min-h-[52px] flex items-center justify-center text-center text-[14px] font-semibold text-white bg-gray-900 rounded-2xl shadow-lg active:scale-[0.98] transition-transform">
-                    Masuk
-                </a>
-            @endauth
-        </div>
+                    <a href="{{ route('login') }}" @click="mobileOpen = false"
+                        class="w-full text-center px-4 py-3 rounded-lg text-[15px] font-medium text-[#1a73e8] border border-gray-300">
+                        Masuk
+                    </a>
+                    @if ($regOpen)
+                        <a href="{{ route('register') }}" @click="mobileOpen = false"
+                            class="w-full text-center px-4 py-3 rounded-lg text-[15px] font-medium text-white bg-[#1a73e8]">
+                            Daftar
+                        </a>
+                    @else
+                        <button type="button" @click="window.dispatchEvent(new CustomEvent('open-register-modal')); mobileOpen = false"
+                            class="w-full text-center px-4 py-3 rounded-lg text-[15px] font-medium text-gray-400 bg-gray-100 cursor-pointer">
+                            Pendaftaran ditutup
+                        </button>
+                    @endif
+                @endauth
+            </div>
+        </nav>
     </div>
-</nav>
+</header>

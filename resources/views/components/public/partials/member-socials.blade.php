@@ -1,25 +1,24 @@
-{{-- Member social icon links --}}
-@props(['member', 'compact' => false])
+{{-- Tautan sosial anggota: Instagram & GitHub (jika tersedia) --}}
+@props(['member'])
 
 @php
-    $iconClass = ($compact ?? false)
-        ? 'w-6 h-6 rounded-md bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#3664AF] hover:bg-[#3664AF]/10 transition-colors duration-200'
-        : 'w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 hover:text-[#3664AF] hover:bg-[#3664AF]/10 transition-colors duration-200';
-    $iconSize = ($compact ?? false) ? 'text-[9px]' : 'text-[11px]';
+    $linkClass = 'w-10 h-10 rounded-xl bg-[#f1f3f4] flex items-center justify-center text-gray-500 hover:text-[#1a73e8] hover:bg-[#e8f0fe] transition-colors duration-200';
 @endphp
 
-@if ($member->instagram)
-    <a href="https://instagram.com/{{ $member->instagram }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram {{ $member->name }}" class="{{ $iconClass }}">
-        <i class="fab fa-instagram {{ $iconSize }}"></i>
-    </a>
-@endif
-@if ($member->github)
-    <a href="https://github.com/{{ $member->github }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub {{ $member->name }}" class="{{ $iconClass }}">
-        <i class="fab fa-github {{ $iconSize }}"></i>
-    </a>
-@endif
-@if ($member->linkedin)
-    <a href="{{ $member->linkedin }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn {{ $member->name }}" class="{{ $iconClass }}">
-        <i class="fab fa-linkedin-in {{ $iconSize }}"></i>
-    </a>
+@if ($member->instagram || $member->github)
+    <div class="flex items-center justify-center gap-2.5">
+        @if ($member->instagram)
+            <a href="https://instagram.com/{{ $member->instagram }}" target="_blank" rel="noopener noreferrer"
+                aria-label="Instagram {{ $member->name }}" class="{{ $linkClass }}">
+                <i class="fab fa-instagram text-[15px]"></i>
+            </a>
+        @endif
+
+        @if ($member->github)
+            <a href="https://github.com/{{ $member->github }}" target="_blank" rel="noopener noreferrer"
+                aria-label="GitHub {{ $member->name }}" class="{{ $linkClass }}">
+                <i class="fab fa-github text-[15px]"></i>
+            </a>
+        @endif
+    </div>
 @endif

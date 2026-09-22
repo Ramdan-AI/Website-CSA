@@ -13,7 +13,6 @@ use App\Http\Controllers\Admin\AlbumController;
 use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventRegistrationController;
-use App\Http\Controllers\Admin\AttendanceController;
 use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\IncomeController;
 use App\Http\Controllers\Admin\ExpenseController;
@@ -30,6 +29,9 @@ use App\Http\Controllers\Frontend\ImageController;
 Route::get('/', [FrontendHomeController::class, 'index'])->name('home');
 
 Route::get('anggota', [FrontendHomeController::class, 'anggota'])->name('anggota');
+
+Route::get('berita', [\App\Http\Controllers\Frontend\NewsController::class, 'index'])->name('berita');
+Route::get('berita/{slug}', [\App\Http\Controllers\Frontend\NewsController::class, 'show'])->name('berita.show');
 
 // On-the-fly resized thumbnails for storage/app/public files (see ImageController).
 Route::get('img/{width}/{path}', [ImageController::class, 'show'])

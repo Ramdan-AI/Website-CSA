@@ -1,5 +1,5 @@
 @props([
-    'icon' => 'fa-folder-open',
+    'icon' => 'folder-open',
     'title' => 'Tidak ada data',
     'description' => 'Belum ada data yang ditambahkan.',
     'createRoute' => null,
@@ -8,20 +8,15 @@
 ])
 
 <tr>
-    <td colspan="{{ $colspan }}" class="py-24 text-center">
-        <div class="relative w-16 h-16 mx-auto mb-5">
-            <div class="absolute inset-0 bg-blue-400/20 rounded-2xl blur-xl"></div>
-            <div
-                class="relative w-full h-full rounded-2xl bg-white/80 backdrop-blur-sm border border-white/60 flex items-center justify-center">
-                <i class="fas {{ $icon }} text-2xl text-blue-400"></i>
-            </div>
+    <td colspan="{{ $colspan }}" class="py-16 text-center">
+        <div class="w-12 h-12 mx-auto mb-4 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-muted)]">
+            <x-admin.icon :name="$icon" :size="22" />
         </div>
-        <p class="text-sm font-semibold text-gray-900 mb-1">{{ $title }}</p>
-        <p class="text-xs text-gray-400 mb-5">{{ $description }}</p>
+        <p class="text-[13px] font-medium text-[var(--text-primary)]">{{ $title }}</p>
+        <p class="text-[12px] text-[var(--text-muted)] mt-1">{{ $description }}</p>
         @if ($createRoute)
-            <a href="{{ $createRoute }}"
-                class="relative inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs font-semibold rounded-xl shadow-[0_4px_16px_rgba(59,130,246,0.3)] hover:shadow-[0_4px_20px_rgba(59,130,246,0.45)] hover:scale-105 transition-all duration-300">
-                <i class="fas fa-plus text-[10px]"></i>
+            <a href="{{ $createRoute }}" class="csa-btn csa-btn-primary mt-4 inline-flex">
+                <x-admin.icon name="plus" :size="15" />
                 {{ $createLabel }}
             </a>
         @endif

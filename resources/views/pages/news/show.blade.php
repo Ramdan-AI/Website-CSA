@@ -1,129 +1,101 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
-
+<div class="space-y-4 sm:space-y-5">
     <div>
-        <a href="{{ route('admin.news.index') }}" class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-gray-700 mb-3">
-            <i class="fas fa-arrow-left text-xs"></i>
-            Kembali ke Berita
+        <a href="{{ route('admin.news.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+            <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Berita
         </a>
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mt-2">
             <div>
-                <span class="px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-700 text-xs font-semibold mb-1 inline-block">
-                    {{ $news->category?->name ?? 'Tanpa Kategori' }}
-                </span>
-                <h1 class="text-3xl font-bold text-gray-900 leading-tight">{{ $news->title }}</h1>
-                <div class="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
-                    <span class="flex items-center gap-1">
-                        <i class="fas fa-user-circle"></i>{{ $news->author?->name ?? '-' }}
-                    </span>
-                    <span class="flex items-center gap-1">
-                        <i class="fas fa-calendar"></i>{{ $news->published_at?->format('d M Y') ?: $news->created_at->format('d M Y') }}
-                    </span>
-                    <span class="px-2 py-1 rounded-lg text-xs font-semibold {{ $news->status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' }}">
-                        {{ ucfirst($news->status) }}
-                    </span>
+                <span class="text-[11px] font-medium text-[var(--accent-bright)]">{{ $news->category?->name ?? 'Tanpa Kategori' }}</span>
+                <h1 class="text-[22px] sm:text-[26px] font-bold text-[var(--text-primary)] tracking-[-0.03em] leading-tight mt-1">{{ $news->title }}</h1>
+                <div class="flex flex-wrap items-center gap-4 mt-3 text-[12px] text-[var(--text-muted)]">
+                    <span class="inline-flex items-center gap-1.5"><x-admin.icon name="user-round" :size="14" /> {{ $news->author?->name ?? '-' }}</span>
+                    <span class="inline-flex items-center gap-1.5"><x-admin.icon name="calendar-days" :size="14" /> {{ $news->published_at?->translatedFormat('d M Y') ?? $news->created_at->translatedFormat('d M Y') }}</span>
+                    <span class="csa-chip {{ $news->status === 'published' ? 'csa-chip-green' : 'csa-chip-amber' }}">{{ ucfirst($news->status) }}</span>
                 </div>
             </div>
-            <div class="flex items-center gap-2 shrink-0">
-                <a href="{{ route('admin.news.edit', $news) }}" class="px-4 py-2 bg-gray-100 text-gray-700 text-xs font-semibold rounded-xl hover:bg-gray-200 transition-colors">
-                    <i class="fas fa-pen mr-1"></i> Edit
-                </a>
-            </div>
+            <a href="{{ route('admin.news.edit', $news) }}" class="csa-btn csa-btn-ghost shrink-0">
+                <x-admin.icon name="pen" :size="16" /> Edit
+            </a>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 space-y-4">
             @if($news->thumbnail_url)
-                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-                    <img src="{{ $news->thumbnail_url }}" alt="{{ $news->title }}" class="w-full h-auto object-cover">
-                </div>
+                <figure class="csa-card overflow-hidden aspect-[16/9] max-h-[340px]">
+                    <img src="{{ $news->thumbnail_url }}" alt="{{ $news->title }}" width="1200" height="675" class="w-full h-full object-cover">
+                </figure>
             @endif
 
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-                <h2 class="text-xl font-bold text-gray-900 mb-4">Konten Berita</h2>
-                <div class="prose prose-teal max-w-none text-gray-700 leading-relaxed">
-                    {!! $news->content !!}
-                </div>
-            </div>
+            <section class="csa-card p-5">
+                <h2 class="text-[14px] font-semibold text-[var(--text-primary)] mb-3">Konten Berita</h2>
+                <div class="article-body text-[13px] text-[var(--text-secondary)] leading-relaxed">{!! $news->content !!}</div>
+            </section>
 
             @if($news->images && count($news->images) > 1)
-                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-base font-bold text-gray-900">Galeri Gambar ({{ count($news->images) }})</h3>
+                <section class="csa-card overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-[var(--border-soft)]">
+                        <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Galeri Gambar ({{ count($news->images) }})</h3>
                     </div>
-                    <div class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div class="p-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                         @foreach($news->images as $image)
-                            <a href="{{ asset('storage/' . $image) }}" target="_blank" class="group block aspect-square bg-gray-100 rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
-                                <img src="{{ asset('storage/' . $image) }}" alt="Gallery" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            <a href="{{ asset('storage/' . $image) }}" target="_blank" rel="noopener" class="block aspect-square rounded-xl overflow-hidden bg-[var(--bg-muted)]">
+                                <img src="{{ asset('storage/' . $image) }}" alt="Galeri" class="w-full h-full object-cover" loading="lazy">
                             </a>
                         @endforeach
                     </div>
-                </div>
+                </section>
             @endif
 
             @if($relatedNews->isNotEmpty())
-                <div class="bg-white border border-gray-200 rounded-2xl shadow-sm">
-                    <div class="px-6 py-4 border-b border-gray-200">
-                        <h3 class="text-base font-bold text-gray-900">Berita Terkait</h3>
+                <section class="csa-card overflow-hidden">
+                    <div class="px-5 py-3.5 border-b border-[var(--border-soft)]">
+                        <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Berita Terkait</h3>
                     </div>
-                    <div class="divide-y divide-gray-100">
+                    <div class="divide-y divide-[var(--border-soft)]">
                         @foreach($relatedNews as $related)
-                            <a href="{{ route('admin.news.show', $related) }}" class="block p-4 hover:bg-gray-50 transition-colors">
-                                <div class="flex items-center gap-3">
-                                    @if($related->thumbnail_url)
-                                        <img src="{{ $related->thumbnail_url }}" alt="" class="w-14 h-14 rounded-lg object-cover border border-gray-100">
-                                    @else
-                                        <div class="w-14 h-14 rounded-lg bg-gray-100 flex items-center justify-center text-gray-300">
-                                            <i class="fas fa-newspaper"></i>
-                                        </div>
-                                    @endif
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-semibold text-gray-900 truncate">{{ $related->title }}</p>
-                                        <p class="text-xs text-gray-400">{{ $related->published_at?->format('d M Y') }}</p>
-                                    </div>
-                                </div>
+                            <a href="{{ route('admin.news.show', $related) }}" class="flex items-center gap-3 p-4 hover:bg-[var(--bg-hover)] transition-colors">
+                                @if($related->thumbnail_url)
+                                    <img src="{{ $related->thumbnail_url }}" alt="" class="w-12 h-12 rounded-lg object-cover shrink-0">
+                                @else
+                                    <span class="w-12 h-12 rounded-lg bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-muted)] shrink-0">
+                                        <x-admin.icon name="newspaper" :size="18" />
+                                    </span>
+                                @endif
+                                <span class="flex-1 min-w-0">
+                                    <span class="block text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $related->title }}</span>
+                                    <span class="block text-[12px] text-[var(--text-muted)]">{{ $related->published_at?->translatedFormat('d M Y') }}</span>
+                                </span>
                             </a>
                         @endforeach
                     </div>
-                </div>
+                </section>
             @endif
         </div>
 
-        <div class="space-y-6">
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
-                <h3 class="text-base font-bold text-gray-900 mb-4">Info Publikasi</h3>
-                <dl class="grid grid-cols-2 gap-4 text-sm">
-                    <dt class="text-gray-400">Judul</dt>
-                    <dd class="font-semibold text-gray-900">{{ $news->title }}</dd>
-                    <dt class="text-gray-400">Slug</dt>
-                    <dd class="font-mono text-gray-500 break-all">{{ $news->slug }}</dd>
-                    <dt class="text-gray-400">Kategori</dt>
-                    <dd class="font-semibold text-gray-900">{{ $news->category?->name ?? 'Tanpa Kategori' }}</dd>
-                    <dt class="text-gray-400">Penulis</dt>
-                    <dd class="font-semibold text-gray-900">{{ $news->author?->name ?? '-' }}</dd>
-                    <dt class="text-gray-400">Status</dt>
-                    <dd class="font-semibold text-gray-900">
-                        <span class="px-2 py-0.5 rounded-lg {{ $news->status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600' }}">
-                            {{ ucfirst($news->status) }}
-                        </span>
-                    </dd>
-                    <dt class="text-gray-400">Tanggal Terbit</dt>
-                    <dd class="font-semibold text-gray-900">{{ $news->published_at?->format('d M Y H:i') ?: $news->created_at->format('d M Y H:i') }}</dd>
-                    <dt class="text-gray-400">Dibuat</dt>
-                    <dd class="font-semibold text-gray-900">{{ $news->created_at->format('d M Y H:i') }}</dd>
-                    <dt class="text-gray-400">Diperbarui</dt>
-                    <dd class="font-semibold text-gray-900">{{ $news->updated_at->format('d M Y H:i') }}</dd>
-                    <dt class="text-gray-400">Gambar Utama</dt>
-                    <dd class="font-semibold text-gray-900">{{ $news->thumbnail ? 'Ada' : 'Tidak' }}</dd>
-                    <dt class="text-gray-400">Galeri Gambar</dt>
-                    <dd class="font-semibold text-gray-900">{{ count($news->images ?? []) }} file</dd>
-                </dl>
-            </div>
-        </div>
+        <section class="csa-card p-5 h-fit">
+            <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Info Publikasi</h3>
+            <dl class="space-y-3 text-[13px]">
+                @foreach ([
+                    ['Slug', $news->slug, 'font-mono text-[12px] break-all'],
+                    ['Kategori', $news->category?->name ?? 'Tanpa Kategori', ''],
+                    ['Penulis', $news->author?->name ?? '-', ''],
+                    ['Tanggal Terbit', $news->published_at?->translatedFormat('d M Y H:i') ?: $news->created_at->translatedFormat('d M Y H:i'), ''],
+                    ['Dibuat', $news->created_at->translatedFormat('d M Y H:i'), ''],
+                    ['Diperbarui', $news->updated_at->translatedFormat('d M Y H:i'), ''],
+                    ['Gambar Utama', $news->thumbnail ? 'Ada' : 'Tidak', ''],
+                    ['Galeri Gambar', count($news->images ?? []) . ' file', ''],
+                ] as [$label, $value, $extra])
+                    <div class="flex justify-between gap-4">
+                        <dt class="text-[var(--text-muted)] shrink-0">{{ $label }}</dt>
+                        <dd class="text-[var(--text-primary)] text-right min-w-0 {{ $extra }}">{{ $value }}</dd>
+                    </div>
+                @endforeach
+            </dl>
+        </section>
     </div>
-
 </div>
 @endsection

@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AdminNavigation
@@ -16,6 +17,7 @@ class AdminNavigation
     public function groups(): array
     {
         $groups = collect(config('admin.menu'))
+            ->filter(fn (array $group) => $this->allowedForRole($group['roles'] ?? []))
             ->filter(fn (array $group) => $this->authorized($group['permissions'] ?? []))
             ->map(function (array $group) {
                 $group['items'] = collect($group['items'])
@@ -48,5 +50,19 @@ class AdminNavigation
     private function authorized(array $permissions): bool
     {
         return empty($permissions) || Gate::any($permissions);
+    }
+
+    /**
+     * True when $roles is empty (all roles) or the current role slug is listed.
+     */
+    private function allowedForRole(array $roles): bool
+    {
+        if (empty($roles)) {
+            return true;
+        }
+
+        $current = Auth::user()?->role?->slug;
+
+        return $current !== null && in_array($current, $roles, true);
     }
 }

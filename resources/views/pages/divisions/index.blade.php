@@ -1,91 +1,76 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-6">
-
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+<div class="space-y-4 sm:space-y-5">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Data Master</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Divisi</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola cabang departemen atau divisi kegiatan organisasi (Maksimal 5 divisi).</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Divisi</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola divisi kegiatan organisasi (maksimal 5 divisi).</p>
         </div>
         @if($canCreate)
-            <a href="{{ route('admin.divisions.create') }}"
-               class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 text-white text-sm font-semibold rounded-xl hover:bg-gray-800 transition-colors shadow-sm">
-                <i class="fas fa-plus text-xs"></i>
-                Tambah Divisi
+            <a href="{{ route('admin.divisions.create') }}" class="csa-btn csa-btn-primary">
+                <x-admin.icon name="plus" :size="16" /> Tambah Divisi
             </a>
         @else
-            <button disabled class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-200 text-gray-400 text-sm font-semibold rounded-xl cursor-not-allowed">
-                <i class="fas fa-lock text-xs"></i>
-                Maksimal 5 Divisi Tercapai
+            <button disabled class="csa-btn csa-btn-ghost cursor-not-allowed">
+                <x-admin.icon name="lock" :size="16" /> Maksimal 5 Divisi
             </button>
         @endif
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse($divisions as $division)
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between">
+            <article class="csa-card p-5 flex flex-col justify-between">
                 <div>
-                    <div class="flex items-start justify-between gap-4 mb-4">
-                        <div class="flex items-center gap-3">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
                             @if ($division->image)
-                                <img src="{{ asset('storage/' . $division->image) }}" alt="{{ $division->name }}" class="w-12 h-12 rounded-xl object-cover border border-gray-100">
+                                <img src="{{ asset('storage/' . $division->image) }}" alt="{{ $division->name }}" class="w-10 h-10 rounded-xl object-cover shrink-0">
                             @else
-                                <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 font-bold">
-                                    {{ substr($division->name, 0, 2) }}
-                                </div>
+                                <div class="w-10 h-10 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-secondary)] font-semibold text-[13px] shrink-0">{{ substr($division->name, 0, 2) }}</div>
                             @endif
-                            <div>
-                                <h3 class="text-base font-bold text-gray-900">{{ $division->name }}</h3>
-                                <span class="text-xs text-gray-400">Ketua: {{ $division->leader_name ?? 'Belum ada' }}</span>
+                            <div class="min-w-0">
+                                <h3 class="text-[14px] font-semibold text-[var(--text-primary)] truncate">{{ $division->name }}</h3>
+                                <p class="text-[12px] text-[var(--text-muted)] truncate">Ketua: {{ $division->leader_name ?? 'Belum ada' }}</p>
                             </div>
                         </div>
-
-                        <div>
-                            @if ($division->is_active)
-                                <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600 text-xs font-semibold">Aktif</span>
-                            @else
-                                <span class="px-2.5 py-1 rounded-full bg-gray-100 text-gray-500 text-xs font-semibold">Nonaktif</span>
-                            @endif
-                        </div>
+                        <span class="csa-chip {{ $division->is_active ? 'csa-chip-green' : '' }} shrink-0">{{ $division->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                     </div>
 
                     @if($division->description)
-                        <p class="text-xs text-gray-500 line-clamp-2 mb-4 leading-relaxed">{{ $division->description }}</p>
+                        <p class="text-[12px] text-[var(--text-secondary)] line-clamp-2 mt-3.5 leading-relaxed">{{ $division->description }}</p>
                     @endif
 
                     @if($division->skills)
-                        <div class="flex flex-wrap gap-1.5 mb-6">
+                        <div class="flex flex-wrap gap-1.5 mt-3.5">
                             @foreach($division->skills as $skill)
-                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-medium rounded-md">{{ $skill }}</span>
+                                <span class="px-2 py-0.5 rounded-md bg-[var(--bg-muted)] text-[var(--text-secondary)] text-[11px]">{{ $skill }}</span>
                             @endforeach
                         </div>
                     @endif
                 </div>
 
-                <div class="pt-4 border-t border-gray-100 flex items-center justify-between text-xs">
-                    <a href="{{ route('admin.divisions.members', $division) }}" class="font-semibold text-blue-600 hover:underline">
-                        <i class="fas fa-users mr-1"></i> {{ $division->members_count }} Anggota
+                <div class="mt-4 pt-4 border-t border-[var(--border-soft)] flex items-center justify-between">
+                    <a href="{{ route('admin.divisions.members', $division) }}" class="text-[12px] font-medium text-[var(--accent-bright)] hover:underline inline-flex items-center gap-1.5">
+                        <x-admin.icon name="users" :size="14" /> {{ $division->members_count }} Anggota
                     </a>
-                    
                     <div class="flex items-center gap-1">
-                        <a href="{{ route('admin.divisions.edit', $division) }}" class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-600 hover:bg-gray-100" title="Edit">
-                            <i class="fas fa-pen text-xs"></i>
+                        <a href="{{ route('admin.divisions.edit', $division) }}" class="csa-icon-btn" title="Edit" aria-label="Edit divisi">
+                            <x-admin.icon name="pen" :size="16" />
                         </a>
-                        <button onclick="openDeleteModal('deleteModal', '{{ route('admin.divisions.destroy', $division) }}')" class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100" title="Hapus">
-                            <i class="fas fa-trash text-xs"></i>
+                        <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.divisions.destroy', $division) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus divisi">
+                            <x-admin.icon name="trash-2" :size="16" />
                         </button>
                     </div>
                 </div>
-            </div>
+            </article>
         @empty
-            <div class="col-span-full bg-white rounded-2xl border border-gray-200 p-12 text-center text-gray-400">
-                <i class="fas fa-sitemap text-4xl mb-3"></i>
-                <p class="text-sm font-semibold">Belum ada divisi tercatat.</p>
+            <div class="col-span-full csa-card p-12 text-center">
+                <x-admin.icon name="building-2" :size="32" class="mx-auto text-[var(--text-muted)]" />
+                <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada divisi tercatat</p>
+                <p class="text-[12px] text-[var(--text-muted)] mt-1">Tambahkan divisi untuk mulai mengelola anggota.</p>
             </div>
         @endforelse
     </div>
-
 </div>
 @endsection
