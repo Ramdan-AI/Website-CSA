@@ -9,15 +9,9 @@
             default => $m->position?->name ?? 'Anggota',
         };
 
-        $memberImageOf = function ($member) {
-            foreach (['image', 'photo', 'profile_photo', 'profile_image', 'avatar', 'avatar_path'] as $field) {
-                $value = $member->getAttribute($field);
-                if (!empty($value)) {
-                    return \Illuminate\Support\Facades\Storage::disk('public')->url($value);
-                }
-            }
-            return $member->photo_url ?: asset('storage/profile/profile-placeholder.png');
-        };
+        // Pakai accessor Member agar URL mengikuti host request.
+        $memberImageOf = fn ($member) => $member->photo_url
+            ?: asset('storage/profile/profile-placeholder.png');
 
         $pengurusSlider = $pengurusInti
             ->concat($koordinator)

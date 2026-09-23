@@ -126,11 +126,7 @@
             <div class="relative ml-0.5" @click.outside="userMenuOpen = false">
                 <button @click="userMenuOpen = !userMenuOpen" class="flex items-center gap-2 p-1 pr-1.5 min-h-[44px] rounded-full hover:bg-[var(--bg-hover)] transition-colors cursor-pointer">
                     <div class="w-8 h-8 rounded-full ring-2 ring-[var(--border-soft)] overflow-hidden">
-                        @if ($hasAvatar)
-                            <img src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
-                        @else
-                            <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ auth()->user()->name }}" class="w-full h-full object-cover">
-                        @endif
+                        <x-admin.avatar :size="32" class="w-full h-full" />
                     </div>
                     <x-admin.icon name="chevron-down" :size="14" class="text-[var(--text-muted)] transition-transform" x-bind:class="userMenuOpen ? 'rotate-180' : ''" />
                 </button>

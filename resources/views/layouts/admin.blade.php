@@ -53,13 +53,26 @@
 </head>
 
 <body class="antialiased overflow-x-hidden bg-[var(--bg-body)] text-[var(--text-primary)]"
-    x-data="{ sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true') }"
-    @sidebar-toggled.window="sidebarExpanded = $event.detail.expanded">
+    x-data="{
+        sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true'),
+        animateLayout: false,
+        init() {
+            window.addEventListener('sidebar-toggled', (event) => {
+                this.sidebarExpanded = event.detail.expanded;
+                this.animateLayout = true;
+            });
+        }
+    }">
 
     <x-admin.sidebar />
 
-    <div class="main-content-container flex flex-col min-h-screen transition-[padding] duration-300"
-        :class="sidebarExpanded ? 'lg:pl-[240px]' : 'lg:pl-[72px]'">
+    {{-- Transisi padding hanya aktif setelah sidebar benar-benar ditoggle,
+         sehingga pindah halaman tidak memicu animasi geser. --}}
+    <div class="main-content-container flex flex-col min-h-screen"
+        :class="[
+            animateLayout ? 'transition-[padding] duration-300' : '',
+            sidebarExpanded ? 'lg:pl-[240px]' : 'lg:pl-[72px]'
+        ]">
         <x-admin.topbar />
         <main class="p-4 sm:p-6 lg:p-8">
             <div class="page-content max-w-[1600px] mx-auto">@yield('content')</div>

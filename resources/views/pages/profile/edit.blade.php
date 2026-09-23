@@ -14,11 +14,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="csa-card p-6 text-center h-fit">
             <div class="w-24 h-24 rounded-full overflow-hidden mx-auto bg-[var(--bg-muted)]">
-                @if ($member && $member->photo)
-                    <img src="{{ asset('storage/' . $member->photo) }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
-                @else
-                    <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
-                @endif
+                <x-admin.avatar :user="$user" :size="96" class="w-full h-full" />
             </div>
             <h2 class="text-[15px] font-semibold text-[var(--text-primary)] mt-4">{{ $user->name }}</h2>
             <p class="text-[12px] text-[var(--text-muted)] mt-1">{{ $user->email }}</p>
@@ -64,10 +60,62 @@
                         </div>
 
                         <div>
-                            <label for="photo" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Foto Profile</label>
-                            <input type="file" name="photo" id="photo" accept="image/jpeg,image/png,image/jpg,image/webp" class="csa-input py-2.5 file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--bg-muted)] file:px-3 file:py-1.5 file:text-[12px] file:font-medium file:text-[var(--text-secondary)]">
-                            <p class="text-[11px] text-[var(--text-muted)] mt-1.5">Maksimal 2MB. Format JPG, PNG, WEBP.</p>
-                            @error('photo')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
+                            <label class="block text-[13px] font-medium text-[var(--text-secondary)] mb-2">Foto Profile</label>
+
+                            {{-- Cropper: pilih gambar, pangkas, lalu unggah. --}}
+                            <div x-data="photoCropper()" x-init="init()">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-muted)] shrink-0">
+                                        <img :src="preview || '{{ $user->avatar ? asset('storage/' . $user->avatar) : ($member?->photo ? asset('storage/' . $member->photo) : asset('storage/profile/profile-placeholder.png')) }}'"
+                                            alt="Pratinjau foto" class="w-full h-full object-cover">
+                                    </div>
+
+                                    <div class="flex flex-col gap-2">
+                                        <input type="file" x-ref="input" name="photo" id="photo"
+                                            accept="image/jpeg,image/png,image/webp" class="hidden"
+                                            @change="onPick($event)">
+                                        <button type="button" @click="$refs.input.click()" class="csa-btn csa-btn-ghost !min-h-[40px] !text-[13px]">
+                                            <x-admin.icon name="upload" :size="15" /> Pilih foto
+                                        </button>
+                                        <p class="text-[11px] text-[var(--text-muted)]">JPG, PNG, WEBP. Maksimal 2MB.</p>
+                                    </div>
+                                </div>
+
+                                @error('photo')<p class="text-[12px] text-red-500 mt-2">{{ $message }}</p>@enderror
+
+                                {{-- Dialog pemangkasan --}}
+                                <div x-show="open" x-cloak class="fixed inset-0 z-[80] flex items-center justify-center p-4"
+                                    style="background: rgba(0,0,0,.6);">
+                                    <div class="csa-card w-full max-w-md p-5">
+                                        <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-3">Sesuaikan foto</h3>
+
+                                        <div class="rounded-xl overflow-hidden bg-[var(--bg-muted)]" style="max-height: 360px;">
+                                            <img x-ref="cropImage" alt="Gambar untuk dipangkas" class="block w-full">
+                                        </div>
+
+                                        <div class="flex items-center gap-2 mt-4">
+                                            <button type="button" @click="$refs.zoomRange.value = Math.max(0.2, $refs.zoomRange.value - 0.1); cropper.zoom(-0.1)"
+                                                class="csa-icon-btn" title="Perkecil" aria-label="Perkecil">
+                                                <x-admin.icon name="minus" :size="16" />
+                                            </button>
+                                            <input x-ref="zoomRange" type="range" min="0.2" max="3" step="0.05" value="1"
+                                                class="flex-1 accent-[var(--accent)]"
+                                                @input="cropper.zoomTo(parseFloat($event.target.value))">
+                                            <button type="button" @click="$refs.zoomRange.value = Math.min(3, parseFloat($refs.zoomRange.value) + 0.1); cropper.zoom(0.1)"
+                                                class="csa-icon-btn" title="Perbesar" aria-label="Perbesar">
+                                                <x-admin.icon name="plus" :size="16" />
+                                            </button>
+                                        </div>
+
+                                        <p class="text-[11px] text-[var(--text-muted)] mt-2">Geser gambar untuk mengatur posisi.</p>
+
+                                        <div class="flex items-center gap-2 mt-5">
+                                            <button type="button" @click="apply()" class="csa-btn csa-btn-primary flex-1">Gunakan foto</button>
+                                            <button type="button" @click="cancel()" class="csa-btn csa-btn-ghost">Batal</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     @endif
 
@@ -103,3 +151,105 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
+    <script>
+        /**
+         * Pemangkas foto profil. Pengguna memilih gambar, memangkasnya jadi
+         * kotak 1:1, lalu hasil pangkasan dikirim lewat input file yang sama.
+         */
+        function photoCropper() {
+            return {
+                open: false,
+                preview: null,
+                cropper: null,
+                originalName: 'photo.jpg',
+
+                init() {
+                    this._onKey = (event) => {
+                        if (event.key === 'Escape' && this.open) this.cancel();
+                    };
+                    window.addEventListener('keydown', this._onKey);
+                },
+
+                onPick(event) {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+
+                    this.originalName = file.name || 'photo.jpg';
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        const image = this.$refs.cropImage;
+                        image.src = e.target.result;
+                        this.open = true;
+
+                        this.$nextTick(() => {
+                            if (this.cropper) this.cropper.destroy();
+
+                            this.cropper = new Cropper(image, {
+                                aspectRatio: 1,
+                                viewMode: 1,
+                                dragMode: 'move',
+                                autoCropArea: 1,
+                                background: false,
+                                guides: false,
+                                responsive: true,
+                                zoomOnWheel: true,
+                            });
+                        });
+                    };
+
+                    reader.readAsDataURL(file);
+                },
+
+                apply() {
+                    if (!this.cropper) return;
+
+                    const canvas = this.cropper.getCroppedCanvas({
+                        width: 512,
+                        height: 512,
+                        imageSmoothingQuality: 'high',
+                    });
+
+                    this.preview = canvas.toDataURL('image/jpeg', 0.9);
+
+                    canvas.toBlob((blob) => {
+                        const file = new File([blob], this.originalName.replace(/\.[^.]+$/, '') + '.jpg', {
+                            type: 'image/jpeg',
+                        });
+
+                        const input = this.$refs.input;
+                        const transfer = new DataTransfer();
+                        transfer.items.add(file);
+                        input.files = transfer.files;
+
+                        // Sinkronkan nama agar validasi server tetap lolos.
+                        input.dispatchEvent(new Event('change', { bubbles: false }));
+
+                        this.close();
+                    }, 'image/jpeg', 0.9);
+                },
+
+                cancel() {
+                    this.$refs.input.value = '';
+                    this.preview = null;
+                    this.close();
+                },
+
+                close() {
+                    this.open = false;
+                    if (this.cropper) {
+                        this.cropper.destroy();
+                        this.cropper = null;
+                    }
+                },
+            };
+        }
+    </script>
+@endpush

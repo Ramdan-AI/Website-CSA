@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Permission;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,6 +16,13 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // URL aset mengikuti host request agar gambar tetap tampil saat
+        // aplikasi dibuka lewat domain lokal (mis. web-csa.test) meskipun
+        // APP_URL menunjuk host lain. Set ASSET_URL di .env untuk mengunci.
+        if (!config('app.asset_url') && !app()->runningInConsole() && request()->getHost()) {
+            URL::forceRootUrl(request()->getSchemeAndHttpHost());
+        }
+
         $requiredPermissions = [
             'manage-divisions',
             'manage-positions',
@@ -31,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
             'manage-finance',
             'view-finance',
             'manage-media',
+            'manage-projects',
         ];
 
         try {

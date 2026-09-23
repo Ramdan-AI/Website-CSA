@@ -1,6 +1,4 @@
 
-import Lenis from "lenis";
-import "lenis/dist/lenis.css";
 import {
     ArrowLeft,
     ArrowRight,
@@ -15,6 +13,7 @@ import {
     ChevronRight,
     CircleCheck,
     ClipboardCheck,
+    Code,
     Download,
     ExternalLink,
     Eye,
@@ -31,12 +30,14 @@ import {
     Lock,
     MapPin,
     Menu,
+    Minus,
     Moon,
     Newspaper,
     PanelLeft,
     Pen,
     Plus,
     QrCode,
+    Rocket,
     Save,
     Search,
     Settings,
@@ -127,6 +128,7 @@ const icons = {
     "chevron-right": ChevronRight,
     "circle-check": CircleCheck,
     "clipboard-check": ClipboardCheck,
+    code: Code,
     download: Download,
     "external-link": ExternalLink,
     eye: Eye,
@@ -143,6 +145,7 @@ const icons = {
     "log-out": LogOut,
     "map-pin": MapPin,
     menu: Menu,
+    minus: Minus,
     moon: Moon,
     newspaper: Newspaper,
     lock: Lock,
@@ -150,6 +153,7 @@ const icons = {
     pen: Pen,
     plus: Plus,
     "qr-code": QrCode,
+    rocket: Rocket,
     save: Save,
     search: Search,
     settings: Settings,
@@ -188,13 +192,7 @@ if (document.readyState === "loading") {
 document.addEventListener("alpine:initialized", bootIcons);
 window.addEventListener("load", bootIcons);
 
-const lenis = new Lenis({
-    autoRaf: true,
-    lerp: 0.18,
-    smoothWheel: true,
-    wheelMultiplier: 1,
-    syncTouch: false,
-    anchors: false,
-    autoResize: true,
-    respectReducedMotion: true,
-});
+// Panel admin memakai smooth scrolling native browser. Sebelumnya Lenis
+// membungkus seluruh halaman dan menganimasikan pemulihan posisi scroll saat
+// pindah halaman, sehingga terasa seperti halaman bergeser. Dinonaktifkan
+// agar navigasi antar halaman terasa instan.

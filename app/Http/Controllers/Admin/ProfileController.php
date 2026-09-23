@@ -53,22 +53,37 @@ class ProfileController extends Controller
             'github' => $validated['github'] ?? $member->github,
         ]);
 
-        // Handle photo upload
+        // Handle photo upload: simpan ke member.photo DAN user.avatar agar
+        // foto yang sama dipakai di sidebar, topbar, dan kartu publik.
         if ($request->hasFile('photo')) {
-            if ($member->photo && Storage::disk('public')->exists($member->photo)) {
-                Storage::disk('public')->delete($member->photo);
+            $stored = $this->storeCroppedPhoto($request->file('photo'));
+
+            $previous = array_filter([$member?->photo, $user->avatar]);
+            foreach ($previous as $old) {
+                if (Storage::disk('public')->exists($old)) {
+                    Storage::disk('public')->delete($old);
+                }
             }
 
-            $photo = $request->file('photo');
-            $photoName = Str::uuid() . '.' . $photo->getClientOriginalExtension();
-            $photo->storeAs('profile', $photoName, 'public');
-
-            $member->update(['photo' => 'profile/' . $photoName]);
+            $member?->update(['photo' => $stored]);
+            $user->update(['avatar' => $stored]);
         }
 
         return redirect()
             ->route('admin.profile.edit')
             ->with('success', 'Profile berhasil diperbarui');
+    }
+
+    /**
+     * Simpan file foto yang sudah dipotong lewat cropper di sisi klien.
+     * Bila cropper tidak dipakai, file asli disimpan apa adanya.
+     */
+    private function storeCroppedPhoto($file): string
+    {
+        $name = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
+        $file->storeAs('profile', $name, 'public');
+
+        return 'profile/' . $name;
     }
 
     public function updatePassword(Request $request)

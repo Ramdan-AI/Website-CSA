@@ -40,6 +40,7 @@
 @include('components.public.sections.divisi')
 @include('components.public.sections.kepengurusan')
 @include('components.public.sections.cerita')
+@include('components.public.sections.karya')
 @include('components.public.sections.kegiatan')
 @include('components.public.sections.daftar')
 

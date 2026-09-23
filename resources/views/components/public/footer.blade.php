@@ -5,6 +5,7 @@
         ['label' => 'Tentang', 'url' => url('/') . '#tentang'],
         ['label' => 'Divisi', 'url' => url('/') . '#divisi'],
         ['label' => 'Berita', 'url' => route('berita')],
+        ['label' => 'Karya', 'url' => route('projects')],
         ['label' => 'Anggota', 'url' => route('anggota')],
         ['label' => 'Cerita', 'url' => url('/') . '#cerita'],
     ];

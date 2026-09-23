@@ -42,6 +42,16 @@ return [
         ],
 
         [
+            'id'          => 'workspace',
+            'label'       => 'Karya',
+            'color'       => 'blue',
+            'permissions' => [],
+            'items'       => [
+                ['icon' => 'rocket', 'label' => 'Showcase Proyek', 'route' => 'admin.showcase.index', 'pattern' => 'admin.showcase.*'],
+            ],
+        ],
+
+        [
             'id'          => 'master-data',
             'label'       => 'Data Master',
             'color'       => 'purple',

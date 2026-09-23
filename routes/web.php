@@ -33,6 +33,9 @@ Route::get('anggota', [FrontendHomeController::class, 'anggota'])->name('anggota
 Route::get('berita', [\App\Http\Controllers\Frontend\NewsController::class, 'index'])->name('berita');
 Route::get('berita/{slug}', [\App\Http\Controllers\Frontend\NewsController::class, 'show'])->name('berita.show');
 
+Route::get('projects', [\App\Http\Controllers\Frontend\ProjectController::class, 'index'])->name('projects');
+Route::get('projects/{slug}', [\App\Http\Controllers\Frontend\ProjectController::class, 'show'])->name('projects.show');
+
 // On-the-fly resized thumbnails for storage/app/public files (see ImageController).
 Route::get('img/{width}/{path}', [ImageController::class, 'show'])
     ->where('width', '[0-9]+')
@@ -74,6 +77,15 @@ Route::prefix('{roleSlug}')
 
         // Notifications
         Route::post('notifications/seen', [MemberPageController::class, 'markNotificationsSeen'])->name('notifications.seen');
+
+        // Showcase proyek: semua role bisa menambah, kepemilikan dijaga controller.
+        Route::get('showcase', [\App\Http\Controllers\Admin\ProjectController::class, 'index'])->name('showcase.index');
+        Route::get('showcase/create', [\App\Http\Controllers\Admin\ProjectController::class, 'create'])->name('showcase.create');
+        Route::post('showcase', [\App\Http\Controllers\Admin\ProjectController::class, 'store'])->name('showcase.store');
+        Route::get('showcase/{project}/edit', [\App\Http\Controllers\Admin\ProjectController::class, 'edit'])->name('showcase.edit');
+        Route::get('showcase/{project}/preview', [\App\Http\Controllers\Admin\ProjectController::class, 'preview'])->name('showcase.preview');
+        Route::put('showcase/{project}', [\App\Http\Controllers\Admin\ProjectController::class, 'update'])->name('showcase.update');
+        Route::delete('showcase/{project}', [\App\Http\Controllers\Admin\ProjectController::class, 'destroy'])->name('showcase.destroy');
 
         Route::middleware(['auth'])->group(function () {
             Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');

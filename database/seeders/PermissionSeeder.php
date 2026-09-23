@@ -25,6 +25,7 @@ class PermissionSeeder extends Seeder
             ['name' => 'Kelola Media',           'slug' => 'manage-media',           'description' => 'Mengelola album & galeri'],
             ['name' => 'Kelola Pengaturan',      'slug' => 'manage-settings',        'description' => 'Mengelola pengaturan website'],
             ['name' => 'Kelola Role & Izin',     'slug' => 'manage-roles',           'description' => 'Mengelola role dan permission'],
+            ['name' => 'Kelola Showcase',        'slug' => 'manage-projects',        'description' => 'Mengelola seluruh proyek showcase'],
         ]);
     }
 }

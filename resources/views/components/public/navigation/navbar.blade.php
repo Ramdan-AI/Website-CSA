@@ -3,8 +3,9 @@
         ['label' => 'Beranda', 'url' => route('home')],
         ['label' => 'Tentang', 'url' => url('/') . '#tentang'],
         ['label' => 'Divisi', 'url' => url('/') . '#divisi'],
-        ['label' => 'Berita', 'url' => route('berita')],
-        ['label' => 'Anggota', 'url' => route('anggota')],
+            ['label' => 'Berita', 'url' => route('berita')],
+            ['label' => 'Karya', 'url' => route('projects')],
+            ['label' => 'Anggota', 'url' => route('anggota')],
         ['label' => 'Cerita', 'url' => url('/') . '#cerita'],
     ];
     $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);

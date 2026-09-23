@@ -46,6 +46,11 @@ class User extends Authenticatable
         return $this->hasOne(Member::class);
     }
 
+    public function projects()
+    {
+        return $this->hasMany(Project::class, 'submitted_by');
+    }
+
     public function news()
     {
         return $this->hasMany(News::class);

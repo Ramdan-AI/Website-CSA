@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\ResolvesStorageUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
@@ -10,6 +11,7 @@ use Illuminate\Support\Str;
 class Member extends Model
 {
     use SoftDeletes;
+    use ResolvesStorageUrl;
 
     protected $fillable = [
         'user_id',
@@ -71,7 +73,7 @@ class Member extends Model
 
     public function getPhotoUrlAttribute()
     {
-        return $this->photo ? Storage::url($this->photo) : null;
+        return $this->storageUrl($this->photo);
     }
 
     public function user()
@@ -97,6 +99,13 @@ class Member extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_member')
+            ->withPivot('role')
+            ->withTimestamps();
     }
 
     public function scopeActive($query)
