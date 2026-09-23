@@ -58,18 +58,36 @@ class NewsController extends Controller
 
     public function show(string $slug)
     {
-        $article = News::with(['category', 'author'])
+        $article = News::with(['category:id,name,slug', 'author:id,name'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->firstOrFail();
 
-        $related = News::with('category')
+        $related = News::query()
+            ->select(['id', 'category_id', 'title', 'slug', 'thumbnail', 'images', 'published_at', 'created_at'])
+            ->with('category:id,name,slug')
             ->where('status', 'published')
             ->where('id', '!=', $article->id)
             ->when($article->category_id, fn ($query) => $query->where('category_id', $article->category_id))
             ->orderByDesc('published_at')
             ->take(3)
             ->get();
+
+        // Bila kategori sama tidak cukup, lengkapi dengan berita terbaru lain.
+        if ($related->count() < 3) {
+            $excludeIds = $related->pluck('id')->push($article->id)->all();
+
+            $related = $related->concat(
+                News::query()
+                    ->select(['id', 'category_id', 'title', 'slug', 'thumbnail', 'images', 'published_at', 'created_at'])
+                    ->with('category:id,name,slug')
+                    ->where('status', 'published')
+                    ->whereNotIn('id', $excludeIds)
+                    ->orderByDesc('published_at')
+                    ->take(3 - $related->count())
+                    ->get()
+            )->values();
+        }
 
         return view('pages.public.berita-show', compact('article', 'related'));
     }

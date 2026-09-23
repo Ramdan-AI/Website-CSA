@@ -1,50 +1,91 @@
-{{-- Berita terbaru --}}
-<section id="kegiatan" class="bg-white scroll-mt-16">
-    <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-20">
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+{{-- Berita: satu feature + empat kartu --}}
+<section id="kegiatan" class="scroll-mt-16" style="background: var(--paper-sunken); border-top: 1px solid var(--line);">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-24">
+
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-12">
             <div class="max-w-[680px]">
-                <h2 class="text-[clamp(1.6rem,3.6vw,2.25rem)] font-bold text-gray-900 leading-[1.25]">
+                <p class="text-[13px] font-medium mb-3" style="color: var(--accent);">Kegiatan</p>
+                <h2 class="text-[clamp(1.7rem,3.8vw,2.4rem)] font-bold leading-[1.22] tracking-[-0.025em]" style="color: var(--ink);">
                     Berita terbaru
                 </h2>
-                <p class="text-[16px] text-gray-600 leading-[1.75] mt-4">
-                    Kegiatan dan kabar terbaru dari CSA.
-                </p>
             </div>
-            <a href="{{ route('berita') }}" class="shrink-0 text-[15px] font-medium text-[#1a73e8] hover:underline">
+            <a href="{{ route('berita') }}" class="shrink-0 text-[15px] font-medium hover:underline" style="color: var(--accent);">
                 Lihat semua berita
             </a>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse($news as $item)
-                <a href="{{ route('berita.show', $item->slug ?? $item->id) }}"
-                    class="group flex flex-col rounded-xl border border-gray-200 overflow-hidden hover:border-gray-300 transition-colors">
-                    <div class="aspect-[16/10] bg-gray-100 overflow-hidden">
-                        @if($item->thumbnail)
-                            <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->title }}"
-                                width="640" height="400" class="w-full h-full object-cover" loading="lazy" decoding="async">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center text-gray-300">
-                                <i class="fas fa-newspaper text-3xl"></i>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="p-5 flex flex-col flex-1">
-                        @if($item->category)
-                            <span class="text-[13px] font-medium text-[#1a73e8]">{{ $item->category->name }}</span>
-                        @endif
-                        <h3 class="text-[17px] font-semibold text-gray-900 mt-2 leading-[1.4] line-clamp-2">{{ $item->title }}</h3>
-                        <p class="text-[14px] text-gray-600 leading-[1.7] mt-2 line-clamp-2">{{ Str::limit(strip_tags($item->content), 100) }}</p>
-                        <p class="text-[13px] text-gray-500 mt-auto pt-4">
-                            {{ $item->published_at?->translatedFormat('d M Y') ?? $item->created_at->translatedFormat('d M Y') }}
-                        </p>
-                    </div>
-                </a>
-            @empty
-                <div class="sm:col-span-2 lg:col-span-3 text-center py-14">
-                    <p class="text-[15px] text-gray-500">Belum ada berita yang dipublikasikan.</p>
+        @php $featured = $news->first(); $rest = $news->skip(1); @endphp
+
+        @if ($featured)
+            {{-- Feature --}}
+            <a href="{{ route('berita.show', $featured->slug ?? $featured->id) }}"
+                class="group grid lg:grid-cols-2 rounded-xl border overflow-hidden transition-colors hover:border-[var(--line-strong)]"
+                style="background: var(--paper); border-color: var(--line);">
+                <div class="aspect-[16/10] lg:aspect-auto lg:min-h-[320px] overflow-hidden" style="background: var(--paper-sunken);">
+                    @if($featured->thumbnail)
+                        <img src="{{ asset('storage/' . $featured->thumbnail) }}" alt="{{ $featured->title }}"
+                            width="960" height="600" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.02]" loading="lazy" decoding="async">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center" style="color: var(--ink-faint);">
+                            <i class="fas fa-newspaper text-4xl"></i>
+                        </div>
+                    @endif
                 </div>
-            @endforelse
-        </div>
+                <div class="p-6 sm:p-10 flex flex-col justify-center">
+                    @if($featured->category)
+                        <span class="text-[13px] font-medium" style="color: var(--accent);">{{ $featured->category->name }}</span>
+                    @endif
+                    <h3 class="text-[24px] sm:text-[30px] font-bold mt-3 leading-[1.25] tracking-[-0.025em]" style="color: var(--ink);">
+                        {{ $featured->title }}
+                    </h3>
+                    <p class="text-[15px] sm:text-[16px] leading-[1.8] mt-4 line-clamp-3" style="color: var(--ink-soft);">
+                        {{ Str::limit(strip_tags($featured->content), 180) }}
+                    </p>
+                    <div class="flex items-center gap-4 mt-6 text-[13px]" style="color: var(--ink-faint);">
+                        <span>{{ $featured->author?->name ?? 'CSA' }}</span>
+                        <span>·</span>
+                        <span>{{ $featured->published_at?->translatedFormat('d M Y') ?? $featured->created_at->translatedFormat('d M Y') }}</span>
+                    </div>
+                </div>
+            </a>
+
+            {{-- Empat kartu --}}
+            @if ($rest->isNotEmpty())
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-5">
+                    @foreach ($rest as $item)
+                        <a href="{{ route('berita.show', $item->slug ?? $item->id) }}"
+                            class="group flex flex-col rounded-xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:border-[var(--line-strong)]"
+                            style="background: var(--paper); border-color: var(--line);">
+                            <div class="aspect-[16/10] overflow-hidden" style="background: var(--paper-sunken);">
+                                @if($item->thumbnail)
+                                    <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->title }}"
+                                        width="480" height="300" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" loading="lazy" decoding="async">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center" style="color: var(--ink-faint);">
+                                        <i class="fas fa-newspaper text-2xl"></i>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-5 flex flex-col flex-1">
+                                @if($item->category)
+                                    <span class="text-[12px] font-medium" style="color: var(--accent);">{{ $item->category->name }}</span>
+                                @endif
+                                <h3 class="text-[15px] font-semibold mt-2 leading-[1.45] line-clamp-3" style="color: var(--ink);">
+                                    {{ $item->title }}
+                                </h3>
+                                <p class="text-[13px] mt-auto pt-4" style="color: var(--ink-faint);">
+                                    {{ $item->published_at?->translatedFormat('d M Y') ?? $item->created_at->translatedFormat('d M Y') }}
+                                </p>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+        @else
+            <div class="text-center py-14 rounded-xl border" style="background: var(--paper); border-color: var(--line);">
+                <p class="text-[15px]" style="color: var(--ink-soft);">Belum ada berita yang dipublikasikan.</p>
+            </div>
+        @endif
+
     </div>
 </section>

@@ -1,12 +1,10 @@
-{{-- Cerita CSA: perjalanan, pembina, pendiri, ajakan --}}
+{{-- Cerita CSA: timeline, pembina, pendiri --}}
 @php
     $pembina = [
         'name' => 'Adi Raharjo, S.Kom., M.M',
-        'role' => 'Pembina',
         'about' => 'Membimbing arah teknis dan akademik CSA sejak awal berdiri.',
         'education' => 'S2 Magister Manajemen, Universitas Pendidikan Indonesia',
         'experience' => '15+ tahun',
-        'linkedin' => '#',
     ];
     $founders = [
         'Diansyah, S.Kom',
@@ -22,106 +20,93 @@
     $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
 
     $milestones = [
-        ['2017', 'CSA lahir', 'HMJ IF yang non-aktif dihidupkan kembali oleh sekelompok mahasiswa sebagai wadah pemrograman dan informatika.'],
+        ['2017', 'CSA lahir', 'UKM pemrograman HMJ IF dihidupkan kembali oleh sekelompok mahasiswa sebagai wadah pemrograman dan informatika.'],
         ['2018', 'Divisi terbentuk', 'Multimedia dan pemrograman berjalan berdampingan. Proyek kolaboratif pertama dikerjakan lintas divisi.'],
         ['2023', 'Metode belajar', 'Study club mingguan dan mentoring internal menjadi kebiasaan baru anggota.'],
         ['Kini', 'Tumbuh bersama', 'Workshop, kompetisi, dan proyek nyata membuka jalan anggota ke industri.'],
     ];
 @endphp
 
-<section id="cerita" class="relative py-20 md:py-28 bg-[#F7FAFF] scroll-mt-24">
-    <div class="max-w-[1200px] mx-auto px-5 sm:px-8">
+<section id="cerita" class="scroll-mt-16" style="background: var(--paper);">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-24">
 
-        <div class="max-w-[720px] mb-12 md:mb-16" data-reveal="up">
-            <p class="text-[13px] font-semibold text-[#1a73e8] mb-3">Cerita CSA</p>
-            <h2 class="text-[clamp(1.8rem,4.4vw,2.75rem)] font-bold text-gray-900 leading-[1.2]">
+        <div class="max-w-[680px] mb-14" data-reveal="up">
+            <p class="text-[13px] font-medium mb-3" style="color: var(--accent);">Cerita CSA</p>
+            <h2 class="text-[clamp(1.7rem,3.8vw,2.4rem)] font-bold leading-[1.22] tracking-[-0.025em]" style="color: var(--ink);">
                 Perjalanan CSA
             </h2>
-            <p class="text-[16px] sm:text-[17px] text-gray-500 leading-[1.7] mt-5">
+            <p class="text-[16px] leading-[1.8] mt-5" style="color: var(--ink-soft);">
                 Dari sekelompok mahasiswa pada 2017, hingga jadi komunitas kreatif yang terus berkarya.
             </p>
         </div>
 
-        {{-- Timeline --}}
-        <ol class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16 md:mb-24" data-reveal-stagger>
-            @foreach ($milestones as [$year, $title, $desc])
-                <li class="bg-white rounded-xl border border-gray-200 p-6">
-                    <span class="text-[24px] font-bold text-[#1a73e8] leading-none">{{ $year }}</span>
-                    <h3 class="text-[15px] font-bold text-gray-900 mt-3.5">{{ $title }}</h3>
-                    <p class="text-[14px] text-gray-500 leading-[1.7] mt-2">{{ $desc }}</p>
-                </li>
-            @endforeach
-        </ol>
+        {{-- Timeline vertikal dengan garis yang tumbuh --}}
+        <div class="relative pl-8 sm:pl-12" data-timeline>
+            <div class="absolute left-[7px] sm:left-[11px] top-2 bottom-2 w-px" style="background: var(--line);"></div>
+            <div data-timeline-fill class="absolute left-[7px] sm:left-[11px] top-2 w-px origin-top" style="height: calc(100% - 1rem); background: var(--accent); transform: scaleY(0);"></div>
+
+            <div class="space-y-12">
+                @foreach ($milestones as $i => [$year, $title, $desc])
+                    <div class="relative" data-timeline-item>
+                        <span class="absolute -left-8 sm:-left-12 top-1.5 w-4 h-4 rounded-full border-2 ring-4"
+                            style="border-color: var(--accent); background: var(--paper); --tw-ring-color: var(--paper);"></span>
+                        <p class="text-[13px] font-medium" style="color: var(--accent);">{{ $year }}</p>
+                        <h3 class="text-[19px] sm:text-[21px] font-bold mt-1.5 tracking-[-0.015em]" style="color: var(--ink);">{{ $title }}</h3>
+                        <p class="text-[15px] leading-[1.8] mt-2 max-w-[640px]" style="color: var(--ink-soft);">{{ $desc }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
 
         {{-- Pembina --}}
-        <div class="rounded-xl bg-white border border-gray-200 p-6 sm:p-8 mb-16 md:mb-24" data-reveal="up">
-            <p class="text-[13px] font-semibold text-gray-400 mb-5">Pembina</p>
-            <div class="flex flex-col sm:flex-row sm:items-center gap-6">
-                <div class="w-20 h-20 rounded-full overflow-hidden bg-[#e8f0fe] shrink-0">
+        <div class="mt-20 rounded-xl border overflow-hidden" style="background: var(--paper-sunken); border-color: var(--line);" data-reveal="up">
+            <div class="grid sm:grid-cols-[200px_1fr]">
+                <div class="aspect-square sm:aspect-auto" style="background: var(--line);">
                     @if ($pembinaPhoto)
-                        <img src="{{ $pembinaPhoto }}" alt="{{ $pembina['name'] }}" width="80" height="80"
-                            class="w-full h-full object-cover" loading="lazy" decoding="async">
+                        <img src="{{ $pembinaPhoto }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
                     @else
                         <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
                     @endif
                 </div>
-                <div class="min-w-0 flex-1">
-                    <h3 class="text-[19px] font-bold text-gray-900">{{ $pembina['name'] }}</h3>
-                    <p class="text-[14px] text-gray-500 mt-1.5 leading-[1.7]">{{ $pembina['about'] }}</p>
-                    <p class="text-[13px] text-gray-400 mt-2">{{ $pembina['education'] }} · {{ $pembina['experience'] }}</p>
+                <div class="p-6 sm:p-8 flex flex-col justify-center">
+                    <p class="text-[13px] font-medium mb-2" style="color: var(--accent);">Pembina</p>
+                    <h3 class="text-[20px] font-bold tracking-[-0.015em]" style="color: var(--ink);">{{ $pembina['name'] }}</h3>
+                    <p class="text-[15px] leading-[1.8] mt-3" style="color: var(--ink-soft);">{{ $pembina['about'] }}</p>
+                    <div class="flex flex-wrap gap-x-6 gap-y-2 mt-5 pt-5 border-t" style="border-color: var(--line);">
+                        <div>
+                            <p class="text-[12px]" style="color: var(--ink-faint);">Pendidikan</p>
+                            <p class="text-[14px] font-medium mt-0.5" style="color: var(--ink);">{{ $pembina['education'] }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[12px]" style="color: var(--ink-faint);">Pengalaman</p>
+                            <p class="text-[14px] font-medium mt-0.5" style="color: var(--ink);">{{ $pembina['experience'] }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         {{-- Pendiri --}}
-        <div class="mb-16 md:mb-24">
+        <div class="mt-20">
             <div class="flex items-end justify-between gap-5 mb-8">
                 <div>
-                    <p class="text-[13px] font-semibold text-gray-400 mb-2">Pendiri</p>
-                    <h3 class="text-[22px] sm:text-[26px] font-bold text-gray-900 tracking-[-0.02em]">Pendiri CSA</h3>
+                    <p class="text-[13px] font-medium mb-2" style="color: var(--ink-faint);">Pendiri</p>
+                    <h3 class="text-[24px] font-bold tracking-[-0.02em]" style="color: var(--ink);">Pendiri CSA</h3>
                 </div>
-                <span class="text-[13px] text-gray-400 shrink-0">{{ count($founders) }} orang</span>
+                <span class="text-[13px] shrink-0" style="color: var(--ink-faint);">{{ count($founders) }} orang</span>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4" data-reveal-stagger>
                 @foreach ($founders as $founder)
-                    <article class="bg-white rounded-xl border border-gray-200 p-5 text-center">
-                        <div class="w-14 h-14 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center mx-auto text-[16px] font-bold">
+                    <article class="group rounded-xl border p-5 text-center transition-transform duration-300 hover:-translate-y-1"
+                        style="background: var(--paper); border-color: var(--line);">
+                        <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto text-[16px] font-bold transition-transform duration-300 group-hover:scale-105"
+                            style="background: var(--accent-soft); color: var(--accent);">
                             {{ $monogram($founder) }}
                         </div>
-                        <h4 class="text-[14px] font-bold text-gray-900 mt-3.5 leading-snug">{{ $founder }}</h4>
+                        <h4 class="text-[14px] font-bold mt-3.5 leading-snug" style="color: var(--ink);">{{ $founder }}</h4>
                     </article>
                 @endforeach
-            </div>
-        </div>
-
-        {{-- CTA --}}
-        <div class="rounded-xl border border-gray-200 bg-white p-8 sm:p-12 text-center">
-            <div class="max-w-[560px] mx-auto">
-                <h3 class="text-[clamp(1.5rem,3.6vw,2rem)] font-bold text-gray-900 leading-[1.25]">
-                    Jadi bagian dari CSA
-                </h3>
-                <p class="text-[16px] text-gray-600 leading-[1.75] mt-4">
-                    Bangun portofolio bersama {{ $members->count() }} anggota aktif lainnya.
-                </p>
-
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 mt-7">
-                    @if ($regOpen)
-                        <a href="{{ route('register') }}"
-                            class="inline-flex items-center justify-center px-6 min-h-[48px] bg-[#1a73e8] text-white text-[15px] font-medium rounded-lg hover:bg-[#1557b0] transition-colors">
-                            Daftar sekarang
-                        </a>
-                    @else
-                        <button type="button" onclick="window.dispatchEvent(new CustomEvent('open-register-modal'))"
-                            class="inline-flex items-center justify-center px-6 min-h-[48px] bg-[#1a73e8] text-white text-[15px] font-medium rounded-lg hover:bg-[#1557b0] transition-colors cursor-pointer">
-                            Daftar sekarang
-                        </button>
-                    @endif
-                    <a href="#kepengurusan"
-                        class="inline-flex items-center justify-center px-6 min-h-[48px] bg-white border border-gray-300 text-gray-700 text-[15px] font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                        Lihat struktur
-                    </a>
-                </div>
             </div>
         </div>
 

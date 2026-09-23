@@ -2,7 +2,7 @@
 @props(['member'])
 
 @php
-    $linkClass = 'w-10 h-10 rounded-xl bg-[#f1f3f4] flex items-center justify-center text-gray-500 hover:text-[#1a73e8] hover:bg-[#e8f0fe] transition-colors duration-200';
+    $linkClass = 'w-10 h-10 rounded-xl bg-[var(--paper-sunken)] flex items-center justify-center text-[var(--ink-faint)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)] transition-colors duration-200';
 @endphp
 
 @if ($member->instagram || $member->github)

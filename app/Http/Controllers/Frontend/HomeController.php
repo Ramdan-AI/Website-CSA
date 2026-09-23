@@ -24,7 +24,7 @@ class HomeController extends Controller
         $news = News::with(['category', 'author'])
             ->where('status', 'published')
             ->orderBy('published_at', 'desc')
-            ->take(3)
+            ->take(5)
             ->get();
 
         $setting = Setting::first();

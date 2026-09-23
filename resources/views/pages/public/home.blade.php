@@ -35,12 +35,12 @@
 @endphp
 
 @include('components.public.sections.hero')
-@include('components.public.sections.stats-band')
 @include('components.public.sections.tentang')
 @include('components.public.sections.mengapa')
 @include('components.public.sections.divisi')
-@include('components.public.sections.kegiatan')
 @include('components.public.sections.kepengurusan')
 @include('components.public.sections.cerita')
+@include('components.public.sections.kegiatan')
+@include('components.public.sections.daftar')
 
 @endsection

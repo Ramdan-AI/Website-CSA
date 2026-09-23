@@ -247,8 +247,8 @@ const initSliders = () => {
     });
 };
 
-// Continuous marquee: photos slide horizontally in a seamless loop.
-// Duplicated content in the markup lets it wrap without a visible jump.
+// Seamless marquee. Each strip duplicates its content so the loop wraps
+// without a visible jump. data-marquee-speed sets direction and pace.
 const initMarquee = () => {
     gsap.utils.toArray("[data-marquee]").forEach((marquee) => {
         const track = marquee.querySelector("[data-marquee-track]");
@@ -257,32 +257,198 @@ const initMarquee = () => {
         const half = track.scrollWidth / 2;
         if (!half || reducedMotion) return;
 
+        const speed = parseFloat(marquee.dataset.marqueeSpeed || "1");
+        const pace = Math.abs(speed);
+        const duration = half / (26 * pace);
+
         const tween = gsap.fromTo(
             track,
-            { x: 0 },
+            { x: speed >= 0 ? 0 : -half },
             {
-                x: -half,
-                duration: half / 60,
+                x: speed >= 0 ? -half : 0,
+                duration,
                 ease: "none",
                 repeat: -1,
             }
         );
 
-        // Only the marquee slows down while the pointer is over it.
-        marquee.addEventListener("pointerenter", () => gsap.to(tween, { timeScale: 0.2, duration: 0.3 }));
-        marquee.addEventListener("pointerleave", () => gsap.to(tween, { timeScale: 1, duration: 0.3 }));
+        marquee._marqueeTween = tween;
+
+        // Melambat saat kursor di atas strip supaya bisa dilihat.
+        marquee.addEventListener("pointerenter", () => gsap.to(tween, { timeScale: 0.2, duration: 0.4 }));
+        marquee.addEventListener("pointerleave", () => gsap.to(tween, { timeScale: 1, duration: 0.4 }));
+    });
+};
+
+// Kalender tahunan: tahun muncul berurutan, lalu tahun berdirinya disorot.
+const initCalendar = () => {
+    const calendar = document.querySelector("[data-calendar]");
+    if (!calendar) return;
+
+    const cells = gsap.utils.toArray("[data-cal-year-cell]", calendar);
+    if (!cells.length) return;
+
+    const highlight = cells.find((el) => el.dataset.year === "2017");
+
+    if (reducedMotion) {
+        if (highlight) {
+            highlight.style.background = "var(--accent-solid)";
+            highlight.style.color = "var(--on-accent)";
+        }
+        return;
+    }
+
+    const tl = gsap.timeline({
+        scrollTrigger: { trigger: calendar, start: "top 85%", once: true },
+    });
+
+    tl.fromTo(
+        cells,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.4, stagger: 0.07, ease: "power2.out" }
+    );
+
+    if (highlight) {
+        tl.to(
+            highlight,
+            {
+                backgroundColor: "var(--accent-solid)",
+                color: "var(--on-accent)",
+                scale: 1.12,
+                duration: 0.5,
+                ease: "back.out(1.8)",
+            },
+            "+=0.05"
+        ).to(highlight, { scale: 1, duration: 0.3, ease: "power2.out" });
+    }
+};
+
+// Garis timeline yang tumbuh mengikuti scroll.
+const initTimeline = () => {
+    const timeline = document.querySelector("[data-timeline]");
+    if (!timeline || reducedMotion) return;
+
+    const fill = timeline.querySelector("[data-timeline-fill]");
+    if (!fill) return;
+
+    gsap.to(fill, {
+        scaleY: 1,
+        ease: "none",
+        scrollTrigger: {
+            trigger: timeline,
+            start: "top 75%",
+            end: "bottom 60%",
+            scrub: 0.4,
+        },
+    });
+};
+
+// Strip foto hero: kecepatan gerak ikut menyesuaikan arah dan laju scroll.
+// Saat pengunjung menggulir, marquee berakselerasi atau mundur sementara.
+const initStripVelocity = () => {
+    const strip = document.querySelector("[data-photo-strip]");
+    if (!strip || reducedMotion) return;
+
+    const marquees = strip.querySelectorAll("[data-marquee]");
+    if (!marquees.length) return;
+
+    ScrollTrigger.create({
+        trigger: strip,
+        start: "top bottom",
+        end: "bottom top",
+        onUpdate: (self) => {
+            const velocity = gsap.utils.clamp(-2400, 2400, self.getVelocity());
+            // 1 = kecepatan dasar, memanjang sesuai arah gulir.
+            const boost = gsap.utils.clamp(0.35, 3.2, 1 + Math.abs(velocity) / 1400);
+            const forward = velocity >= 0;
+
+            marquees.forEach((marquee) => {
+                const tween = marquee._marqueeTween;
+                if (!tween) return;
+                const base = parseFloat(marquee.dataset.marqueeSpeed || "1") >= 0 ? 1 : -1;
+                tween.timeScale(forward ? boost : -boost * 0.6);
+                marquee.dataset.baseDirection = base;
+            });
+        },
+    });
+
+    // Kembali ke kecepatan normal saat gulir berhenti.
+    ScrollTrigger.addEventListener("scrollEnd", () => {
+        marquees.forEach((marquee) => {
+            const tween = marquee._marqueeTween;
+            if (tween) gsap.to(tween, { timeScale: 1, duration: 0.6, overwrite: true });
+        });
+    });
+};
+
+// Daftar bernomor: nomor besar bergerak saat barisnya masuk viewport.
+const initNumberedList = () => {
+    if (reducedMotion) return;
+
+    gsap.utils.toArray("[data-numbered-item]").forEach((item) => {
+        const number = item.querySelector("[data-item-number]");
+        const content = item.querySelector("[data-item-content]");
+        if (!number || !content) return;
+
+        gsap.fromTo(
+            number,
+            { x: -40, opacity: 0 },
+            {
+                x: 0,
+                opacity: 1,
+                duration: 0.9,
+                ease: "power3.out",
+                scrollTrigger: { trigger: item, start: "top 82%", once: true },
+            }
+        );
+
+        gsap.fromTo(
+            content,
+            { x: 40, opacity: 0 },
+            {
+                x: 0,
+                opacity: 1,
+                duration: 0.9,
+                delay: 0.08,
+                ease: "power3.out",
+                scrollTrigger: { trigger: item, start: "top 82%", once: true },
+            }
+        );
+    });
+};
+
+// Judul hero muncul baris demi baris lewat mask, bukan fade.
+const initLineReveal = () => {
+    const title = document.querySelector("[data-hero-title]");
+    if (!title) return;
+
+    const lines = title.querySelectorAll(".line-mask");
+
+    if (reducedMotion) {
+        lines.forEach((line) => line.classList.add("is-in"));
+        return;
+    }
+
+    lines.forEach((line, index) => {
+        gsap.delayedCall(0.1 + index * 0.1, () => line.classList.add("is-in"));
     });
 };
 
 // Start animations as soon as the DOM is ready (avoids waiting for all
 // hero images to finish loading, which made the landing feel slow).
 const init = () => {
+    document.documentElement.classList.add("js-ready");
+    initLineReveal();
     runReveal();
     initParallax();
     initSectionProgress();
     initDeepParallax();
     initSliders();
     initMarquee();
+    initStripVelocity();
+    initCalendar();
+    initTimeline();
+    initNumberedList();
 };
 
 if (document.readyState === "loading") {
