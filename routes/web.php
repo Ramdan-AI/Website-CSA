@@ -66,7 +66,6 @@ Route::prefix('{roleSlug}')
         Route::get('my-calendar', [MemberPageController::class, 'calendar'])->name('member.calendar');
         Route::get('my-division', [MemberPageController::class, 'division'])->name('member.division');
         Route::get('my-gallery', [MemberPageController::class, 'gallery'])->name('member.gallery');
-        Route::get('my-settings', [MemberPageController::class, 'settings'])->name('member.settings');
 
         // Member Attendance Actions
         Route::post('events/{event}/attend/self', [MemberPageController::class, 'selfAttendance'])->name('member.attendance.self');
@@ -86,6 +85,61 @@ Route::prefix('{roleSlug}')
         Route::get('showcase/{project}/preview', [\App\Http\Controllers\Admin\ProjectController::class, 'preview'])->name('showcase.preview');
         Route::put('showcase/{project}', [\App\Http\Controllers\Admin\ProjectController::class, 'update'])->name('showcase.update');
         Route::delete('showcase/{project}', [\App\Http\Controllers\Admin\ProjectController::class, 'destroy'])->name('showcase.destroy');
+
+        // Kesekretariatan — surat & arsip, notulen rapat.
+        Route::middleware(['can:manage-letters'])->group(function () {
+            Route::get('letters', [\App\Http\Controllers\Admin\LetterController::class, 'index'])->name('letters.index');
+            Route::get('letters/create', [\App\Http\Controllers\Admin\LetterController::class, 'create'])->name('letters.create');
+            Route::post('letters', [\App\Http\Controllers\Admin\LetterController::class, 'store'])->name('letters.store');
+            Route::get('letters/{letter}/edit', [\App\Http\Controllers\Admin\LetterController::class, 'edit'])->name('letters.edit');
+            Route::put('letters/{letter}', [\App\Http\Controllers\Admin\LetterController::class, 'update'])->name('letters.update');
+            Route::delete('letters/{letter}', [\App\Http\Controllers\Admin\LetterController::class, 'destroy'])->name('letters.destroy');
+        });
+
+        Route::middleware(['can:manage-minutes'])->group(function () {
+            Route::get('minutes', [\App\Http\Controllers\Admin\MinuteController::class, 'index'])->name('minutes.index');
+            Route::get('minutes/create', [\App\Http\Controllers\Admin\MinuteController::class, 'create'])->name('minutes.create');
+            Route::post('minutes', [\App\Http\Controllers\Admin\MinuteController::class, 'store'])->name('minutes.store');
+            Route::get('minutes/{minute}/edit', [\App\Http\Controllers\Admin\MinuteController::class, 'edit'])->name('minutes.edit');
+            Route::put('minutes/{minute}', [\App\Http\Controllers\Admin\MinuteController::class, 'update'])->name('minutes.update');
+            Route::delete('minutes/{minute}', [\App\Http\Controllers\Admin\MinuteController::class, 'destroy'])->name('minutes.destroy');
+        });
+
+        // Laporan keuangan terpadu.
+        Route::middleware(['can:view-finance-report'])->group(function () {
+            Route::get('finance-report', [\App\Http\Controllers\Admin\FinanceReportController::class, 'index'])->name('finance-report.index');
+            Route::get('finance-report/export', [\App\Http\Controllers\Admin\FinanceReportController::class, 'export'])->name('finance-report.export');
+        });
+
+        // Kelola anggota divisi sendiri (ketua & wakil divisi).
+        Route::middleware(['can:manage-division-members'])->group(function () {
+            Route::get('my-division/manage', [\App\Http\Controllers\Admin\DivisionMemberController::class, 'index'])->name('division-manage.index');
+            Route::post('my-division/manage', [\App\Http\Controllers\Admin\DivisionMemberController::class, 'store'])->name('division-manage.store');
+            Route::delete('my-division/manage/{member}', [\App\Http\Controllers\Admin\DivisionMemberController::class, 'destroy'])->name('division-manage.destroy');
+        });
+
+        // Rekap kehadiran divisi sendiri.
+        Route::middleware(['can:view-division-reports'])->group(function () {
+            Route::get('division-report', [\App\Http\Controllers\Admin\DivisionReportController::class, 'index'])->name('division-report.index');
+            Route::get('division-report/export', [\App\Http\Controllers\Admin\DivisionReportController::class, 'export'])->name('division-report.export');
+        });
+
+        // Pengumuman: semua role kecuali anggota boleh membuat.
+        Route::middleware(['can:manage-announcements'])->group(function () {
+            Route::get('announcements', [\App\Http\Controllers\Admin\AnnouncementController::class, 'index'])->name('announcements.index');
+            Route::get('announcements/create', [\App\Http\Controllers\Admin\AnnouncementController::class, 'create'])->name('announcements.create');
+            Route::post('announcements', [\App\Http\Controllers\Admin\AnnouncementController::class, 'store'])->name('announcements.store');
+            Route::get('announcements/{announcement}/edit', [\App\Http\Controllers\Admin\AnnouncementController::class, 'edit'])->name('announcements.edit');
+            Route::put('announcements/{announcement}', [\App\Http\Controllers\Admin\AnnouncementController::class, 'update'])->name('announcements.update');
+            Route::delete('announcements/{announcement}', [\App\Http\Controllers\Admin\AnnouncementController::class, 'destroy'])->name('announcements.destroy');
+        });
+
+        // Log sistem: khusus pemegang view-activity-log.
+        Route::middleware(['can:view-activity-log'])->group(function () {
+            Route::get('activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-log.index');
+            Route::delete('activity-log/purge', [\App\Http\Controllers\Admin\ActivityLogController::class, 'purge'])->name('activity-log.purge');
+            Route::delete('activity-log/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'destroy'])->name('activity-log.destroy');
+        });
 
         Route::middleware(['auth'])->group(function () {
             Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -110,6 +164,10 @@ Route::prefix('{roleSlug}')
         Route::middleware(['can:manage-settings'])->group(function () {
             Route::get('settings', [SettingController::class, 'edit'])->name('settings.edit');
             Route::put('settings', [SettingController::class, 'update'])->name('settings.update');
+
+            // Pendaftaran & komunitas dipisah agar lebih mudah ditemukan admin.
+            Route::get('registration', [\App\Http\Controllers\Admin\RegistrationController::class, 'edit'])->name('registration.edit');
+            Route::put('registration', [\App\Http\Controllers\Admin\RegistrationController::class, 'update'])->name('registration.update');
         });
 
         Route::middleware(['can:manage-roles'])->group(function () {

@@ -22,8 +22,6 @@ class SettingRequest extends FormRequest
             'youtube' => ['nullable', 'url', 'max:255'],
             'linkedin' => ['nullable', 'url', 'max:255'],
             'about' => ['nullable', 'string'],
-            'registration_open' => ['nullable', 'boolean'],
-            'whatsapp_group_link' => ['nullable', 'url', 'max:500'],
             'logo' => ['nullable', 'image', 'mimes:png,svg', 'max:2048'],
         ];
     }

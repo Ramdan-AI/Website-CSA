@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
@@ -10,6 +11,7 @@ use Illuminate\Support\Str;
 class Division extends Model
 {
     use SoftDeletes;
+    use LogsActivity;
 
     protected $fillable = [
         'name',

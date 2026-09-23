@@ -68,6 +68,13 @@
                         <span class="block text-[12px] text-[var(--text-muted)]">Lacak kehadiran Anda</span>
                     </span>
                 </a>
+                <a href="{{ route('admin.showcase.index') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--bg-hover)] transition-colors">
+                    <span class="w-9 h-9 rounded-lg bg-[var(--bg-muted)] text-[var(--text-secondary)] flex items-center justify-center shrink-0"><x-admin.icon name="rocket" :size="16" /></span>
+                    <span>
+                        <span class="block text-[13px] font-medium text-[var(--text-primary)]">Proyek Saya</span>
+                        <span class="block text-[12px] text-[var(--text-muted)]">{{ ($myProjects ?? collect())->count() }} proyek di showcase</span>
+                    </span>
+                </a>
             </div>
         </div>
 
@@ -144,5 +151,7 @@
             </table>
         </div>
     </div>
+    <x-admin.announcement-feed :announcements="$announcements" />
+    <x-admin.activity-feed :logs="$systemActivity" />
 </div>
 @endsection

@@ -13,6 +13,15 @@ return [
         'gray'    => ['bg' => 'from-gray-500 to-gray-600',    'glow' => 'rgba(107,114,128,0.2)'],
     ],
 
+    /*
+     | Setiap grup mendukung:
+     |   roles       : grup hanya tampil untuk role ini (kosong = semua role)
+     |   permissions : grup tampil bila user punya salah satu izin ini
+     |
+     | Setiap item mendukung:
+     |   permission : item tampil bila user punya izin ini
+     |   roles      : item tampil hanya untuk role ini
+     */
     'menu' => [
         [
             'id'          => 'dashboard',
@@ -24,33 +33,86 @@ return [
             ],
         ],
 
+        // Menu pribadi hanya untuk anggota: presensi, riwayat, dan proyeknya.
+        // Admin tidak perlu ini karena tidak punya profil keanggotaan.
         [
-            'id'          => 'member-services',
-            'label'       => 'Layanan Anggota',
+            'id'          => 'my-workspace',
+            'label'       => 'Workspace Saya',
             'color'       => 'gray',
             'roles'       => ['anggota'],
             'permissions' => [],
             'items'       => [
                 ['icon' => 'calendar-days', 'label' => 'Kegiatan & Presensi', 'route' => 'admin.member.calendar', 'pattern' => 'admin.member.calendar'],
                 ['icon' => 'user-check', 'label' => 'Riwayat Kehadiran', 'route' => 'admin.member.attendance', 'pattern' => 'admin.member.attendance'],
-                ['icon' => 'newspaper', 'label' => 'Berita', 'route' => 'admin.member.news', 'pattern' => 'admin.member.news'],
-                ['icon' => 'folder-open', 'label' => 'Dokumen', 'route' => 'admin.member.documents', 'pattern' => 'admin.member.documents'],
-                ['icon' => 'users', 'label' => 'Anggota Divisi', 'route' => 'admin.member.division', 'pattern' => 'admin.member.division'],
-                ['icon' => 'images', 'label' => 'Galeri', 'route' => 'admin.member.gallery', 'pattern' => 'admin.member.gallery'],
-                ['icon' => 'settings', 'label' => 'Pengaturan', 'route' => 'admin.member.settings', 'pattern' => 'admin.member.settings'],
+                ['icon' => 'rocket', 'label' => 'Proyek Saya', 'route' => 'admin.showcase.index', 'pattern' => 'admin.showcase.*'],
             ],
         ],
 
+        // Layanan publik untuk anggota: berita, dokumen, galeri.
         [
-            'id'          => 'workspace',
-            'label'       => 'Karya',
-            'color'       => 'blue',
+            'id'          => 'member-services',
+            'label'       => 'Informasi',
+            'color'       => 'gray',
+            'roles'       => ['anggota'],
             'permissions' => [],
             'items'       => [
-                ['icon' => 'rocket', 'label' => 'Showcase Proyek', 'route' => 'admin.showcase.index', 'pattern' => 'admin.showcase.*'],
+                ['icon' => 'newspaper', 'label' => 'Berita', 'route' => 'admin.member.news', 'pattern' => 'admin.member.news'],
+                ['icon' => 'folder-open', 'label' => 'Dokumen', 'route' => 'admin.member.documents', 'pattern' => 'admin.member.documents'],
+                ['icon' => 'images', 'label' => 'Galeri', 'route' => 'admin.member.gallery', 'pattern' => 'admin.member.gallery'],
             ],
         ],
 
+        // Komunikasi: pengumuman organisasi.
+        [
+            'id'          => 'communication',
+            'label'       => 'Komunikasi',
+            'color'       => 'amber',
+            'permissions' => ['manage-announcements'],
+            'items'       => [
+                ['icon' => 'megaphone', 'label' => 'Pengumuman', 'route' => 'admin.announcements.index', 'pattern' => 'admin.announcements.*'],
+            ],
+        ],
+
+        // Kesekretariatan: administrasi surat, notulen, dan arsip berita.
+        [
+            'id'          => 'secretariat',
+            'label'       => 'Kesekretariatan',
+            'color'       => 'teal',
+            'permissions' => ['manage-letters', 'manage-minutes'],
+            'items'       => [
+                ['icon' => 'mail', 'label' => 'Surat & Arsip', 'route' => 'admin.letters.index', 'pattern' => 'admin.letters.*', 'permission' => 'manage-letters'],
+                ['icon' => 'notebook-pen', 'label' => 'Notulen Rapat', 'route' => 'admin.minutes.index', 'pattern' => 'admin.minutes.*', 'permission' => 'manage-minutes'],
+            ],
+        ],
+
+        // Publikasi: berita dan dokumen yang tampil ke publik.
+        [
+            'id'          => 'publication',
+            'label'       => 'Publikasi',
+            'color'       => 'teal',
+            'permissions' => ['manage-news', 'manage-documents'],
+            'items'       => [
+                ['icon' => 'tags', 'label' => 'Kategori Berita', 'route' => 'admin.news-categories.index', 'pattern' => 'admin.news-categories.*', 'permission' => 'manage-news'],
+                ['icon' => 'newspaper', 'label' => 'Berita', 'route' => 'admin.news.index', 'pattern' => 'admin.news.*', 'permission' => 'manage-news'],
+                ['icon' => 'folder-open', 'label' => 'Dokumen', 'route' => 'admin.documents.index', 'pattern' => 'admin.documents.*', 'permission' => 'manage-documents'],
+            ],
+        ],
+
+        // Divisi: kelola anggota dan rekap kehadiran divisi sendiri.
+        // Hanya muncul untuk ketua & wakil divisi yang punya izinnya.
+        [
+            'id'          => 'my-division',
+            'label'       => 'Divisi Saya',
+            'color'       => 'purple',
+            'roles'       => ['ketua-divisi', 'wakil-ketua-divisi'],
+            'permissions' => ['manage-division-members', 'view-division-reports'],
+            'items'       => [
+                ['icon' => 'users', 'label' => 'Kelola Anggota', 'route' => 'admin.division-manage.index', 'pattern' => 'admin.division-manage.*', 'permission' => 'manage-division-members'],
+                ['icon' => 'clipboard-check', 'label' => 'Rekap Kehadiran', 'route' => 'admin.division-report.index', 'pattern' => 'admin.division-report.*', 'permission' => 'view-division-reports'],
+            ],
+        ],
+
+        // Data master: hanya pimpinan dengan izin terkait.
         [
             'id'          => 'master-data',
             'label'       => 'Data Master',
@@ -74,24 +136,13 @@ return [
         ],
 
         [
-            'id'          => 'publication',
-            'label'       => 'Publikasi',
-            'color'       => 'teal',
-            'permissions' => ['manage-news', 'manage-documents'],
-            'items'       => [
-                ['icon' => 'tags', 'label' => 'Kategori', 'route' => 'admin.news-categories.index', 'pattern' => 'admin.news-categories.*', 'permission' => 'manage-news'],
-                ['icon' => 'newspaper', 'label' => 'Berita', 'route' => 'admin.news.index', 'pattern' => 'admin.news.*', 'permission' => 'manage-news'],
-                ['icon' => 'folder-open', 'label' => 'Dokumen', 'route' => 'admin.documents.index', 'pattern' => 'admin.documents.*', 'permission' => 'manage-documents'],
-            ],
-        ],
-
-        [
             'id'          => 'events',
             'label'       => 'Kegiatan',
             'color'       => 'cyan',
-            'permissions' => ['manage-events', 'view-events'],
+            'permissions' => ['manage-events', 'view-events', 'manage-registrations'],
             'items'       => [
                 ['icon' => 'calendar-days', 'label' => 'Acara', 'route' => 'admin.events.index', 'pattern' => 'admin.events.*'],
+                ['icon' => 'clipboard-list', 'label' => 'Pendaftaran', 'route' => 'admin.event-registrations.index', 'pattern' => 'admin.event-registrations.*', 'permission' => 'manage-registrations'],
             ],
         ],
 
@@ -99,10 +150,11 @@ return [
             'id'          => 'finance',
             'label'       => 'Keuangan',
             'color'       => 'emerald',
-            'permissions' => ['manage-finance', 'view-finance'],
+            'permissions' => ['manage-finance', 'view-finance', 'view-finance-report'],
             'items'       => [
-                ['icon' => 'trending-up', 'label' => 'Pemasukan', 'route' => 'admin.incomes.index', 'pattern' => 'admin.incomes.*', 'permission' => 'manage-finance'],
-                ['icon' => 'trending-down', 'label' => 'Pengeluaran', 'route' => 'admin.expenses.index', 'pattern' => 'admin.expenses.*', 'permission' => 'manage-finance'],
+                ['icon' => 'trending-up', 'label' => 'Pemasukan', 'route' => 'admin.incomes.index', 'pattern' => 'admin.incomes.*', 'permission' => 'view-finance'],
+                ['icon' => 'trending-down', 'label' => 'Pengeluaran', 'route' => 'admin.expenses.index', 'pattern' => 'admin.expenses.*', 'permission' => 'view-finance'],
+                ['icon' => 'chart-line', 'label' => 'Laporan Keuangan', 'route' => 'admin.finance-report.index', 'pattern' => 'admin.finance-report.*', 'permission' => 'view-finance-report'],
             ],
         ],
 
@@ -112,13 +164,27 @@ return [
             'color'       => 'pink',
             'permissions' => ['manage-media'],
             'items'       => [
-                ['icon' => 'images', 'label' => 'Album', 'route' => 'admin.albums.index', 'pattern' => 'admin.albums.*', 'permission' => 'manage-media'],
-                ['icon' => 'image', 'label' => 'Galeri', 'route' => 'admin.galleries.index', 'pattern' => 'admin.galleries.*', 'permission' => 'manage-media'],
+                ['icon' => 'images', 'label' => 'Album', 'route' => 'admin.albums.index', 'pattern' => 'admin.albums.*'],
+                ['icon' => 'image', 'label' => 'Galeri', 'route' => 'admin.galleries.index', 'pattern' => 'admin.galleries.*'],
             ],
         ],
     ],
 
     'settings' => [
+        [
+            'label'      => 'Log Sistem',
+            'icon'       => 'scroll-text',
+            'route'      => 'admin.activity-log.index',
+            'pattern'    => 'admin.activity-log.*',
+            'permission' => 'view-activity-log',
+        ],
+        [
+            'label'      => 'Pendaftaran & Komunitas',
+            'icon'       => 'user-plus',
+            'route'      => 'admin.registration.edit',
+            'pattern'    => 'admin.registration.*',
+            'permission' => 'manage-settings',
+        ],
         [
             'label'      => 'Pengaturan',
             'icon'       => 'settings',

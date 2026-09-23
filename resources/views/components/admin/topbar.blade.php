@@ -54,6 +54,11 @@
     }
     $notifications = $notifications->take(10);
     $unreadCount = $notifications->count();
+
+    // Ringkasan aktivitas sistem: hanya untuk pemegang izin log.
+    $systemActivity = auth()->user()?->role?->hasPermission('view-activity-log')
+        ? \App\Models\ActivityLog::with('user:id,name')->latestFirst()->take(6)->get()
+        : collect();
 @endphp
 
 <header x-data="{
@@ -88,7 +93,7 @@
                 <span x-show="!isDark"><x-admin.icon name="moon" :size="18" /></span>
             </button>
 
-            <div class="relative" @click.outside="notifOpen = false">
+            <div class="relative" @click.outside="notifOpen = false" x-data="{ tab: 'notif' }">
                 <button @click="notifOpen = !notifOpen" class="csa-icon-btn relative" aria-label="Notifikasi">
                     <x-admin.icon name="bell" :size="18" />
                     <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-orange-500 border-2 border-[var(--topbar-bg)] {{ $unreadCount > 0 ? '' : 'hidden' }}"></span>
@@ -97,12 +102,30 @@
                     class="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-[var(--bg-elevated)] border border-[var(--border-strong)] rounded-2xl shadow-2xl overflow-hidden z-50"
                     style="display: none;">
                     <div class="p-4 border-b border-[var(--border-soft)] flex items-center justify-between">
-                        <h3 class="text-sm font-semibold text-[var(--text-primary)]">Notifikasi</h3>
+                        <h3 class="text-sm font-semibold text-[var(--text-primary)]">
+                            <span x-text="tab === 'notif' ? 'Notifikasi' : 'Aktivitas Sistem'"></span>
+                        </h3>
                         @if($unreadCount > 0)
-                            <span class="px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-500 text-[10px] font-bold">{{ $unreadCount }}</span>
+                            <span class="px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-500 text-[10px] font-bold" x-show="tab === 'notif'">{{ $unreadCount }}</span>
                         @endif
                     </div>
-                    <div class="max-h-72 overflow-y-auto">
+
+                    @if ($systemActivity->isNotEmpty())
+                        <div class="flex items-center gap-1 px-3 pt-3">
+                            <button type="button" @click="tab = 'notif'"
+                                class="flex-1 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
+                                :class="tab === 'notif' ? 'bg-[var(--accent-subtle)] text-[var(--accent-bright)]' : 'text-[var(--text-muted)]'">
+                                Notifikasi
+                            </button>
+                            <button type="button" @click="tab = 'activity'"
+                                class="flex-1 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-colors"
+                                :class="tab === 'activity' ? 'bg-[var(--accent-subtle)] text-[var(--accent-bright)]' : 'text-[var(--text-muted)]'">
+                                Aktivitas
+                            </button>
+                        </div>
+                    @endif
+
+                    <div class="max-h-72 overflow-y-auto" x-show="tab === 'notif'">
                         @forelse($notifications as $notification)
                             <a href="{{ $notification['link'] }}" class="flex items-center gap-3 px-4 py-3 hover:bg-[var(--bg-hover)] transition-colors border-b border-[var(--border-soft)] last:border-0">
                                 <div class="w-8 h-8 rounded-lg {{ $notification['color'] }} flex items-center justify-center shrink-0">
@@ -120,6 +143,28 @@
                             </div>
                         @endforelse
                     </div>
+
+                    {{-- Aktivitas terbaru: hanya untuk pemegang izin log --}}
+                    @if ($systemActivity->isNotEmpty())
+                        <div class="max-h-72 overflow-y-auto" x-show="tab === 'activity'" x-cloak>
+                            @foreach ($systemActivity as $log)
+                                <div class="flex items-start gap-3 px-4 py-3 border-b border-[var(--border-soft)] last:border-0">
+                                    <div class="w-8 h-8 rounded-lg bg-[var(--bg-muted)] flex items-center justify-center shrink-0">
+                                        <x-admin.icon name="scroll-text" :size="15" class="text-[var(--text-muted)]" />
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-xs text-[var(--text-primary)] line-clamp-2">{{ $log->description }}</p>
+                                        <p class="text-[10px] text-[var(--text-muted)] mt-0.5">
+                                            {{ $log->user?->name ?? 'Sistem' }} · {{ $log->created_at?->diffForHumans() }}
+                                        </p>
+                                    </div>
+                                </div>
+                            @endforeach
+                            <a href="{{ route('admin.activity-log.index') }}" class="block px-4 py-3 text-center text-[12px] font-medium hover:underline" style="color: var(--accent);">
+                                Lihat log lengkap
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -141,9 +186,6 @@
                     <div class="p-1.5">
                         <a href="{{ route('admin.profile.edit') }}" class="flex min-h-[44px] items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors">
                             <x-admin.icon name="user-round" :size="16" /> Profile
-                        </a>
-                        <a href="{{ route('admin.member.calendar') }}" class="flex min-h-[44px] items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] transition-colors">
-                            <x-admin.icon name="calendar-days" :size="16" /> Presensi Saya
                         </a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

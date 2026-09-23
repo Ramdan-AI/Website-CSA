@@ -24,22 +24,46 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $requiredPermissions = [
+            // Data master
             'manage-divisions',
             'manage-positions',
-            'manage-settings',
-            'manage-roles',
+
+            // Keanggotaan
             'manage-members',
+            'manage-division-members',
             'manage-attendances',
             'view-attendances',
+            'view-division-reports',
+
+            // Publikasi
             'manage-news',
             'manage-documents',
+
+            // Kesekretariatan
+            'manage-letters',
+            'manage-minutes',
+
+            // Kegiatan
             'manage-events',
             'view-events',
             'manage-registrations',
+
+            // Keuangan
             'manage-finance',
             'view-finance',
+            'view-finance-report',
+
+            // Media & showcase
             'manage-media',
             'manage-projects',
+
+            // Komunikasi & audit
+            'manage-announcements',
+            'view-activity-log',
+
+            // Sistem
+            'manage-settings',
+            'manage-roles',
         ];
 
         try {

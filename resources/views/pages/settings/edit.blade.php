@@ -52,21 +52,13 @@
                 </section>
 
                 <section class="csa-card p-5">
-                    <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Pendaftaran & Komunitas</h3>
-
-                    <label class="flex items-center justify-between gap-4 cursor-pointer">
-                        <span>
-                            <span class="block text-[13px] font-medium text-[var(--text-primary)]">Buka Pendaftaran</span>
-                            <span class="block text-[12px] text-[var(--text-muted)] mt-0.5">Jika aktif, pengguna baru bisa mendaftar akun.</span>
-                        </span>
-                        <input type="hidden" name="registration_open" value="0">
-                        <input type="checkbox" name="registration_open" value="1" class="peer sr-only" {{ old('registration_open', $setting->registration_open) ? 'checked' : '' }}>
-                        <span class="relative w-10 h-6 rounded-full bg-[var(--border-strong)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-[var(--accent)] peer-checked:after:translate-x-4 shrink-0"></span>
-                    </label>
-
-                    <div class="mt-4 pt-4 border-t border-[var(--border-soft)]">
-                        <x-form.input name="whatsapp_group_link" id="whatsapp_group_link" type="url" label="Link Grup WhatsApp CSA" :value="old('whatsapp_group_link', $setting->whatsapp_group_link)" placeholder="https://chat.whatsapp.com/..." hint="Dibagikan ke anggota baru setelah berhasil mendaftar." />
-                    </div>
+                    <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-1">Pendaftaran & Komunitas</h3>
+                    <p class="text-[13px] text-[var(--text-muted)] mb-4">
+                        Pengaturan pembukaan pendaftaran dan grup WhatsApp kini punya halaman sendiri.
+                    </p>
+                    <a href="{{ route('admin.registration.edit') }}" class="csa-btn csa-btn-ghost">
+                        <x-admin.icon name="arrow-right" :size="15" /> Buka pengaturan pendaftaran
+                    </a>
                 </section>
             </div>
         </div>

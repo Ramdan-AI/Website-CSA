@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class News extends Model
 {
+    use LogsActivity;
     protected $fillable = [
         'category_id',
         'user_id',

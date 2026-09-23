@@ -212,14 +212,6 @@ class MemberPageController extends Controller
         return view('pages.member.gallery.index', compact('albums', 'heroGalleries', 'recentGalleries'));
     }
 
-    public function settings()
-    {
-        $user = Auth::user();
-        $member = $this->member();
-
-        return view('pages.member.settings.index', compact('user', 'member'));
-    }
-
     public function markNotificationsSeen(Request $request)
     {
         session(['notifications_seen_at' => now()->timestamp]);

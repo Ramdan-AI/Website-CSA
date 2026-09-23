@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\LogsActivity;
 use App\Support\ResolvesStorageUrl;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,6 +11,7 @@ use Illuminate\Support\Str;
 
 class Project extends Model
 {
+    use LogsActivity;
     use SoftDeletes;
     use ResolvesStorageUrl;
 
