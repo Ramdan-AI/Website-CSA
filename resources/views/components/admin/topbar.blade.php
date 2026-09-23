@@ -32,6 +32,25 @@
     $hasAvatar = !empty(auth()->user()->avatar);
     $notifications = collect();
     $lastSeen = session('notifications_seen_at', 0);
+
+    // Pengumuman aktif (terbit + dalam rentang tanggal), disematkan lebih dulu.
+    // Link diarahkan ke dashboard karena hanya di sanalah feed pengumuman
+    // tampil untuk semua role (halaman kelola khusus pemegang izin).
+    $newAnnouncements = \App\Models\Announcement::active()->ordered()->take(5)->get();
+    foreach ($newAnnouncements as $announcement) {
+        $notifications->push([
+            'icon' => 'megaphone',
+            'color' => match ($announcement->category) {
+                \App\Models\Announcement::CATEGORY_URGENT => 'bg-red-500/15 text-red-500 dark:text-red-300',
+                \App\Models\Announcement::CATEGORY_IMPORTANT => 'bg-amber-500/15 text-amber-600 dark:text-amber-300',
+                default => 'bg-blue-500/15 text-blue-600 dark:text-blue-300',
+            },
+            'title' => $announcement->title,
+            'time' => $announcement->created_at->diffForHumans(),
+            'link' => route('admin.dashboard'),
+        ]);
+    }
+
     $newNews = \App\Models\News::where('status', 'published')->where('created_at', '>', now()->setTimestamp($lastSeen))->latest('published_at')->take(5)->get();
     foreach ($newNews as $news) {
         $notifications->push([
@@ -64,7 +83,21 @@
 <header x-data="{
     notifOpen: false,
     userMenuOpen: false,
+    tab: 'notif',
+    showBadge: {{ $unreadCount > 0 ? 'true' : 'false' }},
     sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true'),
+    markSeen() {
+        if (!this.showBadge) return;
+        this.showBadge = false;
+        const token = document.querySelector('meta[name=csrf-token]');
+        fetch('{{ route('admin.notifications.seen') }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': token ? token.content : '',
+                'Accept': 'application/json',
+            },
+        }).catch(() => {});
+    },
     init() {
         window.addEventListener('sidebar-toggled', (e) => { this.sidebarExpanded = e.detail.expanded; });
         window.addEventListener('keydown', (e) => {
@@ -93,10 +126,10 @@
                 <span x-show="!isDark"><x-admin.icon name="moon" :size="18" /></span>
             </button>
 
-            <div class="relative" @click.outside="notifOpen = false" x-data="{ tab: 'notif' }">
-                <button @click="notifOpen = !notifOpen" class="csa-icon-btn relative" aria-label="Notifikasi">
+            <div class="relative" @click.outside="notifOpen = false">
+                <button @click="notifOpen = !notifOpen; tab = 'notif'; if (notifOpen) markSeen()" class="csa-icon-btn relative" aria-label="Notifikasi">
                     <x-admin.icon name="bell" :size="18" />
-                    <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-orange-500 border-2 border-[var(--topbar-bg)] {{ $unreadCount > 0 ? '' : 'hidden' }}"></span>
+                    <span x-show="showBadge" x-cloak class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-orange-500 border-2 border-[var(--topbar-bg)]"></span>
                 </button>
                 <div x-show="notifOpen" x-transition
                     class="absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] bg-[var(--bg-elevated)] border border-[var(--border-strong)] rounded-2xl shadow-2xl overflow-hidden z-50"

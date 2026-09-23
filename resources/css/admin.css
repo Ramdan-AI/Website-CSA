@@ -2,6 +2,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Sembunyikan elemen ber-x-cloak sebelum Alpine aktif, agar tidak berkedip. */
+[x-cloak] {
+  display: none !important;
+}
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -161,6 +166,29 @@ body {
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
+}
+
+/* ============ PANEL (permukaan tenang, gaya editorial Google) ============
+   Dipakai untuk blok konten dashboard. Border tipis tanpa shadow berat
+   agar hierarki dibentuk oleh tata letak, bukan dekorasi. */
+.csa-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+}
+
+/* Baris konten di dalam panel: hover halus, tanpa kotak bertint. */
+.csa-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin: 0 -12px;
+  border-radius: 12px;
+  transition: background .15s ease;
+}
+.csa-row:hover {
+  background: var(--bg-hover);
 }
 
 .csa-card-hover {

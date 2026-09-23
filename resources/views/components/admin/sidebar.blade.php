@@ -6,27 +6,28 @@
     $isActive = fn (string $pattern) => request()->routeIs($pattern);
 @endphp
 
-<div x-data="{ mobileOpen: false }"
-     @sidebar-mobile-toggle.window="mobileOpen = !mobileOpen; document.body.classList.toggle('overflow-hidden', mobileOpen)">
+<div x-data="{
+        mobileOpen: false,
+        expanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true'),
+        animated: false,
+        toggle() {
+            this.animated = true;
+            this.expanded = !this.expanded;
+        }
+    }"
+    @sidebar-mobile-toggle.window="mobileOpen = !mobileOpen; document.body.classList.toggle('overflow-hidden', mobileOpen)"
+    x-effect="localStorage.setItem('sidebar-expanded', expanded); $dispatch('sidebar-toggled', { expanded })">
     <div x-show="mobileOpen" x-transition.opacity.duration.200
         class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
         @click="mobileOpen = false; document.body.classList.remove('overflow-hidden')"></div>
 
-    <aside x-data="{
-            expanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true'),
-            animated: false,
-            toggle() {
-                this.animated = true;
-                this.expanded = !this.expanded;
-            }
-        }"
+    <aside
         @sidebar-mobile-close.window="mobileOpen = false; document.body.classList.remove('overflow-hidden')"
         :class="[
             mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
             expanded ? 'lg:w-[240px]' : 'lg:w-[72px]',
             animated ? 'transition-all duration-300' : ''
         ]"
-        x-effect="localStorage.setItem('sidebar-expanded', expanded); $dispatch('sidebar-toggled', { expanded })"
         class="csa-sidebar fixed inset-y-0 left-0 z-50 flex flex-col">
 
         <div class="flex items-center gap-2.5 px-4 h-14 shrink-0">

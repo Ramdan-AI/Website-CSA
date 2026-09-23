@@ -137,6 +137,7 @@ Route::prefix('{roleSlug}')
         // Log sistem: khusus pemegang view-activity-log.
         Route::middleware(['can:view-activity-log'])->group(function () {
             Route::get('activity-log', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-log.index');
+            Route::put('activity-log/settings', [\App\Http\Controllers\Admin\ActivityLogController::class, 'updateSettings'])->name('activity-log.settings');
             Route::delete('activity-log/purge', [\App\Http\Controllers\Admin\ActivityLogController::class, 'purge'])->name('activity-log.purge');
             Route::delete('activity-log/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'destroy'])->name('activity-log.destroy');
         });

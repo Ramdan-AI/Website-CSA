@@ -7,7 +7,7 @@
     'expenses' => [],
 ])
 
-<article {{ $attributes->merge(['class' => 'csa-card p-4 sm:p-5']) }}>
+<article {{ $attributes->merge(['class' => 'csa-panel p-5']) }}>
     <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-5">
         <div>
             <h2 class="text-[15px] font-semibold text-[var(--text-primary)]">{{ $title }}</h2>

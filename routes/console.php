@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\ActivityLog;
+use App\Support\LogRetentionService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -9,11 +9,23 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+/*
+ * Retensi log: periode dan status on/off kini dikendalikan dari halaman
+ * Log Sistem (setelan tersimpan di tabel settings). Command ini hanya
+ * menjalankan purge bila otomatis aktif dan jadwalnya tiba; interval riil
+ * ditentukan setelan, bukan frekuensi scheduler.
+ */
 Artisan::command('activity-log:purge', function () {
-    $deleted = ActivityLog::where('created_at', '<', now()->subDays(14))->delete();
+    $deleted = app(LogRetentionService::class)->runScheduledPurge();
 
-    $this->info("{$deleted} catatan aktivitas lebih tua dari 14 hari dihapus.");
-})->purpose('Bersihkan log aktivitas lama');
+    if ($deleted === 0) {
+        $this->info('Tidak ada log yang dibersihkan (otomatis nonaktif atau belum waktunya).');
 
-// Retensi log: catatan lebih tua dari 14 hari dibuang otomatis.
-Schedule::command('activity-log:purge')->daily();
+        return;
+    }
+
+    $this->info("{$deleted} catatan aktivitas lama dihapus.");
+})->purpose('Bersihkan log aktivitas sesuai setelan retensi');
+
+// Dijalankan tiap hari; keputusan hapus ada di dalam command (idempotent).
+Schedule::command('activity-log:purge')->daily()->withoutOverlapping();

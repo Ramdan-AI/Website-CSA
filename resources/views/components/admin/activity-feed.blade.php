@@ -1,7 +1,7 @@
 @props(['logs' => collect()])
 
 @if ($logs->isNotEmpty())
-    <section class="csa-card overflow-hidden">
+    <section class="csa-panel overflow-hidden">
         <div class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)] inline-flex items-center gap-2">
                 <x-admin.icon name="scroll-text" :size="16" class="text-[var(--text-muted)]" />

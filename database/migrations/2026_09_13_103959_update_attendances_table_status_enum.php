@@ -12,11 +12,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::getConnection()->getDriverName() === 'mysql') {
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'mysql') {
             DB::statement("ALTER TABLE attendances MODIFY status ENUM('present', 'permit', 'sick', 'absent') NOT NULL DEFAULT 'present'");
         }
 
-        DB::statement('DELETE a1 FROM attendances a1 INNER JOIN attendances a2 ON a1.event_id = a2.event_id AND a1.member_id = a2.member_id AND a1.id > a2.id');
+        // Hapus duplikat (event_id, member_id), simpan baris dengan id terkecil.
+        if ($driver === 'mysql') {
+            DB::statement('DELETE a1 FROM attendances a1 INNER JOIN attendances a2 ON a1.event_id = a2.event_id AND a1.member_id = a2.member_id AND a1.id > a2.id');
+        } else {
+            // SQLite/Postgres: korelasikan subquery agar portabel.
+            DB::statement('DELETE FROM attendances WHERE id NOT IN (SELECT min_id FROM (SELECT MIN(id) AS min_id FROM attendances GROUP BY event_id, member_id) AS keep)');
+        }
+
         Schema::table('attendances', function (Blueprint $table) {
             $table->unique(['event_id', 'member_id'], 'attendances_event_member_unique');
         });

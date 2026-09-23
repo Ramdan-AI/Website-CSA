@@ -7,7 +7,7 @@
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Log Sistem</h1>
             <p class="text-[13px] text-[var(--text-muted)] mt-1">Riwayat aktivitas pengguna pada data penting.</p>
         </div>
-        <form method="POST" action="{{ route('admin.activity-log.purge') }}" onsubmit="return confirm('Hapus catatan lebih tua dari 14 hari?')">
+        <form method="POST" action="{{ route('admin.activity-log.purge') }}" onsubmit="return confirm('Bersihkan catatan lebih tua dari {{ $setting->log_retention_days }} hari?')">
             @csrf
             @method('DELETE')
             <button type="submit" class="csa-btn csa-btn-ghost">
@@ -19,6 +19,71 @@
     @if (session('success'))
         <div class="csa-card p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
+
+    {{-- Setelan retensi: penghapusan otomatis on/off + periode. --}}
+    <div class="csa-card p-5 sm:p-6" x-data="{ auto: {{ $setting->log_auto_purge_enabled ? 'true' : 'false' }} }">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Penghapusan Otomatis</h2>
+                <p class="text-[12px] text-[var(--text-muted)] mt-1 max-w-xl">
+                    Saat aktif, catatan aktivitas yang lebih tua dari periode terpilih dibersihkan otomatis.
+                    Hitungan dimulai sejak kamu mengaktifkannya.
+                </p>
+            </div>
+            <span class="csa-chip {{ $setting->log_auto_purge_enabled ? 'csa-chip-green' : '' }} shrink-0">
+                {{ $setting->log_auto_purge_enabled ? 'Aktif' : 'Nonaktif' }}
+            </span>
+        </div>
+
+        <form method="POST" action="{{ route('admin.activity-log.settings') }}" class="mt-5">
+            @csrf
+            @method('PUT')
+
+            <label class="flex items-center justify-between gap-4 cursor-pointer">
+                <span>
+                    <span class="block text-[14px] font-medium text-[var(--text-primary)]" x-text="auto ? 'Penghapusan otomatis aktif' : 'Penghapusan otomatis nonaktif'"></span>
+                    <span class="block text-[12px] text-[var(--text-muted)] mt-0.5">Ubah status lalu simpan untuk menerapkan.</span>
+                </span>
+                <input type="hidden" name="log_auto_purge_enabled" value="0">
+                <input type="checkbox" name="log_auto_purge_enabled" value="1" class="peer sr-only"
+                    x-model="auto"
+                    {{ old('log_auto_purge_enabled', $setting->log_auto_purge_enabled) ? 'checked' : '' }}>
+                <span class="relative w-11 h-6 rounded-full bg-[var(--border-strong)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-[var(--accent)] peer-checked:after:translate-x-5 shrink-0"></span>
+            </label>
+
+            <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                <div>
+                    <label for="log_retention_days" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-2">Periode retensi</label>
+                    <select name="log_retention_days" id="log_retention_days" class="csa-input"
+                        :disabled="!auto" :class="!auto ? 'opacity-50 cursor-not-allowed' : ''">
+                        @foreach ($retentionOptions as $days)
+                            <option value="{{ $days }}" @selected(old('log_retention_days', $setting->log_retention_days) == $days)>
+                                Per {{ $days }} hari
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('log_retention_days')<p class="text-[12px] text-red-500 mt-2">{{ $message }}</p>@enderror
+                </div>
+
+                <div class="text-[12px] text-[var(--text-muted)]">
+                    @if ($setting->log_auto_purge_enabled && $setting->log_next_purge_at)
+                        <p class="text-[var(--text-secondary)]">
+                            Jadwal berikutnya: <span class="font-medium">{{ $setting->log_next_purge_at->translatedFormat('d M Y H:i') }}</span>
+                        </p>
+                        <p class="mt-0.5">Sekitar {{ $remainingDays }} hari lagi.</p>
+                    @else
+                        <p>Penghapusan otomatis nonaktif. Log lama tetap tersimpan sampai kamu membersihkannya manual.</p>
+                    @endif
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-5 pt-4 border-t border-[var(--border-soft)]">
+                <button type="submit" class="csa-btn csa-btn-primary">
+                    <x-admin.icon name="save" :size="16" /> Simpan Setelan
+                </button>
+            </div>
+        </form>
+    </div>
 
     <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-3">
         <div class="relative">

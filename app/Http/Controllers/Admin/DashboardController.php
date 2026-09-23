@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Attendance;
-use App\Models\Division;
 use App\Models\Document;
 use App\Models\Event;
 use App\Models\Expense;
@@ -12,10 +12,8 @@ use App\Models\Letter;
 use App\Models\Member;
 use App\Models\Minute;
 use App\Models\News;
-use App\Models\Position;
 use App\Models\Project;
 use App\Models\User;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -51,38 +49,49 @@ class DashboardController extends Controller
 
         $totalIncome = (float) Income::sum('amount');
         $totalExpense = (float) Expense::sum('amount');
+        $balance = $totalIncome - $totalExpense;
 
-        // Kehadiran bulan ini sebagai indikator kesehatan organisasi.
-        $attendanceThisMonth = Attendance::whereHas(
-            'event',
-            fn ($query) => $query->whereMonth('event_date', now()->month)->whereYear('event_date', $currentYear)
-        );
+        // Pemasukan & pengeluaran bulan berjalan untuk konteks cepat.
+        $incomeThisMonth = (float) Income::whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', $currentYear)->sum('amount');
+        $expenseThisMonth = (float) Expense::whereMonth('transaction_date', now()->month)
+            ->whereYear('transaction_date', $currentYear)->sum('amount');
 
         return view('pages.dashboard', [
-            // Statistik utama
-            'totalMembers' => Member::where('is_active', true)->count(),
-            'totalDivisions' => Division::count(),
-            'totalPositions' => Position::count(),
-            'totalEvents' => Event::count(),
-            'activeEvents' => Event::where('event_date', '>=', now()->toDateString())->count(),
-
-            // Keuangan
+            // Keuangan — inti dashboard pimpinan.
+            'balance' => $balance,
             'totalIncome' => $totalIncome,
             'totalExpense' => $totalExpense,
-            'balance' => $totalIncome - $totalExpense,
+            'incomeThisMonth' => $incomeThisMonth,
+            'expenseThisMonth' => $expenseThisMonth,
             'chartIncomes' => $chartIncomes,
             'chartExpenses' => $chartExpenses,
 
-            // Kehadiran bulan ini
-            'attendanceTotal' => (clone $attendanceThisMonth)->count(),
-            'attendancePresent' => (clone $attendanceThisMonth)->where('status', 'present')->count(),
+            // Agenda terdekat — bukan angka, tapi apa yang akan terjadi.
+            'upcomingEvents' => Event::where('event_date', '>=', now()->toDateString())
+                ->where('status', 'published')
+                ->orderBy('event_date')
+                ->take(3)
+                ->get(),
 
-            // Konten
-            'totalNews' => News::count(),
-            'totalDocuments' => Document::count(),
+            // Konten terbaru — visual, bukan statistik kosong.
+            'recentNews' => News::with(['category:id,name', 'author:id,name'])
+                ->where('status', 'published')
+                ->latest('published_at')
+                ->take(3)
+                ->get(),
 
-            // Proyek
-            'totalProjects' => Project::count(),
+            'recentDocuments' => Document::with('user:id,name')
+                ->latest()
+                ->take(4)
+                ->get(),
+
+            'recentProjects' => Project::with(['submitter:id,name', 'members:id,name'])
+                ->published()
+                ->orderByDesc('featured')
+                ->latest()
+                ->take(3)
+                ->get(),
         ]);
     }
 
@@ -150,7 +159,7 @@ class DashboardController extends Controller
         $member = $user->member;
         $division = $member?->division;
 
-        if (!$division) {
+        if (! $division) {
             return view('pages.dashboard-division', [
                 'division' => null,
                 'members' => collect(),
@@ -208,7 +217,7 @@ class DashboardController extends Controller
         $member = $user->member;
 
         // Pengurus yang tidak punya profil anggota tetap bisa membuka dashboard.
-        if (!$member) {
+        if (! $member) {
             return view('pages.dashboard-member', [
                 'user' => $user,
                 'member' => null,
@@ -261,7 +270,8 @@ class DashboardController extends Controller
     /**
      * Total per bulan untuk satu jenis transaksi dalam satu tahun.
      */
-    private function monthlyTotals($query, int $year): array    {
+    private function monthlyTotals($query, int $year): array
+    {
         return $query
             ->select(
                 DB::raw('SUM(amount) as total'),

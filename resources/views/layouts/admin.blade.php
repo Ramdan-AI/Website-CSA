@@ -1,29 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="dark" x-data="{
-    isDark: true,
-    applyTheme() {
-        const html = document.documentElement;
-        const stored = localStorage.getItem('theme');
-        if (stored === 'light') {
-            this.isDark = false;
-            html.classList.remove('dark');
-        } else {
-            this.isDark = true;
-            html.classList.add('dark');
-        }
-        const meta = document.querySelector('meta[name=theme-color]');
-        if (meta) meta.setAttribute('content', this.isDark ? '#0b0d12' : '#f4f6fb');
-    },
-    toggleTheme() {
-        const next = this.isDark ? 'light' : 'dark';
-        localStorage.setItem('theme', next);
-        this.applyTheme();
-        this.$nextTick(() => window.renderLucide?.());
-    },
-    init() {
-        this.applyTheme();
-    }
-}" x-init="init">
+<html lang="id" class="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -54,9 +30,30 @@
 
 <body class="antialiased overflow-x-hidden bg-[var(--bg-body)] text-[var(--text-primary)]"
     x-data="{
+        isDark: true,
         sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true'),
         animateLayout: false,
+        applyTheme() {
+            const html = document.documentElement;
+            const stored = localStorage.getItem('theme');
+            if (stored === 'light') {
+                this.isDark = false;
+                html.classList.remove('dark');
+            } else {
+                this.isDark = true;
+                html.classList.add('dark');
+            }
+            const meta = document.querySelector('meta[name=theme-color]');
+            if (meta) meta.setAttribute('content', this.isDark ? '#0b0d12' : '#f4f6fb');
+        },
+        toggleTheme() {
+            const next = this.isDark ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            this.applyTheme();
+            this.$nextTick(() => window.renderLucide?.());
+        },
         init() {
+            this.applyTheme();
             window.addEventListener('sidebar-toggled', (event) => {
                 this.sidebarExpanded = event.detail.expanded;
                 this.animateLayout = true;
