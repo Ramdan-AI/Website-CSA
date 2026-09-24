@@ -24,6 +24,8 @@ return new class extends Migration
 
             $table->string('caption')->nullable();
 
+            $table->boolean('is_hero')->default(false);
+
             $table->timestamps();
         });
     }

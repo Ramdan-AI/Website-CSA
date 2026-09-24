@@ -33,9 +33,11 @@ return new class extends Migration
 
             $table->string('thumbnail')->nullable();
 
+            $table->json('images')->nullable();
+
             $table->enum('status', [
                 'draft',
-                'published'
+                'published',
             ])->default('draft');
 
             $table->timestamp('published_at')

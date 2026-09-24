@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Division;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DivisionSeeder extends Seeder
 {
@@ -56,6 +57,10 @@ class DivisionSeeder extends Seeder
         foreach ($divisions as $data) {
             $keyword = $data['image_keyword'];
             unset($data['image_keyword']);
+
+            // Slug ditetapkan eksplisit karena WithoutModelEvents pada
+            // DatabaseSeeder menonaktifkan hook pembuat slug otomatis.
+            $data['slug'] = Str::slug($data['name']);
 
             // Cari gambar yang namanya relevan dengan divisi (pemograman/mulmed).
             $image = $photoPool->first(fn (string $file) => str_contains($file, $keyword));

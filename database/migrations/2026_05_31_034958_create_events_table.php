@@ -24,6 +24,8 @@ return new class extends Migration
 
             $table->string('slug')->unique();
 
+            $table->enum('type', ['acara', 'study_club'])->default('acara');
+
             $table->longText('description');
 
             $table->string('location')->nullable();
@@ -37,8 +39,15 @@ return new class extends Migration
             $table->enum('status', [
                 'draft',
                 'published',
-                'closed'
+                'closed',
             ])->default('draft');
+
+            $table->boolean('attendance_enabled')->default(false);
+            $table->boolean('self_attendance_enabled')->default(false);
+            $table->string('attendance_code', 6)->nullable();
+            $table->string('qr_code')->nullable();
+            $table->timestamp('attendance_opened_at')->nullable();
+            $table->timestamp('attendance_closed_at')->nullable();
 
             $table->timestamps();
         });

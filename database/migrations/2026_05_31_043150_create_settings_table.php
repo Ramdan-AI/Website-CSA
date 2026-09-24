@@ -32,6 +32,18 @@ return new class extends Migration
 
             $table->longText('about')->nullable();
 
+            $table->boolean('registration_open')->default(false);
+            $table->boolean('registration_use_schedule')->default(false);
+            $table->timestamp('registration_opens_at')->nullable();
+            $table->timestamp('registration_closes_at')->nullable();
+
+            $table->string('whatsapp_group_link', 500)->nullable();
+
+            $table->boolean('log_auto_purge_enabled')->default(false);
+            $table->unsignedSmallInteger('log_retention_days')->default(14);
+            $table->timestamp('log_retention_started_at')->nullable();
+            $table->timestamp('log_next_purge_at')->nullable();
+
             $table->timestamps();
         });
     }

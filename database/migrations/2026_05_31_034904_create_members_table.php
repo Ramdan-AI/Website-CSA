@@ -34,7 +34,9 @@ return new class extends Migration
 
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('nim')->nullable();
+            $table->string('nim')->unique();
+            $table->unsignedTinyInteger('semester')->nullable();
+            $table->unsignedTinyInteger('level')->nullable();
             $table->string('email')->nullable()->unique();
             $table->string('photo')->nullable();
             $table->text('bio')->nullable();

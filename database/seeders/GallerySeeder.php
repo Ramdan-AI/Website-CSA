@@ -28,6 +28,7 @@ class GallerySeeder extends Seeder
 
         if ($files->isEmpty()) {
             $this->command->warn('Tidak ada gambar di storage/app/public/galleries. Letakkan gambar di sana lalu jalankan ulang seeder.');
+
             return;
         }
 
@@ -40,7 +41,7 @@ class GallerySeeder extends Seeder
             $gallery->caption = $this->caption($file);
 
             // Hanya tandai hero saat pertama dibuat, jangan timpa pilihan admin.
-            if (!$gallery->exists) {
+            if (! $gallery->exists) {
                 $gallery->is_hero = true;
             }
 
