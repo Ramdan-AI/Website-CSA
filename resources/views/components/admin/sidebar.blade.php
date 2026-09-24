@@ -42,7 +42,6 @@
                 </div>
                 <div class="overflow-hidden whitespace-nowrap" x-show="expanded" x-cloak>
                     <p class="text-[13px] font-bold tracking-tight leading-none" style="color: var(--sidebar-text-strong);">CSA</p>
-                    <p class="text-[10px] mt-0.5" style="color: var(--sidebar-group);">Administration</p>
                 </div>
             </a>
             <button @click="toggle()"
@@ -85,10 +84,6 @@
         </nav>
     </aside>
 </div>
-
-<style>
-    [x-cloak] { display: none !important; }
-</style>
 
 <script>
     (() => {

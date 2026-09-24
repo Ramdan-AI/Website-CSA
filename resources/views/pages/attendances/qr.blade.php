@@ -10,7 +10,7 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-0.5">{{ $event->title }} · {{ $event->event_date?->translatedFormat('d M Y') }}</p>
     </div>
 
-    <div class="csa-card p-6 sm:p-8 text-center">
+    <div class="csa-panel p-6 sm:p-8 text-center">
         <p class="text-[12px] font-medium text-[var(--text-muted)] mb-4">Arahkan kamera anggota ke kode berikut.</p>
 
         @php

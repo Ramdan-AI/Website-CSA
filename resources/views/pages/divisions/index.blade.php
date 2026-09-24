@@ -20,7 +20,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse($divisions as $division)
-            <article class="csa-card p-5 flex flex-col justify-between">
+            <article class="csa-panel p-5 flex flex-col justify-between">
                 <div>
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-center gap-3 min-w-0">
@@ -65,7 +65,7 @@
                 </div>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="building-2" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada divisi tercatat</p>
                 <p class="text-[12px] text-[var(--text-muted)] mt-1">Tambahkan divisi untuk mulai mengelola anggota.</p>

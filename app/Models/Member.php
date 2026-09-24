@@ -12,8 +12,8 @@ use Illuminate\Support\Str;
 class Member extends Model
 {
     use LogsActivity;
-    use SoftDeletes;
     use ResolvesStorageUrl;
+    use SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -22,6 +22,8 @@ class Member extends Model
         'name',
         'slug',
         'nim',
+        'semester',
+        'level',
         'email',
         'photo',
         'bio',
@@ -34,7 +36,23 @@ class Member extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
+        'semester' => 'integer',
+        'level' => 'integer',
     ];
+
+    /**
+     * Tingkatan skill anggota. Hanya dipakai divisi bertingkat.
+     */
+    public const LEVELS = [
+        1 => ['label' => 'Tingkat 1', 'name' => 'Pemula', 'description' => 'Belum menguasai dasar'],
+        2 => ['label' => 'Tingkat 2', 'name' => 'Menengah', 'description' => 'Sudah paham dasar'],
+        3 => ['label' => 'Tingkat 3', 'name' => 'Mahir', 'description' => 'Sudah mahir'],
+    ];
+
+    public function getLevelNameAttribute(): ?string
+    {
+        return $this->level ? (self::LEVELS[$this->level]['name'] ?? null) : null;
+    }
 
     protected static function booted()
     {
@@ -49,9 +67,28 @@ class Member extends Model
         });
 
         static::deleting(function ($member) {
-            if ($member->isForceDeleting() && $member->photo) {
-                Storage::disk('public')->delete($member->photo);
+            if ($member->isForceDeleting()) {
+                if ($member->photo) {
+                    Storage::disk('public')->delete($member->photo);
+                }
+
+                return;
             }
+
+            // Soft delete: bebaskan email & NIM agar tidak menahan unique index
+            // dan bisa dipakai anggota baru. Dilakukan lewat query builder agar
+            // tidak memicu event model lain (menghindari rekursi).
+            static::withTrashed()
+                ->whereKey($member->getKey())
+                ->update([
+                    'email' => null,
+                    'nim' => 'deleted-'.$member->getKey(),
+                ]);
+
+            $member->setRawAttributes(array_merge(
+                $member->getAttributes(),
+                ['email' => null, 'nim' => 'deleted-'.$member->getKey()],
+            ), true);
         });
     }
 
@@ -61,12 +98,14 @@ class Member extends Model
         $originalSlug = $slug;
         $counter = 1;
 
-        while (static::where('slug', $slug)
-            ->whereNull('deleted_at')
-            ->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+        // Unique index mencakup baris yang di-soft delete, jadi keberadaannya
+        // juga harus dihitung agar tidak bentrok dengan constraint DB.
+        while (static::withTrashed()
+            ->where('slug', $slug)
+            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
             ->exists()
         ) {
-            $slug = $originalSlug . '-' . $counter;
+            $slug = $originalSlug.'-'.$counter;
             $counter++;
         }
 
@@ -91,11 +130,6 @@ class Member extends Model
     public function position()
     {
         return $this->belongsTo(Position::class);
-    }
-
-    public function registrations()
-    {
-        return $this->hasMany(EventRegistration::class);
     }
 
     public function attendances()

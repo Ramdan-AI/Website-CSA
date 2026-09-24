@@ -9,7 +9,7 @@
     'paginator' => null,
 ])
 
-<div {{ $attributes->merge(['class' => 'csa-card overflow-hidden']) }}>
+<div {{ $attributes->merge(['class' => 'csa-panel overflow-hidden']) }}>
     <div class="overflow-x-auto">
         <table class="w-full">
             <thead>

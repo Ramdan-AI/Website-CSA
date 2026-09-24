@@ -21,7 +21,7 @@
     </div>
 
     @if ($errors->any())
-        <div class="csa-card p-4 border-l-2 border-red-500 space-y-1.5">
+        <div class="csa-panel p-4 border-l-2 border-red-500 space-y-1.5">
             <p class="text-[13px] font-medium text-red-500">Periksa kembali data berikut:</p>
             <ul class="space-y-1">
                 @foreach ($errors->all() as $message)
@@ -36,7 +36,7 @@
         @csrf
         @if ($isEdit) @method('PUT') @endif
 
-        <div class="csa-card p-5 sm:p-6 space-y-4">
+        <div class="csa-panel p-5 sm:p-6 space-y-4">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Informasi Rapat</h2>
 
             <x-form.input name="title" id="title" label="Judul Rapat" :value="old('title', $minute->title ?? '')"
@@ -56,7 +56,7 @@
                 placeholder="Hasil dan keputusan rapat." rows="6" />
         </div>
 
-        <div class="csa-card p-5 sm:p-6 space-y-4"
+        <div class="csa-panel p-5 sm:p-6 space-y-4"
             x-data="{
                 query: '',
                 members: @js($memberPayload),
@@ -101,7 +101,7 @@
             <p class="text-[12px] text-[var(--text-muted)]"><span x-text="selected.length"></span> peserta dipilih.</p>
         </div>
 
-        <div class="csa-card p-5 sm:p-6 space-y-4">
+        <div class="csa-panel p-5 sm:p-6 space-y-4">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Lampiran</h2>
             <input type="file" name="attachment" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx" class="csa-file">
             <p class="text-[11px] text-[var(--text-muted)]">Opsional. Maksimal 5MB.</p>

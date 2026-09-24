@@ -13,30 +13,28 @@
     </div>
 
     @if (session('success'))
-        <div class="csa-card p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
     <div class="grid grid-cols-2 gap-3">
-        <div class="csa-card p-4">
+        <div class="csa-panel p-4">
             <p class="csa-stat-label">Surat Masuk</p>
             <p class="csa-stat-number mt-2">{{ number_format($counts['incoming']) }}</p>
         </div>
-        <div class="csa-card p-4">
+        <div class="csa-panel p-4">
             <p class="csa-stat-label">Surat Keluar</p>
             <p class="csa-stat-number mt-2">{{ number_format($counts['outgoing']) }}</p>
         </div>
     </div>
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nomor, perihal, atau pengirim..." class="csa-input pl-10" aria-label="Cari surat">
         </div>
-        <select name="type" onchange="this.form.submit()" class="csa-input sm:w-44" aria-label="Jenis surat">
-            <option value="">Semua jenis</option>
-            <option value="incoming" @selected($type === 'incoming')>Surat Masuk</option>
-            <option value="outgoing" @selected($type === 'outgoing')>Surat Keluar</option>
-        </select>
+        <x-form.select name="type" :value="$type" onchange="this.form.submit()" aria-label="Jenis surat"
+            placeholder="Semua jenis"
+            :options="['incoming' => 'Surat Masuk', 'outgoing' => 'Surat Keluar']" />
         <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
     </form>
 

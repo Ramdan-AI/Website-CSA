@@ -17,6 +17,7 @@ class MemberSeeder extends Seeder
 
         if ($divisions->isEmpty() || $positions->isEmpty()) {
             $this->command->warn('Pastikan DivisionSeeder dan PositionSeeder sudah dijalankan.');
+
             return;
         }
 
@@ -196,12 +197,23 @@ class MemberSeeder extends Seeder
         ];
 
         foreach ($members as $member) {
-            Member::create(array_merge([
+            $attributes = array_merge([
                 'is_active' => true,
                 'slug' => Str::slug($member['name']),
-            ], $member));
+            ], $member);
+
+            // Anggota divisi bertingkat (Pemrograman) diberi semester & level
+            // contoh. Level bukan turunan otomatis semester, di sini hanya
+            // ilustrasi data awal.
+            if ($member['division_id'] === $divPemrograman) {
+                $semester = $attributes['semester'] ?? random_int(1, 7);
+                $attributes['semester'] = $semester;
+                $attributes['level'] ??= $semester <= 2 ? 1 : ($semester <= 4 ? 2 : 3);
+            }
+
+            Member::create($attributes);
         }
 
-        $this->command->info('MemberSeeder berhasil: ' . count($members) . ' anggota dibuat.');
+        $this->command->info('MemberSeeder berhasil: '.count($members).' anggota dibuat.');
     }
 }

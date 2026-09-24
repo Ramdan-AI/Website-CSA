@@ -17,7 +17,7 @@
             </p>
         </div>
 
-        <form action="{{ $isEdit ? route('admin.expenses.update', $expense) : route('admin.expenses.store') }}" method="POST" class="csa-card p-5 sm:p-6 space-y-4">
+        <form action="{{ $isEdit ? route('admin.expenses.update', $expense) : route('admin.expenses.store') }}" method="POST" class="csa-panel p-5 sm:p-6 space-y-4">
             @csrf
             @if($isEdit) @method('PUT') @endif
 

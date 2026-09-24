@@ -8,11 +8,11 @@
     </div>
 
     @if (session('success'))
-        <div class="csa-card p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
     {{-- Tambah anggota --}}
-    <div class="csa-card p-5" x-data="{ open: false }">
+    <div class="csa-panel p-5" x-data="{ open: false }">
         <div class="flex items-center justify-between gap-4">
             <div>
                 <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Tambah Anggota</h2>
@@ -48,7 +48,7 @@
     </div>
 
     {{-- Daftar anggota --}}
-    <div class="csa-card overflow-hidden">
+    <div class="csa-panel overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-[var(--border-soft)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Anggota Saat Ini</h2>
             <form method="GET" class="flex gap-2">

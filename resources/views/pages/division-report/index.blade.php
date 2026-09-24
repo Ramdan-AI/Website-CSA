@@ -10,14 +10,9 @@
 
         <div class="flex items-center gap-2">
             <form method="GET" class="flex items-center gap-2">
-                <select name="event_id" onchange="this.form.submit()" class="csa-input !min-h-[40px] w-56" aria-label="Filter kegiatan">
-                    <option value="">Semua kegiatan</option>
-                    @foreach ($events as $event)
-                        <option value="{{ $event->id }}" @selected($eventId == $event->id)>
-                            {{ Str::limit($event->title, 34) }}
-                        </option>
-                    @endforeach
-                </select>
+                <x-form.select name="event_id" :value="$eventId" onchange="this.form.submit()" class="!min-h-[40px] w-56" aria-label="Filter kegiatan"
+                    placeholder="Semua kegiatan"
+                    :options="collect($events)->mapWithKeys(fn ($e) => [$e->id => Str::limit($e->title, 34)])->all()" />
             </form>
             <a href="{{ route('admin.division-report.export', ['event_id' => $eventId]) }}" class="csa-btn csa-btn-ghost !min-h-[40px] !text-[13px]">
                 <x-admin.icon name="download" :size="15" /> Ekspor CSV
@@ -26,19 +21,19 @@
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="csa-card p-4">
+        <div class="csa-panel p-4">
             <p class="csa-stat-label">Anggota Divisi</p>
             <p class="csa-stat-number mt-2">{{ number_format($rows->count()) }}</p>
         </div>
-        <div class="csa-card p-4">
+        <div class="csa-panel p-4">
             <p class="csa-stat-label">Rata-rata Hadir</p>
             <p class="csa-stat-number mt-2">{{ $divisionAverage }}%</p>
         </div>
-        <div class="csa-card p-4">
+        <div class="csa-panel p-4">
             <p class="csa-stat-label">Total Tercatat</p>
             <p class="csa-stat-number mt-2">{{ number_format($rows->sum('total')) }}</p>
         </div>
-        <div class="csa-card p-4">
+        <div class="csa-panel p-4">
             <p class="csa-stat-label">Total Hadir</p>
             <p class="csa-stat-number mt-2">{{ number_format($rows->sum('present')) }}</p>
         </div>

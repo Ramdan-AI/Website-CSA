@@ -23,6 +23,8 @@ class Setting extends Model
         'linkedin',
         'about',
         'registration_open',
+        'registration_opens_at',
+        'registration_closes_at',
         'whatsapp_group_link',
         'log_auto_purge_enabled',
         'log_retention_days',
@@ -34,6 +36,8 @@ class Setting extends Model
     {
         return [
             'registration_open' => 'boolean',
+            'registration_opens_at' => 'datetime',
+            'registration_closes_at' => 'datetime',
             'log_auto_purge_enabled' => 'boolean',
             'log_retention_days' => 'integer',
             'log_retention_started_at' => 'datetime',
@@ -41,5 +45,29 @@ class Setting extends Model
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * True bila pendaftaran sedang dibuka: toggle manual menyala, ATAU
+     * waktu sekarang berada di dalam rentang tanggal pendaftaran.
+     */
+    public function isRegistrationOpen(): bool
+    {
+        if ($this->registration_open) {
+            return true;
+        }
+
+        $now = now();
+
+        $afterOpen = $this->registration_opens_at === null
+            || $this->registration_opens_at->lessThanOrEqualTo($now);
+
+        $beforeClose = $this->registration_closes_at === null
+            || $this->registration_closes_at->greaterThanOrEqualTo($now);
+
+        // Kedua kolom harus terisi agar rentang tanggal berlaku.
+        $hasWindow = $this->registration_opens_at !== null || $this->registration_closes_at !== null;
+
+        return $hasWindow && $afterOpen && $beforeClose;
     }
 }

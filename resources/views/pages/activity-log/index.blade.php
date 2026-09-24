@@ -17,11 +17,11 @@
     </div>
 
     @if (session('success'))
-        <div class="csa-card p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
     {{-- Setelan retensi: penghapusan otomatis on/off + periode. --}}
-    <div class="csa-card p-5 sm:p-6" x-data="{ auto: {{ $setting->log_auto_purge_enabled ? 'true' : 'false' }} }">
+    <div class="csa-panel p-5 sm:p-6" x-data="{ auto: {{ $setting->log_auto_purge_enabled ? 'true' : 'false' }} }">
         <div class="flex items-start justify-between gap-4">
             <div>
                 <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Penghapusan Otomatis</h2>
@@ -85,34 +85,28 @@
         </form>
     </div>
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari deskripsi atau nama entitas..." class="csa-input pl-10" aria-label="Cari log">
         </div>
-        <select name="action" onchange="this.form.submit()" class="csa-input sm:w-40" aria-label="Jenis aksi">
-            <option value="">Semua aksi</option>
-            <option value="created" @selected($action === 'created')>Penambahan</option>
-            <option value="updated" @selected($action === 'updated')>Perubahan</option>
-            <option value="deleted" @selected($action === 'deleted')>Penghapusan</option>
-        </select>
-        <select name="module" onchange="this.form.submit()" class="csa-input sm:w-44" aria-label="Modul">
-            <option value="">Semua modul</option>
-            @foreach ($modules as $moduleName)
-                <option value="{{ $moduleName }}" @selected($moduleName === $module)>{{ $moduleName }}</option>
-            @endforeach
-        </select>
+        <x-form.select name="action" :value="$action" onchange="this.form.submit()" class="sm:w-40" aria-label="Jenis aksi"
+            placeholder="Semua aksi"
+            :options="['created' => 'Penambahan', 'updated' => 'Perubahan', 'deleted' => 'Penghapusan']" />
+        <x-form.select name="module" :value="$module" onchange="this.form.submit()" class="sm:w-44" aria-label="Modul"
+            placeholder="Semua modul"
+            :options="collect($modules)->mapWithKeys(fn ($m) => [$m => $m])->all()" />
         <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
     </form>
 
     @if ($logs->isEmpty())
-        <div class="csa-card p-12 text-center">
+        <div class="csa-panel p-12 text-center">
             <x-admin.icon name="file-text" :size="32" class="mx-auto text-[var(--text-muted)]" />
             <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada catatan aktivitas</p>
             <p class="text-[12px] text-[var(--text-muted)] mt-1">Catatan muncul saat pengguna menambah, mengubah, atau menghapus data.</p>
         </div>
     @else
-        <div class="csa-card overflow-hidden">
+        <div class="csa-panel overflow-hidden">
             <div class="divide-y divide-[var(--border-soft)]">
                 @foreach ($logs as $log)
                     <div class="flex items-start gap-4 p-4" x-data="{ open: false }">

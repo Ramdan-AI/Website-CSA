@@ -18,7 +18,7 @@
                 $firstMember = $position->members->first();
                 $isUnique = in_array(strtolower($position->name), ['ketua', 'wakil ketua', 'ketua divisi', 'wakil ketua divisi', 'sekretaris', 'bendahara']);
             @endphp
-            <article class="csa-card p-5 flex flex-col">
+            <article class="csa-panel p-5 flex flex-col">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3 min-w-0">
                         @if($isUnique && $firstMember)
@@ -64,7 +64,7 @@
                 </div>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="briefcase" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada jabatan</p>
                 <p class="text-[12px] text-[var(--text-muted)] mt-1">Tambahkan jabatan pertama untuk memulai.</p>

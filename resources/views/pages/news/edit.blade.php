@@ -10,29 +10,17 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Perbarui konten berita yang telah terpublikasi.</p>
     </div>
 
-    <form action="{{ route('admin.news.update', $news) }}" method="POST" enctype="multipart/form-data" class="csa-card p-5 sm:p-6 space-y-4">
+    <form action="{{ route('admin.news.update', $news) }}" method="POST" enctype="multipart/form-data" class="csa-panel p-5 sm:p-6 space-y-4">
         @csrf
         @method('PUT')
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label for="category_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Kategori</label>
-                <select name="category_id" id="category_id" required class="csa-input">
-                    <option value="">Pilih Kategori</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}" @selected(old('category_id', $news->category_id) == $category->id)>{{ $category->name }}</option>
-                    @endforeach
-                </select>
-                @error('category_id')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
-            </div>
-            <div>
-                <label for="status" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Status</label>
-                <select name="status" id="status" required class="csa-input">
-                    <option value="draft" @selected(old('status', $news->status) == 'draft')>Draft</option>
-                    <option value="published" @selected(old('status', $news->status) == 'published')>Published</option>
-                </select>
-                @error('status')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
-            </div>
+            <x-form.select name="category_id" id="category_id" label="Kategori" required
+                :value="old('category_id', $news->category_id)" placeholder="Pilih Kategori"
+                :options="collect($categories)->mapWithKeys(fn ($c) => [$c->id => $c->name])->all()" />
+            <x-form.select name="status" id="status" label="Status" required
+                :value="old('status', $news->status)"
+                :options="['draft' => 'Draft', 'published' => 'Published']" />
         </div>
 
         <x-form.input name="title" id="title" label="Judul" :value="old('title', $news->title)" placeholder="Judul berita" required autofocus />

@@ -25,18 +25,18 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="lg:col-span-2 space-y-4">
             @if($news->thumbnail_url)
-                <figure class="csa-card overflow-hidden aspect-[16/9] max-h-[340px]">
+                <figure class="csa-panel overflow-hidden aspect-[16/9] max-h-[340px]">
                     <img src="{{ $news->thumbnail_url }}" alt="{{ $news->title }}" width="1200" height="675" class="w-full h-full object-cover">
                 </figure>
             @endif
 
-            <section class="csa-card p-5">
+            <section class="csa-panel p-5">
                 <h2 class="text-[14px] font-semibold text-[var(--text-primary)] mb-3">Konten Berita</h2>
                 <div class="article-body text-[13px] text-[var(--text-secondary)] leading-relaxed">{!! $news->content !!}</div>
             </section>
 
             @if($news->images && count($news->images) > 1)
-                <section class="csa-card overflow-hidden">
+                <section class="csa-panel overflow-hidden">
                     <div class="px-5 py-3.5 border-b border-[var(--border-soft)]">
                         <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Galeri Gambar ({{ count($news->images) }})</h3>
                     </div>
@@ -51,7 +51,7 @@
             @endif
 
             @if($relatedNews->isNotEmpty())
-                <section class="csa-card overflow-hidden">
+                <section class="csa-panel overflow-hidden">
                     <div class="px-5 py-3.5 border-b border-[var(--border-soft)]">
                         <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Berita Terkait</h3>
                     </div>
@@ -76,7 +76,7 @@
             @endif
         </div>
 
-        <section class="csa-card p-5 h-fit">
+        <section class="csa-panel p-5 h-fit">
             <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Info Publikasi</h3>
             <dl class="space-y-3 text-[13px]">
                 @foreach ([

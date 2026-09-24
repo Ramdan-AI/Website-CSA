@@ -8,23 +8,23 @@
     </div>
 
     @if (session('success'))
-        <div class="csa-card p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
-    <form action="{{ route('admin.registration.update') }}" method="POST" class="csa-card p-5 sm:p-6 space-y-6">
+    <form action="{{ route('admin.registration.update') }}" method="POST" class="csa-panel p-5 sm:p-6 space-y-6">
         @csrf
         @method('PUT')
 
         <div>
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Status Pendaftaran</h2>
             <p class="text-[12px] text-[var(--text-muted)] mt-1">
-                Saat aktif, halaman publik menampilkan tombol daftar. Saat nonaktif, pendaftar akan diberi tahu bahwa pendaftaran ditutup.
+                Pendaftaran dibuka bila sakelar di bawah aktif, ATAU saat ini berada di dalam rentang tanggal. Biasanya dibuka tiap semester ganjil.
             </p>
 
             <label class="mt-4 flex items-center justify-between gap-4 cursor-pointer">
                 <span>
                     <span class="block text-[14px] font-medium text-[var(--text-primary)]">
-                        {{ $setting->registration_open ? 'Pendaftaran dibuka' : 'Pendaftaran ditutup' }}
+                        {{ $setting->registration_open ? 'Pendaftaran dibuka manual' : 'Belum dibuka manual' }}
                     </span>
                     <span class="block text-[12px] text-[var(--text-muted)] mt-0.5">
                         Ubah status lalu simpan untuk menerapkan.
@@ -35,6 +35,25 @@
                     {{ old('registration_open', $setting->registration_open) ? 'checked' : '' }}>
                 <span class="relative w-11 h-6 rounded-full bg-[var(--border-strong)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-5 after:h-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-[var(--accent)] peer-checked:after:translate-x-5 shrink-0"></span>
             </label>
+
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <x-form.input name="registration_opens_at" id="registration_opens_at" type="datetime-local" label="Buka Pendaftaran"
+                    :value="old('registration_opens_at', $setting->registration_opens_at?->format('Y-m-d\TH:i'))"
+                    hint="Kosongkan bila tidak memakai jadwal." />
+                <x-form.input name="registration_closes_at" id="registration_closes_at" type="datetime-local" label="Tutup Pendaftaran"
+                    :value="old('registration_closes_at', $setting->registration_closes_at?->format('Y-m-d\TH:i'))"
+                    hint="Setelah tanggal ini, pendaftaran otomatis ditutup." />
+            </div>
+
+            @php
+                $now = now();
+                $windowOpen = $setting->registration_opens_at && $setting->registration_closes_at
+                    && $now->between($setting->registration_opens_at, $setting->registration_closes_at);
+            @endphp
+            <p class="text-[12px] mt-3 {{ $setting->isRegistrationOpen() ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--text-muted)]' }}">
+                Status saat ini: {{ $setting->isRegistrationOpen() ? 'Pendaftaran terbuka' : 'Pendaftaran tertutup' }}
+                @if ($windowOpen) (dalam rentang tanggal) @endif
+            </p>
         </div>
 
         <div class="pt-6 border-t border-[var(--border-soft)]">

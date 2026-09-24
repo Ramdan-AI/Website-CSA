@@ -26,6 +26,8 @@ class RegistrationController extends Controller
     {
         $validated = $request->validate([
             'registration_open' => ['nullable', 'boolean'],
+            'registration_opens_at' => ['nullable', 'date'],
+            'registration_closes_at' => ['nullable', 'date', 'after_or_equal:registration_opens_at'],
             'whatsapp_group_link' => ['nullable', 'url', 'max:500'],
         ]);
 
@@ -33,6 +35,8 @@ class RegistrationController extends Controller
 
         $setting->update([
             'registration_open' => $request->boolean('registration_open'),
+            'registration_opens_at' => $validated['registration_opens_at'] ?? null,
+            'registration_closes_at' => $validated['registration_closes_at'] ?? null,
             'whatsapp_group_link' => $validated['whatsapp_group_link'] ?? null,
         ]);
 

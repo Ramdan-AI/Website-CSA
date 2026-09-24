@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Member;
+use App\Models\Position;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,19 +30,19 @@ class MemberRequest extends FormRequest
                 'nullable',
                 'exists:positions,id',
                 function ($attribute, $value, $fail) {
-                    $position = \App\Models\Position::find($value);
+                    $position = Position::find($value);
 
-                    if (!$position) {
+                    if (! $position) {
                         return;
                     }
 
                     $memberId = $this->route('member')?->id;
-                    $currentCount = \App\Models\Member::where('position_id', $value)
-                        ->when($memberId, fn($q) => $q->where('id', '!=', $memberId))
+                    $currentCount = Member::where('position_id', $value)
+                        ->when($memberId, fn ($q) => $q->where('id', '!=', $memberId))
                         ->count();
 
                     if ($currentCount >= $position->max_members) {
-                        $fail('Jabatan ' . $position->name . ' sudah penuh (maksimal ' . $position->max_members . ' orang).');
+                        $fail('Jabatan '.$position->name.' sudah penuh (maksimal '.$position->max_members.' orang).');
                     }
                 },
             ],
@@ -54,9 +56,21 @@ class MemberRequest extends FormRequest
                 Rule::unique('members', 'email')
                     ->whereNull('deleted_at')
                     ->ignore($memberId),
+                // Email juga dipakai untuk login, jadi harus unik di tabel users.
+                Rule::unique('users', 'email')
+                    ->ignore($member?->user_id),
             ],
 
-            'nim' => ['nullable', 'max:100'],
+            'nim' => [
+                'required',
+                'numeric',
+                'digits_between:6,20',
+                Rule::unique('members', 'nim')
+                    ->whereNull('deleted_at')
+                    ->ignore($memberId),
+            ],
+            'semester' => ['nullable', 'integer', 'between:1,8'],
+            'level' => ['nullable', 'integer', 'in:1,2,3'],
             'phone' => ['nullable', 'max:50'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'linkedin' => ['nullable', 'url', 'max:255'],
@@ -95,6 +109,12 @@ class MemberRequest extends FormRequest
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
+            'nim.required' => 'NIM wajib diisi.',
+            'nim.numeric' => 'NIM hanya boleh berisi angka.',
+            'nim.digits_between' => 'NIM harus berupa 6-20 digit angka.',
+            'nim.unique' => 'NIM sudah digunakan anggota lain.',
+            'semester.between' => 'Semester harus antara 1 sampai 8.',
+            'level.in' => 'Tingkatan tidak valid.',
             'photo.image' => 'File harus berupa gambar.',
             'photo.mimes' => 'Format gambar harus JPEG, PNG, JPG, atau WEBP.',
             'photo.max' => 'Ukuran gambar maksimal 2MB.',

@@ -25,22 +25,18 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Akses dan unduh dokumen penting UKM CSA.</p>
     </div>
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama dokumen..." class="csa-input pl-10" aria-label="Cari dokumen">
         </div>
-        <select name="sort" onchange="this.form.submit()" class="csa-input sm:w-48" aria-label="Urutkan">
-            <option value="newest" @selected(request('sort', 'newest') === 'newest')>Terbaru</option>
-            <option value="oldest" @selected(request('sort') === 'oldest')>Terlama</option>
-            <option value="title_asc" @selected(request('sort') === 'title_asc')>Nama A-Z</option>
-            <option value="title_desc" @selected(request('sort') === 'title_desc')>Nama Z-A</option>
-        </select>
+        <x-form.select name="sort" :value="request('sort', 'newest')" onchange="this.form.submit()" class="sm:w-48" aria-label="Urutkan"
+            :options="['newest' => 'Terbaru', 'oldest' => 'Terlama', 'title_asc' => 'Nama A-Z', 'title_desc' => 'Nama Z-A']" />
     </form>
 
     <div class="space-y-2">
         @forelse($documents as $document)
-            <a href="{{ route('admin.documents.download', $document) }}" class="csa-card csa-card-hover p-4 flex items-center gap-4">
+            <a href="{{ route('admin.documents.download', $document) }}" class="csa-panel csa-panel-hover p-4 flex items-center gap-4">
                 <span class="w-10 h-10 rounded-xl bg-[var(--bg-muted)] text-[var(--text-secondary)] flex items-center justify-center shrink-0">
                     <x-admin.icon :name="$fileIcon($document->file)" :size="18" />
                 </span>
@@ -58,7 +54,7 @@
                 </span>
             </a>
         @empty
-            <div class="csa-card p-12 text-center">
+            <div class="csa-panel p-12 text-center">
                 <x-admin.icon name="folder-open" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Tidak ada dokumen ditemukan</p>
                 <p class="text-[12px] text-[var(--text-muted)] mt-1">Coba ubah kriteria pencarian.</p>

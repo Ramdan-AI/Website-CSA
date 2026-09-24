@@ -14,7 +14,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse($albums as $album)
-            <article class="csa-card csa-card-hover overflow-hidden flex flex-col">
+            <article class="csa-panel csa-panel-hover overflow-hidden flex flex-col">
                 @php
                     $cover = $album->cover_image
                         ? asset('storage/' . $album->cover_image)
@@ -58,7 +58,7 @@
                 </div>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="folder-open" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada album</p>
                 <p class="text-[12px] text-[var(--text-muted)] mt-1">Tambahkan album pertama untuk mengelompokkan foto.</p>

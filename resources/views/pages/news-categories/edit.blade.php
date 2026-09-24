@@ -10,7 +10,7 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Perbarui informasi kategori berita yang sudah terdaftar.</p>
     </div>
 
-    <form action="{{ route('admin.news-categories.update', $newsCategory) }}" method="POST" class="csa-card p-5 sm:p-6 space-y-4">
+    <form action="{{ route('admin.news-categories.update', $newsCategory) }}" method="POST" class="csa-panel p-5 sm:p-6 space-y-4">
         @csrf
         @method('PUT')
 

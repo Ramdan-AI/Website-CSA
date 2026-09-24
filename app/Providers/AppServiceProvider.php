@@ -46,7 +46,6 @@ class AppServiceProvider extends ServiceProvider
             // Kegiatan
             'manage-events',
             'view-events',
-            'manage-registrations',
 
             // Keuangan
             'manage-finance',

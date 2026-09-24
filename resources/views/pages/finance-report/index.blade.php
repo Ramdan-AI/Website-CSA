@@ -2,6 +2,11 @@
 
 @php
     $format = fn ($value) => 'Rp ' . number_format((float) $value, 0, ',', '.');
+    $statItems = [
+        ['label' => 'Total Pemasukan', 'value' => $format($totalIncome), 'note' => 'Tahun ' . $year],
+        ['label' => 'Total Pengeluaran', 'value' => $format($totalExpense), 'note' => 'Tahun ' . $year],
+        ['label' => 'Saldo Akhir', 'value' => $format($balance), 'note' => 'Awal ' . $format($openingBalance)],
+    ];
 @endphp
 
 @section('content')
@@ -14,11 +19,8 @@
 
         <div class="flex items-center gap-2">
             <form method="GET" class="flex items-center gap-2">
-                <select name="year" onchange="this.form.submit()" class="csa-input !min-h-[40px] w-32" aria-label="Pilih tahun">
-                    @foreach ($years as $option)
-                        <option value="{{ $option }}" @selected((int) $option === $year)>{{ $option }}</option>
-                    @endforeach
-                </select>
+                <x-form.select name="year" :value="$year" onchange="this.form.submit()" class="!min-h-[40px] w-32" aria-label="Pilih tahun"
+                    :options="collect($years)->mapWithKeys(fn ($y) => [$y => $y])->all()" />
             </form>
             <a href="{{ route('admin.finance-report.export', ['year' => $year]) }}" class="csa-btn csa-btn-ghost !min-h-[40px] !text-[13px]">
                 <x-admin.icon name="download" :size="15" /> Ekspor CSV
@@ -26,14 +28,11 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <x-admin.metric-card label="Total Pemasukan" :value="$format($totalIncome)" change-label="tahun {{ $year }}" tone="green" />
-        <x-admin.metric-card label="Total Pengeluaran" :value="$format($totalExpense)" change-label="tahun {{ $year }}" trend="down" tone="red" />
-        <x-admin.metric-card label="Saldo Akhir" :value="$format($balance)"
-            :change-label="'awal ' . $format($openingBalance)" :tone="$balance >= 0 ? 'blue' : 'red'" />
-    </div>
+    <section class="csa-panel p-5 sm:p-6">
+        <x-admin.stat-strip :lead="true" :items="$statItems" />
+    </section>
 
-    <div class="csa-card p-5">
+    <div class="csa-panel p-5">
         <h2 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Tren {{ $year }}</h2>
         <div class="h-64"><canvas id="financeReportChart"></canvas></div>
     </div>

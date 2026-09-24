@@ -25,7 +25,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-1">
-                <div class="csa-card p-5">
+                <div class="csa-panel p-5">
                     <label class="block text-[13px] font-medium text-[var(--text-secondary)] mb-2">Cover Album <span class="text-[var(--text-muted)] font-normal">· Opsional</span></label>
                     <div class="w-full aspect-[4/3] rounded-2xl border border-dashed border-[var(--border-strong)] flex items-center justify-center overflow-hidden bg-[var(--bg-muted)] hover:border-[var(--accent)] transition-colors cursor-pointer"
                         onclick="document.getElementById('cover-input').click()">
@@ -43,14 +43,14 @@
             </div>
 
             <div class="lg:col-span-2 space-y-4">
-                <section class="csa-card p-5 space-y-4">
+                <section class="csa-panel p-5 space-y-4">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Informasi Album</h3>
                     <x-form.input name="title" id="title" label="Nama Album" :value="old('title', $album->title ?? '')" placeholder="Contoh: Mubes 2026, Study Club Week 5" required autofocus />
                     <x-form.textarea name="description" id="description" label="Deskripsi" :value="old('description', $album->description ?? '')" placeholder="Deskripsikan isi album ini..." rows="4" />
                 </section>
 
                 @if ($isEdit && $album->galleries->count() > 0)
-                    <section class="csa-card p-5">
+                    <section class="csa-panel p-5">
                         <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Foto dalam Album</h3>
                         <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                             @foreach ($album->galleries->take(6) as $gallery)

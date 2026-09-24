@@ -27,14 +27,20 @@ class ProfileController extends Controller
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$user->id],
             'whatsapp' => ['required', 'string', 'regex:/^[0-9+\-\s]+$/', 'max:20'],
-            'nim' => ['nullable', 'string', 'max:20', 'unique:members,nim,' . $member->id],
+            'nim' => $member
+                ? ['nullable', 'numeric', 'digits_between:6,20', 'unique:members,nim,'.$member->id]
+                : ['nullable'],
             'bio' => ['nullable', 'string', 'max:500'],
             'linkedin' => ['nullable', 'url'],
             'instagram' => ['nullable', 'url'],
             'github' => ['nullable', 'url'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+        ], [
+            'nim.numeric' => 'NIM hanya boleh berisi angka.',
+            'nim.digits_between' => 'NIM harus berupa 6-20 digit angka.',
+            'nim.unique' => 'NIM sudah digunakan anggota lain.',
         ]);
 
         // Update User
@@ -44,14 +50,16 @@ class ProfileController extends Controller
             'whatsapp' => $validated['whatsapp'] ?? $user->whatsapp,
         ]);
 
-        // Update Member
-        $member->update([
-            'nim' => $validated['nim'] ?? $member->nim,
-            'bio' => $validated['bio'] ?? $member->bio,
-            'linkedin' => $validated['linkedin'] ?? $member->linkedin,
-            'instagram' => $validated['instagram'] ?? $member->instagram,
-            'github' => $validated['github'] ?? $member->github,
-        ]);
+        // Update Member (bila pengguna punya profil anggota).
+        if ($member) {
+            $member->update([
+                'nim' => $validated['nim'] ?? $member->nim,
+                'bio' => $validated['bio'] ?? $member->bio,
+                'linkedin' => $validated['linkedin'] ?? $member->linkedin,
+                'instagram' => $validated['instagram'] ?? $member->instagram,
+                'github' => $validated['github'] ?? $member->github,
+            ]);
+        }
 
         // Handle photo upload: simpan ke member.photo DAN user.avatar agar
         // foto yang sama dipakai di sidebar, topbar, dan kartu publik.
@@ -80,10 +88,10 @@ class ProfileController extends Controller
      */
     private function storeCroppedPhoto($file): string
     {
-        $name = Str::uuid() . '.' . strtolower($file->getClientOriginalExtension());
+        $name = Str::uuid().'.'.strtolower($file->getClientOriginalExtension());
         $file->storeAs('profile', $name, 'public');
 
-        return 'profile/' . $name;
+        return 'profile/'.$name;
     }
 
     public function updatePassword(Request $request)

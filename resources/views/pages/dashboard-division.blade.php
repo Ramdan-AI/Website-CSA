@@ -1,10 +1,18 @@
 @extends('layouts.admin')
 
+@php
+    $statItems = $division ? [
+        ['label' => 'Anggota Divisi', 'value' => number_format($members->count()), 'note' => 'Aktif'],
+        ['label' => 'Rata-rata Hadir', 'value' => $divisionAverage . '%', 'note' => 'Seluruh anggota'],
+        ['label' => 'Total Hadir', 'value' => number_format($rows->sum('present')), 'note' => 'Dari ' . number_format($rows->sum('total')) . ' tercatat'],
+    ] : [];
+@endphp
+
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
 
     @if (!$division)
-        <div class="csa-card p-12 text-center">
+        <div class="csa-panel p-12 text-center">
             <x-admin.icon name="building-2" :size="32" class="mx-auto text-[var(--text-muted)]" />
             <p class="text-[15px] font-medium text-[var(--text-secondary)] mt-3">Anda belum terhubung ke divisi</p>
             <p class="text-[13px] text-[var(--text-muted)] mt-1">Hubungi pengurus untuk menetapkan divisi Anda.</p>
@@ -25,16 +33,15 @@
             </div>
         </div>
 
-        <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <x-admin.metric-card label="Anggota Divisi" :value="number_format($members->count())" change-label="aktif" tone="blue" />
-            <x-admin.metric-card label="Rata-rata Hadir" :value="$divisionAverage . '%'" change-label="seluruh anggota" tone="green" />
-            <x-admin.metric-card label="Total Tercatat" :value="number_format($rows->sum('total'))" change-label="kehadiran" tone="violet" />
-            <x-admin.metric-card label="Total Hadir" :value="number_format($rows->sum('present'))" change-label="kehadiran" tone="green" />
+        <x-admin.announcement-feed :announcements="$announcements" />
+
+        <section class="csa-panel p-5 sm:p-6">
+            <x-admin.stat-strip :lead="true" :items="$statItems" />
         </section>
 
         <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {{-- Anggota divisi --}}
-            <div class="csa-card overflow-hidden">
+            <div class="csa-panel overflow-hidden">
                 <div class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between">
                     <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Anggota Divisi</h2>
                     <span class="text-[12px] text-[var(--text-muted)]">{{ $members->count() }} orang</span>
@@ -61,7 +68,7 @@
             </div>
 
             {{-- Kegiatan mendatang --}}
-            <div class="csa-card overflow-hidden">
+            <div class="csa-panel overflow-hidden">
                 <div class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between">
                     <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Kegiatan Mendatang</h2>
                     <a href="{{ route('admin.events.index') }}" class="text-[12px] font-medium hover:underline" style="color: var(--accent);">Lihat semua</a>
@@ -88,7 +95,6 @@
         </section>
     @endif
 
-    <x-admin.announcement-feed :announcements="$announcements" />
     <x-admin.activity-feed :logs="$systemActivity" />
 </div>
 @endsection

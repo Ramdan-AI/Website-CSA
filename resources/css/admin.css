@@ -153,28 +153,24 @@ body {
 .dark .text-gray-500, .dark .text-gray-600 { color: var(--text-muted); }
 .dark .bg-white, .dark .bg-gray-50, .dark .bg-gray-100 { background-color: var(--bg-card); }
 
-/* ============ FLAT CLEAN CARD ============ */
-.csa-glass {
-  background: var(--bg-card);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-
-.csa-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-
 /* ============ PANEL (permukaan tenang, gaya editorial Google) ============
-   Dipakai untuk blok konten dashboard. Border tipis tanpa shadow berat
+   Permukaan standar untuk blok konten: border tipis tanpa shadow berat
    agar hierarki dibentuk oleh tata letak, bukan dekorasi. */
 .csa-panel {
   background: var(--bg-card);
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
+}
+
+.csa-panel-hover {
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.csa-panel-hover:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
+}
+.csa-panel-hover:active {
+  transform: translateY(0.5px) scale(0.998);
 }
 
 /* Baris konten di dalam panel: hover halus, tanpa kotak bertint. */
@@ -189,17 +185,6 @@ body {
 }
 .csa-row:hover {
   background: var(--bg-hover);
-}
-
-.csa-card-hover {
-  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
-}
-.csa-card-hover:hover {
-  border-color: var(--border-strong);
-  box-shadow: var(--shadow-glow);
-}
-.csa-card-hover:active {
-  transform: translateY(0.5px) scale(0.998);
 }
 
 /* ============ TEXT COLORS ============ */
@@ -275,6 +260,7 @@ body {
 .csa-nav-active {
   background: var(--accent-subtle);
   color: var(--accent-bright);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
 }
 .csa-nav-active:hover {
   background: var(--accent-subtle);
@@ -282,16 +268,6 @@ body {
 }
 .csa-nav-active .csa-nav-icon { color: var(--accent-bright); opacity: 1; }
 .csa-nav-active:hover .csa-nav-icon { color: var(--accent-bright); }
-.csa-nav-active::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 50%;
-  transform: translateY(-50%);
-  width: 3px; height: 18px;
-  border-radius: 0 4px 4px 0;
-  background: var(--accent);
-  box-shadow: 0 0 12px var(--accent-glow);
-}
 
 .csa-sidebar-toggle {
   color: var(--sidebar-group);

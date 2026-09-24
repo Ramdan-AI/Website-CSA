@@ -16,7 +16,7 @@
         @csrf
         @method('PUT')
 
-        <div class="csa-card overflow-hidden">
+        <div class="csa-panel overflow-hidden">
             <div class="p-5 space-y-6">
                 @foreach ($permissions as $group => $groupPermissions)
                     <div>

@@ -12,28 +12,21 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Baca berita dan informasi terbaru dari UKM CSA.</p>
     </div>
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau isi berita..." class="csa-input pl-10" aria-label="Cari berita">
         </div>
-        <select name="category_id" onchange="this.form.submit()" class="csa-input sm:w-44" aria-label="Kategori">
-            <option value="">Semua Kategori</option>
-            @foreach($categories as $category)
-                <option value="{{ $category->id }}" @selected(request('category_id') == $category->id)>{{ $category->name }}</option>
-            @endforeach
-        </select>
-        <select name="sort" onchange="this.form.submit()" class="csa-input sm:w-48" aria-label="Urutkan">
-            <option value="published_desc" @selected(request('sort', 'published_desc') === 'published_desc')>Terbit terbaru</option>
-            <option value="published_asc" @selected(request('sort') === 'published_asc')>Terbit terlama</option>
-            <option value="title_asc" @selected(request('sort') === 'title_asc')>Judul A-Z</option>
-            <option value="title_desc" @selected(request('sort') === 'title_desc')>Judul Z-A</option>
-        </select>
+        <x-form.select name="category_id" :value="request('category_id')" onchange="this.form.submit()" class="sm:w-44" aria-label="Kategori"
+            placeholder="Semua Kategori"
+            :options="collect($categories)->mapWithKeys(fn ($c) => [$c->id => $c->name])->all()" />
+        <x-form.select name="sort" :value="request('sort', 'published_desc')" onchange="this.form.submit()" class="sm:w-48" aria-label="Urutkan"
+            :options="['published_desc' => 'Terbit terbaru', 'published_asc' => 'Terbit terlama', 'title_asc' => 'Judul A-Z', 'title_desc' => 'Judul Z-A']" />
     </form>
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         @forelse($news as $item)
-            <article class="csa-card csa-card-hover overflow-hidden">
+            <article class="csa-panel csa-panel-hover overflow-hidden">
                 <a href="{{ route('admin.news.show', $item) }}" class="block">
                     @if($item->thumbnail_url)
                         <div class="h-44 w-full bg-[var(--bg-muted)] overflow-hidden">
@@ -57,7 +50,7 @@
                 </a>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="newspaper" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Tidak ada berita ditemukan</p>
                 <p class="text-[12px] text-[var(--text-muted)] mt-1">Coba ubah kriteria pencarian.</p>

@@ -24,7 +24,7 @@
         </button>
     </div>
 
-    <div id="addMembersPanel" class="hidden csa-card overflow-hidden">
+    <div id="addMembersPanel" class="hidden csa-panel overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-[var(--border-soft)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
                 <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Tambah Anggota</h2>
@@ -58,7 +58,7 @@
         </form>
     </div>
 
-    <div class="csa-card overflow-hidden">
+    <div class="csa-panel overflow-hidden">
         <div class="p-4 sm:p-5 border-b border-[var(--border-soft)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Anggota Saat Ini</h2>
             <form method="GET" action="{{ route('admin.divisions.members', $division) }}" class="flex gap-2">

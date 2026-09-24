@@ -2,22 +2,33 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Member;
-use App\Models\Division;
-use App\Models\Position;
-use App\Models\Role;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MemberRequest;
+use App\Models\Division;
+use App\Models\Member;
+use App\Models\Position;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class MemberController extends Controller
 {
+    /**
+     * Level hanya berlaku untuk divisi bertingkat. Divisi lain dikosongkan.
+     */
+    private function resolveLevel(array $data): ?int
+    {
+        $hasLevels = ! empty($data['division_id'])
+            && Division::whereKey($data['division_id'])->value('has_levels');
+
+        return $hasLevels && ! empty($data['level']) ? (int) $data['level'] : null;
+    }
+
     private function getRoleSlugFromPosition(?Position $position): string
     {
-        if (!$position) {
+        if (! $position) {
             return 'anggota';
         }
 
@@ -27,7 +38,7 @@ class MemberController extends Controller
             str_contains($name, 'ketua divisi') => 'ketua-divisi',
             str_contains($name, 'wakil ketua divisi') => 'wakil-ketua-divisi',
             str_contains($name, 'wakil ketua') => 'wakil-ketua',
-            str_contains($name, 'ketua') && !str_contains($name, 'wakil') => 'ketua',
+            str_contains($name, 'ketua') && ! str_contains($name, 'wakil') => 'ketua',
             str_contains($name, 'sekretaris') => 'sekretaris',
             str_contains($name, 'bendahara') => 'bendahara',
             default => 'anggota',
@@ -37,6 +48,7 @@ class MemberController extends Controller
     private function getRoleFromPosition(?Position $position): ?Role
     {
         $roleSlug = $this->getRoleSlugFromPosition($position);
+
         return Role::where('slug', $roleSlug)->first();
     }
 
@@ -129,6 +141,8 @@ class MemberController extends Controller
         $data['is_active'] = true;
         unset($data['password'], $data['password_confirmation']);
 
+        $data['level'] = $this->resolveLevel($data);
+
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('members', 'public');
         }
@@ -178,6 +192,8 @@ class MemberController extends Controller
 
         unset($data['password'], $data['password_confirmation']);
 
+        $data['level'] = $this->resolveLevel($data);
+
         $oldPositionId = $member->position_id;
 
         if ($request->hasFile('photo')) {
@@ -205,10 +221,15 @@ class MemberController extends Controller
             Storage::disk('public')->delete($member->photo);
         }
 
-        // Hapus user terkait untuk mencegah data yatim piatu
-        if ($member->user) {
-            $member->user->delete();
-        }
+        // Hapus akun login terkait. Selain lewat relasi user_id, cari juga
+        // berdasarkan email agar akun yatim (user_id kosong) ikut terhapus
+        // dan tidak memblokir email untuk anggota berikutnya.
+        $linkedUserIds = collect([$member->user_id])
+            ->merge(User::where('email', $member->email)->pluck('id'))
+            ->filter()
+            ->unique();
+
+        User::whereIn('id', $linkedUserIds)->delete();
 
         $member->delete();
 

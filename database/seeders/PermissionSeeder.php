@@ -38,7 +38,6 @@ class PermissionSeeder extends Seeder
             // Kegiatan
             ['name' => 'Kelola Acara',           'slug' => 'manage-events',            'description' => 'Mengelola acara'],
             ['name' => 'Lihat Acara',            'slug' => 'view-events',              'description' => 'Melihat daftar acara'],
-            ['name' => 'Kelola Pendaftaran',     'slug' => 'manage-registrations',     'description' => 'Mengelola pendaftaran acara'],
 
             // Keuangan
             ['name' => 'Kelola Keuangan',        'slug' => 'manage-finance',           'description' => 'Mengelola pemasukan & pengeluaran'],

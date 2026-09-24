@@ -14,7 +14,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse ($roles as $role)
-            <article class="csa-card p-5 flex flex-col">
+            <article class="csa-panel p-5 flex flex-col">
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3 min-w-0">
                         <span class="w-10 h-10 rounded-xl bg-[var(--bg-muted)] text-[var(--text-secondary)] flex items-center justify-center shrink-0">
@@ -55,7 +55,7 @@
                 </a>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="shield" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada role</p>
             </div>

@@ -19,7 +19,7 @@
         </div>
 
         <form action="{{ $isEdit ? route('admin.divisions.update', $division) : route('admin.divisions.store') }}"
-            method="POST" enctype="multipart/form-data" class="csa-card p-5 sm:p-6 space-y-6">
+            method="POST" enctype="multipart/form-data" class="csa-panel p-5 sm:p-6 space-y-6">
             @csrf
             @if ($isEdit)
                 @method('PUT')

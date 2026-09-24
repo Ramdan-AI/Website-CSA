@@ -13,7 +13,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-1">
-                <div class="csa-card p-5">
+                <div class="csa-panel p-5">
                     <label class="block text-[13px] font-medium text-[var(--text-secondary)] mb-2">Logo CSA</label>
                     <div class="w-full aspect-square rounded-2xl border border-dashed border-[var(--border-strong)] flex items-center justify-center overflow-hidden bg-[var(--bg-muted)] cursor-pointer hover:border-[var(--accent)] transition-colors"
                         onclick="document.getElementById('logo-input').click()">
@@ -32,7 +32,7 @@
             </div>
 
             <div class="lg:col-span-2 space-y-4">
-                <section class="csa-card p-5">
+                <section class="csa-panel p-5">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Informasi Dasar</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <x-form.input name="site_name" id="site_name" label="Nama Situs" :value="old('site_name', $setting->site_name)" placeholder="Nama organisasi" required />
@@ -42,7 +42,7 @@
                     </div>
                 </section>
 
-                <section class="csa-card p-5">
+                <section class="csa-panel p-5">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Media Sosial</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <x-form.input name="instagram" id="instagram" type="url" label="Instagram" :value="old('instagram', $setting->instagram)" placeholder="https://instagram.com/csa" />
@@ -51,7 +51,7 @@
                     </div>
                 </section>
 
-                <section class="csa-card p-5">
+                <section class="csa-panel p-5">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-1">Pendaftaran & Komunitas</h3>
                     <p class="text-[13px] text-[var(--text-muted)] mb-4">
                         Pengaturan pembukaan pendaftaran dan grup WhatsApp kini punya halaman sendiri.

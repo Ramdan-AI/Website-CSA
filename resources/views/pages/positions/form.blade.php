@@ -18,7 +18,7 @@
         </div>
 
         <form action="{{ $isEdit ? route('admin.positions.update', $position) : route('admin.positions.store') }}"
-            method="POST" class="csa-card p-5 sm:p-6 space-y-5">
+            method="POST" class="csa-panel p-5 sm:p-6 space-y-5">
             @csrf
             @if ($isEdit)
                 @method('PUT')

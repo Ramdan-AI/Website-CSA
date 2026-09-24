@@ -2,35 +2,45 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Event;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\EventRequest;
+use App\Models\Event;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class EventController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::with('user')
-            ->latest()
-            ->paginate(10);
+        $validated = $request->validate([
+            'type' => ['nullable', 'in:acara,study_club'],
+        ]);
 
-        return view('pages.events.index',
-            compact('events')
-        );
+        $events = Event::with('user')
+            ->when($validated['type'] ?? null, fn ($query, $type) => $query->where('type', $type))
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('pages.events.index', [
+            'events' => $events,
+            'type' => $validated['type'] ?? '',
+        ]);
     }
 
     public function show(Event $event)
     {
-        $event->load(['attendances.member', 'registrations.member']);
+        $event->load('attendances.member');
+
         return view('pages.events.show', compact('event'));
     }
 
     public function create()
     {
-        $event = new Event();
+        $event = new Event;
+
         return view('pages.events.form', compact('event'));
     }
 

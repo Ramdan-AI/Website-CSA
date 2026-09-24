@@ -1,7 +1,9 @@
 @extends('layouts.landing')
 
 @php
-    $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+    $setting = \App\Models\Setting::first();
+    $regOpen = $setting?->isRegistrationOpen() ?? false;
+    $levelDivisionIds = isset($divisions) ? $divisions->where('has_levels', true)->pluck('id')->map(fn ($id) => (string) $id)->all() : [];
 @endphp
 
 @section('content')
@@ -61,7 +63,13 @@
 
                 <div class="bg-[var(--paper)] rounded-xl border border-[var(--line)]/80 p-6 sm:p-8">
                     <form method="POST" action="{{ route('register') }}" class="space-y-6"
-                        x-data="{ selectedDivision: '{{ old('division_id', '') }}', showPassword: false }">
+                        x-data="{
+                            selectedDivision: '{{ old('division_id', '') }}',
+                            selectedLevel: '{{ old('level', '') }}',
+                            showPassword: false,
+                            levelDivisions: @js($levelDivisionIds),
+                            get needsLevel() { return this.levelDivisions.includes(String(this.selectedDivision)); }
+                        }">
                         @csrf
 
                         {{-- Step 1 --}}
@@ -76,12 +84,25 @@
                                 @error('name')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 <div>
                                     <label for="nim" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">NIM</label>
-                                    <input type="text" name="nim" id="nim" value="{{ old('nim') }}" placeholder="Contoh: 21130001" required
+                                    <input type="text" name="nim" id="nim" value="{{ old('nim') }}" placeholder="21130001"
+                                        inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                        autocomplete="off" required
                                         class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('nim') border-red-300 @enderror">
                                     @error('nim')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label for="semester" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Semester</label>
+                                    <select name="semester" id="semester" required
+                                        class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('semester') border-red-300 @enderror">
+                                        <option value="" disabled @selected(old('semester') === null)>Pilih semester</option>
+                                        @for ($i = 1; $i <= 8; $i++)
+                                            <option value="{{ $i }}" @selected((int) old('semester') === $i)>Semester {{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                    @error('semester')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
                                     <label for="whatsapp" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Nomor WhatsApp</label>
@@ -151,6 +172,36 @@
                             @endif
 
                             @error('division_id')
+                                <p class="text-[12px] text-red-500 flex items-center gap-1.5">
+                                    <i class="fas fa-circle-exclamation text-[11px]"></i> {{ $message }}
+                                </p>
+                            @enderror
+                        </fieldset>
+
+                        {{-- Step 2b: Tingkatan (hanya divisi bertingkat seperti Pemrograman) --}}
+                        <fieldset class="space-y-4 pt-2" x-show="needsLevel" x-cloak>
+                            <legend class="text-[14px] font-semibold text-[var(--accent)]">Tingkatan</legend>
+                            <p class="text-[12px] text-[var(--ink-soft)] leading-relaxed">
+                                Divisi ini punya tingkatan sesuai kemampuan. Pilih yang paling sesuai — bisa dinaikkan nanti setelah kamu bergabung.
+                            </p>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                @foreach (\App\Models\Member::LEVELS as $value => $level)
+                                    <label for="level_{{ $value }}" @click="selectedLevel = '{{ $value }}'"
+                                        :class="selectedLevel == '{{ $value }}'
+                                            ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-2 ring-[var(--accent)]/15'
+                                            : 'border-[var(--line)] bg-[var(--paper)] hover:border-[var(--line-strong)]'"
+                                        class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all duration-200 select-none">
+                                        <input type="radio" name="level" id="level_{{ $value }}" value="{{ $value }}"
+                                            x-model="selectedLevel" class="sr-only" :required="needsLevel">
+                                        <span class="text-[13px] font-bold text-[var(--ink)]">{{ $level['label'] }}</span>
+                                        <span class="text-[12px] font-semibold text-[var(--accent)] mt-0.5">{{ $level['name'] }}</span>
+                                        <span class="text-[11px] text-[var(--ink-soft)] mt-1 leading-relaxed">{{ $level['description'] }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+
+                            @error('level')
                                 <p class="text-[12px] text-red-500 flex items-center gap-1.5">
                                     <i class="fas fa-circle-exclamation text-[11px]"></i> {{ $message }}
                                 </p>

@@ -13,10 +13,10 @@
     </div>
 
     @if (session('success'))
-        <div class="csa-card p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau agenda rapat..." class="csa-input pl-10" aria-label="Cari notulen">
@@ -25,7 +25,7 @@
     </form>
 
     @if ($minutes->isEmpty())
-        <div class="csa-card p-12 text-center">
+        <div class="csa-panel p-12 text-center">
             <x-admin.icon name="file-text" :size="32" class="mx-auto text-[var(--text-muted)]" />
             <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada notulen</p>
             <p class="text-[12px] text-[var(--text-muted)] mt-1">Catat hasil rapat pertama untuk diarsipkan.</p>
@@ -33,7 +33,7 @@
     @else
         <div class="space-y-3">
             @foreach ($minutes as $minute)
-                <article class="csa-card p-5">
+                <article class="csa-panel p-5">
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2">

@@ -15,7 +15,7 @@
             ['Sakit', $stats['sick'], 'thermometer'],
             ['Alfa', $stats['absent'], 'calendar-x'],
         ] as [$label, $value, $icon])
-            <div class="csa-card p-4">
+            <div class="csa-panel p-4">
                 <div class="flex items-center justify-between">
                     <p class="csa-stat-label">{{ $label }}</p>
                     <x-admin.icon :name="$icon" :size="16" class="text-[var(--text-muted)]" />
@@ -25,28 +25,20 @@
         @endforeach
     </section>
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama kegiatan..."
                 class="csa-input pl-10" aria-label="Cari kegiatan">
         </div>
-        <select name="status" onchange="this.form.submit()" class="csa-input sm:w-40" aria-label="Filter status">
-            <option value="">Semua Status</option>
-            <option value="present" @selected(request('status') === 'present')>Hadir</option>
-            <option value="permit" @selected(request('status') === 'permit')>Izin</option>
-            <option value="sick" @selected(request('status') === 'sick')>Sakit</option>
-            <option value="absent" @selected(request('status') === 'absent')>Alfa</option>
-        </select>
-        <select name="sort" onchange="this.form.submit()" class="csa-input sm:w-48" aria-label="Urutkan">
-            <option value="date_desc" @selected(request('sort', 'date_desc') === 'date_desc')>Tanggal terbaru</option>
-            <option value="date_asc" @selected(request('sort') === 'date_asc')>Tanggal terlama</option>
-            <option value="title_asc" @selected(request('sort') === 'title_asc')>Nama A-Z</option>
-            <option value="title_desc" @selected(request('sort') === 'title_desc')>Nama Z-A</option>
-        </select>
+        <x-form.select name="status" :value="request('status')" onchange="this.form.submit()" class="sm:w-40" aria-label="Filter status"
+            placeholder="Semua Status"
+            :options="['present' => 'Hadir', 'permit' => 'Izin', 'sick' => 'Sakit', 'absent' => 'Alfa']" />
+        <x-form.select name="sort" :value="request('sort', 'date_desc')" onchange="this.form.submit()" class="sm:w-48" aria-label="Urutkan"
+            :options="['date_desc' => 'Tanggal terbaru', 'date_asc' => 'Tanggal terlama', 'title_asc' => 'Nama A-Z', 'title_desc' => 'Nama Z-A']" />
     </form>
 
-    <div class="csa-card overflow-hidden">
+    <div class="csa-panel overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full min-w-[640px]">
                 <thead>

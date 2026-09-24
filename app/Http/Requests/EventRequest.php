@@ -17,39 +17,43 @@ class EventRequest extends FormRequest
             'title' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
+            ],
+            'type' => [
+                'required',
+                'in:acara,study_club',
             ],
             'description' => [
                 'required',
-                'string'
+                'string',
             ],
             'location' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'event_date' => [
                 'required',
-                'date'
+                'date',
             ],
             'banner' => [
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048'
+                'max:2048',
             ],
             'registration_link' => [
                 'nullable',
                 'url',
-                'max:255'
+                'max:255',
             ],
             'status' => [
                 'required',
-                'in:draft,published,closed'
+                'in:draft,published,closed',
             ],
             'attendance_enabled' => [
-                'boolean'
-            ]
+                'boolean',
+            ],
         ];
     }
 
@@ -57,6 +61,7 @@ class EventRequest extends FormRequest
     {
         return [
             'status.in' => 'Status kegiatan harus draft, published, atau closed.',
+            'type.in' => 'Jenis kegiatan harus acara atau study club.',
             'registration_link.url' => 'Link pendaftaran harus berupa URL yang valid.',
         ];
     }

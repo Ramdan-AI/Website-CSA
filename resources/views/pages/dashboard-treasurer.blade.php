@@ -2,44 +2,50 @@
 
 @php
     $format = fn ($value) => 'Rp ' . number_format((float) $value, 0, ',', '.');
+    $statItems = [
+        ['label' => 'Saldo Kas', 'value' => $format($balance), 'note' => 'Selisih bulan ini ' . $format($incomeThisMonth - $expenseThisMonth)],
+        ['label' => 'Pemasukan', 'value' => $format($totalIncome), 'note' => 'Bulan ini ' . $format($incomeThisMonth)],
+        ['label' => 'Pengeluaran', 'value' => $format($totalExpense), 'note' => 'Bulan ini ' . $format($expenseThisMonth)],
+    ];
+    $chartLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
 @endphp
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div>
         <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Dashboard Bendahara</h1>
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Ringkasan keuangan organisasi.</p>
     </div>
 
-    <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-        <x-admin.metric-card label="Saldo Kas" :value="$format($balance)"
-            :change="$format($incomeThisMonth - $expenseThisMonth)" change-label="selisih bulan ini"
-            :tone="$balance >= 0 ? 'green' : 'red'" :trend="$balance >= 0 ? 'up' : 'down'" />
-        <x-admin.metric-card label="Pemasukan" :value="$format($totalIncome)"
-            :change="$format($incomeThisMonth)" change-label="bulan ini" tone="blue" />
-        <x-admin.metric-card label="Pengeluaran" :value="$format($totalExpense)"
-            :change="$format($expenseThisMonth)" change-label="bulan ini" trend="down" tone="red" />
-    </section>
+    <x-admin.announcement-feed :announcements="$announcements" />
 
-    <div class="csa-card p-5">
-        <div class="flex items-center justify-between gap-4 mb-5">
-            <div>
+    <section class="csa-panel p-5 sm:p-6">
+        <x-admin.stat-strip :lead="true" :items="$statItems" />
+
+        <div class="mt-6 pt-6 border-t border-[var(--border-soft)]">
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 mb-5">
                 <h2 class="text-[15px] font-semibold text-[var(--text-primary)]">Arus Kas {{ now()->year }}</h2>
-                <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Pemasukan dan pengeluaran per bulan</p>
+                <span class="flex items-center gap-1.5 text-[11px] text-[var(--text-secondary)]">
+                    <span class="w-2.5 h-0.5 rounded bg-emerald-500"></span>Pemasukan
+                </span>
+                <span class="flex items-center gap-1.5 text-[11px] text-[var(--text-secondary)]">
+                    <span class="w-2.5 h-0.5 rounded bg-red-500"></span>Pengeluaran
+                </span>
+                <a href="{{ route('admin.finance-report.index') }}" class="ml-auto inline-flex items-center gap-1 text-[12px] font-medium text-[var(--text-secondary)] hover:text-[var(--accent-bright)] transition-colors">
+                    Laporan lengkap
+                    <x-admin.icon name="arrow-right" :size="13" />
+                </a>
             </div>
-            <a href="{{ route('admin.finance-report.index') }}" class="text-[13px] font-medium hover:underline shrink-0" style="color: var(--accent);">
-                Laporan lengkap
-            </a>
+            <div class="h-60 sm:h-72"><canvas id="treasurerChart"></canvas></div>
         </div>
-        <div class="h-64 sm:h-72"><canvas id="treasurerChart"></canvas></div>
-    </div>
+    </section>
 
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         @foreach ([
             ['Pemasukan Terbaru', $recentIncomes, 'admin.incomes.index'],
             ['Pengeluaran Terbaru', $recentExpenses, 'admin.expenses.index'],
         ] as [$title, $items, $route])
-            <div class="csa-card overflow-hidden">
+            <div class="csa-panel overflow-hidden">
                 <div class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between">
                     <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">{{ $title }}</h2>
                     <a href="{{ route($route) }}" class="text-[12px] font-medium hover:underline" style="color: var(--accent);">Lihat semua</a>
@@ -62,7 +68,7 @@
             </div>
         @endforeach
     </section>
-    <x-admin.announcement-feed :announcements="$announcements" />
+
     <x-admin.activity-feed :logs="$systemActivity" />
 </div>
 @endsection
@@ -80,7 +86,7 @@
         new window.Chart(canvas, {
             type: 'line',
             data: {
-                labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Ags','Sep','Okt','Nov','Des'],
+                labels: @json($chartLabels),
                 datasets: [
                     { label: 'Pemasukan', data: @json($chartIncomes), borderColor: '#10b981', borderWidth: 2, tension: .4, pointRadius: 0, fill: false },
                     { label: 'Pengeluaran', data: @json($chartExpenses), borderColor: '#ef4444', borderWidth: 2, tension: .4, pointRadius: 0, fill: false },
@@ -90,7 +96,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: muted, boxWidth: 10, font: { size: 11 } } },
+                    legend: { display: false },
                     tooltip: {
                         backgroundColor: dark ? '#1a1f2e' : '#ffffff',
                         titleColor: dark ? '#e6e9f0' : '#0f172a',

@@ -13,27 +13,25 @@
     </div>
 
     @if (session('success'))
-        <div class="csa-card p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari proyek..." class="csa-input pl-10" aria-label="Cari proyek">
         </div>
 
         @if ($canManageAll)
-            <select name="scope" onchange="this.form.submit()" class="csa-input sm:w-44" aria-label="Cakupan">
-                <option value="all" @selected($scope === 'all')>Semua proyek</option>
-                <option value="mine" @selected($scope === 'mine')>Proyek saya</option>
-            </select>
+            <x-form.select name="scope" :value="$scope" onchange="this.form.submit()" class="sm:w-44" aria-label="Cakupan"
+                :options="['all' => 'Semua proyek', 'mine' => 'Proyek saya']" />
         @endif
 
         <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
     </form>
 
     @if ($projects->isEmpty())
-        <div class="csa-card p-12 text-center">
+        <div class="csa-panel p-12 text-center">
             <x-admin.icon name="folder-open" :size="32" class="mx-auto text-[var(--text-muted)]" />
             <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada proyek</p>
             <p class="text-[12px] text-[var(--text-muted)] mt-1">Tambahkan proyek pertama untuk ditampilkan.</p>
@@ -41,7 +39,7 @@
     @else
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach ($projects as $project)
-                <article class="csa-card overflow-hidden flex flex-col">
+                <article class="csa-panel overflow-hidden flex flex-col">
                     <div class="aspect-[16/10] bg-[var(--bg-muted)] overflow-hidden">
                         @if ($project->thumbnail_url)
                             <img src="{{ $project->thumbnail_url }}" alt="{{ $project->title }}" class="w-full h-full object-cover">

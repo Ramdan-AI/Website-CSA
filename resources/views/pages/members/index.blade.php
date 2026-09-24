@@ -14,33 +14,22 @@
         @endcan
     </div>
 
-    <form method="GET" class="csa-card p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto] gap-3">
+    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, email..." class="csa-input pl-10" aria-label="Cari anggota">
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, email..." class="csa-input pl-10" aria-label="Cari anggota">
         </div>
-        <select name="division_id" onchange="this.form.submit()" class="csa-input" aria-label="Filter divisi">
-            <option value="">Semua Divisi</option>
-            @foreach($divisions as $division)
-                <option value="{{ $division->id }}" @selected(request('division_id') == $division->id)>{{ $division->name }}</option>
-            @endforeach
-        </select>
-        <select name="position_id" onchange="this.form.submit()" class="csa-input" aria-label="Filter jabatan">
-            <option value="">Semua Jabatan</option>
-            @foreach($positions as $position)
-                <option value="{{ $position->id }}" @selected(request('position_id') == $position->id)>{{ $position->name }}</option>
-            @endforeach
-        </select>
-        <select name="status" onchange="this.form.submit()" class="csa-input" aria-label="Filter status">
-            <option value="">Semua Status</option>
-            <option value="active" @selected(request('status') == 'active')>Aktif</option>
-            <option value="inactive" @selected(request('status') == 'inactive')>Nonaktif</option>
-        </select>
-        <select name="sort" onchange="this.form.submit()" class="csa-input" aria-label="Urutkan">
-            <option value="newest" @selected(request('sort') == 'newest')>Terbaru</option>
-            <option value="name_asc" @selected(request('sort') == 'name_asc')>Nama A-Z</option>
-            <option value="name_desc" @selected(request('sort') == 'name_desc')>Nama Z-A</option>
-        </select>
+        <x-form.select name="division_id" :value="request('division_id')" onchange="this.form.submit()" aria-label="Filter divisi"
+            placeholder="Semua Divisi"
+            :options="collect($divisions)->mapWithKeys(fn ($d) => [$d->id => $d->name])->all()" />
+        <x-form.select name="position_id" :value="request('position_id')" onchange="this.form.submit()" aria-label="Filter jabatan"
+            placeholder="Semua Jabatan"
+            :options="collect($positions)->mapWithKeys(fn ($p) => [$p->id => $p->name])->all()" />
+        <x-form.select name="status" :value="request('status')" onchange="this.form.submit()" aria-label="Filter status"
+            placeholder="Semua Status"
+            :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
+        <x-form.select name="sort" :value="request('sort', 'newest')" onchange="this.form.submit()" aria-label="Urutkan"
+            :options="['newest' => 'Terbaru', 'name_asc' => 'Nama A-Z', 'name_desc' => 'Nama Z-A']" />
         <a href="{{ route('admin.members.index') }}" class="csa-btn csa-btn-ghost">Reset</a>
     </form>
 

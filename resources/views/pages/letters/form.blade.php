@@ -15,7 +15,7 @@
     </div>
 
     @if ($errors->any())
-        <div class="csa-card p-4 border-l-2 border-red-500 space-y-1.5">
+        <div class="csa-panel p-4 border-l-2 border-red-500 space-y-1.5">
             <p class="text-[13px] font-medium text-red-500">Periksa kembali data berikut:</p>
             <ul class="space-y-1">
                 @foreach ($errors->all() as $message)
@@ -26,18 +26,14 @@
     @endif
 
     <form action="{{ $isEdit ? route('admin.letters.update', $letter) : route('admin.letters.store') }}"
-        method="POST" enctype="multipart/form-data" class="csa-card p-5 sm:p-6 space-y-4">
+        method="POST" enctype="multipart/form-data" class="csa-panel p-5 sm:p-6 space-y-4">
         @csrf
         @if ($isEdit) @method('PUT') @endif
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label for="type" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Jenis Surat</label>
-                <select name="type" id="type" class="csa-input" required>
-                    <option value="incoming" @selected(old('type', $letter->type ?? 'incoming') === 'incoming')>Surat Masuk</option>
-                    <option value="outgoing" @selected(old('type', $letter->type ?? '') === 'outgoing')>Surat Keluar</option>
-                </select>
-            </div>
+            <x-form.select name="type" id="type" label="Jenis Surat" required
+                :value="old('type', $letter->type ?? 'incoming')"
+                :options="['incoming' => 'Surat Masuk', 'outgoing' => 'Surat Keluar']" />
 
             <x-form.input name="letter_date" id="letter_date" type="date" label="Tanggal Surat"
                 :value="old('letter_date', $isEdit ? $letter->letter_date->format('Y-m-d') : now()->format('Y-m-d'))" required />

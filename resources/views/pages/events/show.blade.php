@@ -17,6 +17,7 @@
             </a>
             <h1 class="text-[22px] sm:text-[26px] font-bold text-[var(--text-primary)] tracking-[-0.03em] mt-2">{{ $event->title }}</h1>
             <p class="text-[13px] text-[var(--text-muted)] mt-1 inline-flex items-center gap-3 flex-wrap">
+                <span class="csa-chip {{ $event->type === 'study_club' ? 'csa-chip-violet' : 'csa-chip-blue' }}">{{ \App\Models\Event::TYPES[$event->type] ?? 'Acara' }}</span>
                 <span class="inline-flex items-center gap-1.5"><x-admin.icon name="calendar-days" :size="14" /> {{ $event->event_date?->translatedFormat('d M Y') }}</span>
                 @if($event->location)
                     <span class="inline-flex items-center gap-1.5"><x-admin.icon name="map-pin" :size="14" /> {{ $event->location }}</span>
@@ -37,12 +38,12 @@
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <section class="lg:col-span-2 csa-card p-5">
+        <section class="lg:col-span-2 csa-panel p-5">
             <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-3">Deskripsi Kegiatan</h3>
             <div class="text-[13px] text-[var(--text-secondary)] leading-relaxed">{!! nl2br(e($event->description)) !!}</div>
         </section>
 
-        <section class="csa-card p-5 space-y-4 h-fit">
+        <section class="csa-panel p-5 space-y-4 h-fit">
             <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Pendaftaran & Presensi</h3>
 
             <div>
@@ -59,11 +60,11 @@
                 <a href="{{ $event->registration_link }}" target="_blank" rel="noopener" class="csa-btn csa-btn-ghost w-full">
                     <x-admin.icon name="external-link" :size="16" /> Link Pendaftaran Eksternal
                 </a>
-            @elseif($event->attendance_enabled && !$event->attendance_closed_at)
-                <form action="{{ route('admin.events.register', $event) }}" method="POST">
+            @elseif($event->attendance_enabled && !$event->attendance_closed_at && auth()->user()?->member)
+                <form action="{{ route('admin.member.attendance.self', $event) }}" method="POST">
                     @csrf
                     <button type="submit" class="csa-btn csa-btn-primary w-full">
-                        <x-admin.icon name="user-plus" :size="16" /> Daftar / Check-In
+                        <x-admin.icon name="user-check" :size="16" /> Check-In Sekarang
                     </button>
                 </form>
             @endif

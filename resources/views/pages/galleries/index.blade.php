@@ -14,7 +14,7 @@
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5">
         @forelse($galleries as $gallery)
-            <article class="csa-card csa-card-hover overflow-hidden group">
+            <article class="csa-panel csa-panel-hover overflow-hidden group">
                 <div class="relative aspect-square overflow-hidden cursor-pointer" onclick="openImagePreview('imagePreviewModal', '{{ asset('storage/' . $gallery->image) }}', '{{ $gallery->caption ?? 'Galeri CSA' }}')">
                     <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->caption ?? 'Foto kegiatan' }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
                 </div>
@@ -43,7 +43,7 @@
                 </div>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="images" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada foto</p>
                 <p class="text-[12px] text-[var(--text-muted)] mt-1">Tambahkan foto pertama ke galeri.</p>

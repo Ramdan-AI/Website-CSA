@@ -1,7 +1,14 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+@php
+    $statItems = [
+        ['label' => 'Surat Tercatat', 'value' => number_format($totalLetters), 'note' => 'Masuk & keluar'],
+        ['label' => 'Notulen Rapat', 'value' => number_format($totalMinutes), 'note' => 'Tersimpan'],
+        ['label' => 'Dokumen', 'value' => number_format($totalDocuments), 'note' => 'Arsip'],
+    ];
+@endphp
+<div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Dashboard Sekretaris</h1>
@@ -17,16 +24,15 @@
         </div>
     </div>
 
-    <section class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <x-admin.metric-card label="Surat Tercatat" :value="number_format($totalLetters)" change-label="masuk & keluar" tone="blue" />
-        <x-admin.metric-card label="Notulen Rapat" :value="number_format($totalMinutes)" change-label="tersimpan" tone="violet" />
-        <x-admin.metric-card label="Dokumen" :value="number_format($totalDocuments)" change-label="arsip" tone="green" />
-        <x-admin.metric-card label="Berita Draf" :value="number_format($draftNews)" change-label="perlu diterbitkan" tone="red" trend="down" />
+    <x-admin.announcement-feed :announcements="$announcements" />
+
+    <section class="csa-panel p-5 sm:p-6">
+        <x-admin.stat-strip :items="$statItems" />
     </section>
 
     <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {{-- Surat terbaru --}}
-        <div class="csa-card overflow-hidden">
+        <div class="csa-panel overflow-hidden">
             <div class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between">
                 <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Surat Terbaru</h2>
                 <a href="{{ route('admin.letters.index') }}" class="text-[12px] font-medium hover:underline" style="color: var(--accent);">Lihat semua</a>
@@ -47,7 +53,7 @@
         </div>
 
         {{-- Notulen terbaru --}}
-        <div class="csa-card overflow-hidden">
+        <div class="csa-panel overflow-hidden">
             <div class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between">
                 <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Notulen Terbaru</h2>
                 <a href="{{ route('admin.minutes.index') }}" class="text-[12px] font-medium hover:underline" style="color: var(--accent);">Lihat semua</a>
@@ -68,7 +74,7 @@
         </div>
     </section>
 
-    <div class="csa-card overflow-hidden">
+    <div class="csa-panel overflow-hidden">
         <div class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Dokumen Terbaru</h2>
             <a href="{{ route('admin.documents.index') }}" class="text-[12px] font-medium hover:underline" style="color: var(--accent);">Lihat semua</a>
@@ -92,7 +98,7 @@
             @endforelse
         </div>
     </div>
-    <x-admin.announcement-feed :announcements="$announcements" />
+
     <x-admin.activity-feed :logs="$systemActivity" />
 </div>
 @endsection

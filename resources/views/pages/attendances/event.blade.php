@@ -44,14 +44,14 @@
             ['Sakit', $event->sick_count, 'text-blue-600 dark:text-blue-400'],
             ['Alfa', $event->absent_count, 'text-red-600 dark:text-red-400'],
         ] as [$label, $value, $tone])
-            <div class="csa-card p-4">
+            <div class="csa-panel p-4">
                 <p class="csa-stat-label">{{ $label }}</p>
                 <p class="text-[22px] font-bold mt-1.5 {{ $tone }}">{{ $value }}</p>
             </div>
         @endforeach
     </div>
 
-    <form method="POST" action="{{ route('admin.attendances.bulk', $event) }}" class="csa-card overflow-hidden">
+    <form method="POST" action="{{ route('admin.attendances.bulk', $event) }}" class="csa-panel overflow-hidden">
         @csrf
         <div class="p-4 sm:p-5 border-b border-[var(--border-soft)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>

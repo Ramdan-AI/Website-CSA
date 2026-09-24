@@ -10,36 +10,17 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Tambahkan data absensi anggota ke dalam kegiatan.</p>
     </div>
 
-    <form action="{{ route('admin.attendances.store') }}" method="POST" class="csa-card p-5 sm:p-6 space-y-4">
+    <form action="{{ route('admin.attendances.store') }}" method="POST" class="csa-panel p-5 sm:p-6 space-y-4">
         @csrf
-        <div>
-            <label for="event_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Kegiatan</label>
-            <select name="event_id" id="event_id" required class="csa-input">
-                <option value="">Pilih kegiatan</option>
-                @foreach($events as $event)
-                    <option value="{{ $event->id }}" @selected(old('event_id') == $event->id)>{{ $event->title }}</option>
-                @endforeach
-            </select>
-            @error('event_id')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
-        </div>
-        <div>
-            <label for="member_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Anggota</label>
-            <select name="member_id" id="member_id" required class="csa-input">
-                <option value="">Pilih anggota</option>
-                @foreach($members as $member)
-                    <option value="{{ $member->id }}" @selected(old('member_id') == $member->id)>{{ $member->name }}</option>
-                @endforeach
-            </select>
-            @error('member_id')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
-        </div>
-        <div>
-            <label for="status" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Status</label>
-            <select name="status" id="status" required class="csa-input">
-                <option value="present" @selected(old('status') == 'present')>Hadir</option>
-                <option value="absent" @selected(old('status') == 'absent')>Absen</option>
-            </select>
-            @error('status')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
-        </div>
+        <x-form.select name="event_id" id="event_id" label="Kegiatan" required
+            :value="old('event_id')" placeholder="Pilih kegiatan"
+            :options="collect($events)->mapWithKeys(fn ($e) => [$e->id => $e->title])->all()" />
+        <x-form.select name="member_id" id="member_id" label="Anggota" required
+            :value="old('member_id')" placeholder="Pilih anggota"
+            :options="collect($members)->mapWithKeys(fn ($m) => [$m->id => $m->name])->all()" />
+        <x-form.select name="status" id="status" label="Status" required
+            :value="old('status', 'present')"
+            :options="['present' => 'Hadir', 'permit' => 'Izin', 'sick' => 'Sakit', 'absent' => 'Alfa']" />
 
         <div class="flex items-center gap-3 pt-2 border-t border-[var(--border-soft)]">
             <button type="submit" class="csa-btn csa-btn-primary">

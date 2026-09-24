@@ -10,7 +10,7 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Registrasikan kategori berita baru ke dalam sistem.</p>
     </div>
 
-    <form action="{{ route('admin.news-categories.store') }}" method="POST" class="csa-card p-5 sm:p-6 space-y-4">
+    <form action="{{ route('admin.news-categories.store') }}" method="POST" class="csa-panel p-5 sm:p-6 space-y-4">
         @csrf
 
         <x-form.input name="name" id="name" label="Nama Kategori" :value="old('name')" placeholder="Contoh: Teknologi" required autofocus />

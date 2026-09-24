@@ -19,7 +19,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         @forelse($news as $item)
-            <article class="csa-card csa-card-hover overflow-hidden">
+            <article class="csa-panel csa-panel-hover overflow-hidden">
                 <a href="{{ route('admin.news.show', $item) }}" class="block">
                     @if($item->thumbnail_url)
                         <div class="h-40 w-full bg-[var(--bg-muted)] overflow-hidden">
@@ -37,7 +37,7 @@
                 </a>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="newspaper" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada berita dalam kategori ini</p>
             </div>

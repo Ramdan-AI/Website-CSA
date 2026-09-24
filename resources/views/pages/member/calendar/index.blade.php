@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <div id="calendarView" class="csa-card p-3 sm:p-4 hidden">
+    <div id="calendarView" class="csa-panel p-3 sm:p-4 hidden">
         <div id="calendar"></div>
     </div>
 
@@ -38,7 +38,7 @@
                     'absent' => ['Alfa', 'csa-chip-red'],
                 ];
             @endphp
-            <article class="csa-card p-4 sm:p-5">
+            <article class="csa-panel p-4 sm:p-5">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div class="flex items-start gap-3.5 min-w-0">
                         <div class="w-11 h-11 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center shrink-0 text-[var(--text-secondary)]">
@@ -107,7 +107,7 @@
                 </div>
             </article>
         @empty
-            <div class="csa-card p-12 text-center">
+            <div class="csa-panel p-12 text-center">
                 <x-admin.icon name="calendar-x" :size="36" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada kegiatan</p>
                 <p class="text-[12px] text-[var(--text-muted)] mt-1">Kegiatan yang dipublikasikan akan muncul di sini.</p>
@@ -118,7 +118,7 @@
 
 {{-- QR Scanner Modal --}}
 <div id="qrScannerModal" class="hidden fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm items-center justify-center p-4" data-qr-overlay>
-    <div class="csa-card w-full max-w-sm" data-qr-panel>
+    <div class="csa-panel w-full max-w-sm" data-qr-panel>
         <div class="p-4 border-b border-[var(--border-soft)] flex items-center justify-between">
             <h3 class="text-[15px] font-semibold text-[var(--text-primary)]">Scan QR Code</h3>
             <button type="button" class="csa-icon-btn" data-qr-close aria-label="Tutup">

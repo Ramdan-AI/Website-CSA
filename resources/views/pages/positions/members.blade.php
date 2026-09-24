@@ -19,28 +19,24 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="lg:col-span-1">
-            <section class="csa-card p-5 lg:sticky lg:top-20">
+            <section class="csa-panel p-5 lg:sticky lg:top-20">
                 <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Tambah Anggota</h3>
                 <p class="text-[12px] text-[var(--text-muted)] mt-0.5 mb-4">Pilih anggota untuk jabatan {{ $position->name }}.</p>
 
                 <form action="{{ route('admin.positions.assign', $position) }}" method="POST" class="space-y-4">
                     @csrf
-                    <div>
-                        <label for="member_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Pilih Anggota</label>
-                        <select name="member_id" id="member_id" required class="csa-input">
-                            <option value="">-- Pilih anggota --</option>
-                            @foreach($allMembers as $member)
-                                @php
-                                    $isCurrentPosition = $member->position_id == $position->id;
-                                    $hasOtherPosition = $member->position_id && $member->position_id != $position->id;
-                                @endphp
-                                <option value="{{ $member->id }}" {{ $isCurrentPosition ? 'selected' : '' }}>
-                                    {{ $member->name }}@if($member->division) — {{ $member->division->name }}@endif
-                                    @if($isCurrentPosition) (saat ini) @elseif($hasOtherPosition) ({{ $member->position?->name }}) @else (tersedia) @endif
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    <x-form.select name="member_id" id="member_id" label="Pilih Anggota" required placeholder="-- Pilih anggota --">
+                        @foreach($allMembers as $member)
+                            @php
+                                $isCurrentPosition = $member->position_id == $position->id;
+                                $hasOtherPosition = $member->position_id && $member->position_id != $position->id;
+                            @endphp
+                            <option value="{{ $member->id }}" @selected($isCurrentPosition)>
+                                {{ $member->name }}@if($member->division) — {{ $member->division->name }}@endif
+                                @if($isCurrentPosition) (saat ini) @elseif($hasOtherPosition) ({{ $member->position?->name }}) @else (tersedia) @endif
+                            </option>
+                        @endforeach
+                    </x-form.select>
                     <button type="submit" class="csa-btn csa-btn-primary w-full">
                         <x-admin.icon name="plus" :size="16" /> Tambahkan
                     </button>
@@ -49,7 +45,7 @@
         </div>
 
         <div class="lg:col-span-2">
-            <section class="csa-card overflow-hidden">
+            <section class="csa-panel overflow-hidden">
                 <div class="px-5 py-4 border-b border-[var(--border-soft)] flex items-center justify-between">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Anggota {{ $position->name }}</h3>
                     <span class="text-[12px] text-[var(--text-muted)]">{{ $members->total() }} orang</span>

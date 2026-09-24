@@ -17,7 +17,7 @@
         </form>
     </div>
 
-    <div class="csa-card overflow-hidden">
+    <div class="csa-panel overflow-hidden">
         <div class="px-4 py-3 border-b border-[var(--border-soft)]">
             <p class="text-[13px] font-medium text-[var(--text-secondary)]">{{ $members->total() }} anggota</p>
         </div>

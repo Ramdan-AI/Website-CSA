@@ -14,7 +14,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         @forelse($categories as $category)
-            <article class="csa-card csa-card-hover overflow-hidden flex flex-col">
+            <article class="csa-panel csa-panel-hover overflow-hidden flex flex-col">
                 <a href="{{ route('admin.news-categories.show', $category) }}" class="block p-4 flex-1">
                     <div class="flex items-start justify-between gap-3">
                         <span class="w-10 h-10 rounded-xl bg-[var(--bg-muted)] text-[var(--text-secondary)] flex items-center justify-center shrink-0">
@@ -50,7 +50,7 @@
                 </div>
             </article>
         @empty
-            <div class="col-span-full csa-card p-12 text-center">
+            <div class="col-span-full csa-panel p-12 text-center">
                 <x-admin.icon name="tags" :size="32" class="mx-auto text-[var(--text-muted)]" />
                 <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada kategori berita</p>
             </div>

@@ -27,29 +27,24 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-1">
-                <div class="csa-card p-5">
-                    <label class="block text-[13px] font-medium text-[var(--text-secondary)] mb-2">Foto Anggota</label>
-                    <div class="w-full aspect-square rounded-2xl border border-dashed border-[var(--border-strong)] flex items-center justify-center overflow-hidden bg-[var(--bg-muted)] cursor-pointer hover:border-[var(--accent)] transition-colors"
-                        onclick="document.getElementById('photo-input').click()">
-                        <img id="photo-preview" src="{{ $hasPhoto ? $photoUrl : '#' }}" alt="Pratinjau foto" class="{{ $hasPhoto ? 'w-full h-full object-cover' : 'hidden' }}">
-                        <div id="photo-placeholder" class="{{ $hasPhoto ? 'hidden' : 'flex' }} flex-col items-center text-[var(--text-muted)]">
-                            <x-admin.icon name="camera" :size="24" />
-                            <span class="text-[12px] font-medium mt-2">Klik untuk upload</span>
-                            <span class="text-[11px] mt-0.5">JPG, PNG, WEBP</span>
-                        </div>
-                    </div>
-                    <input type="file" name="photo" id="photo-input" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="previewPhoto(event)">
-                    @error('photo')<p class="text-[12px] text-red-500 mt-2">{{ $message }}</p>@enderror
-                    <p class="text-[11px] text-[var(--text-muted)] mt-2">Maksimal 2MB. Rasio 1:1.</p>
+                <div class="csa-panel p-5">
+                    <x-form.file-crop
+                        name="photo"
+                        label="Foto Anggota"
+                        :current="$hasPhoto ? $photoUrl : null"
+                        :aspect="1"
+                        preview-size="w-24 h-24"
+                        hint="JPG, PNG, WEBP. Maksimal 2MB. Rasio 1:1." />
                 </div>
             </div>
 
             <div class="lg:col-span-2 space-y-4">
-                <section class="csa-card p-5">
+                <section class="csa-panel p-5">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Data Anggota</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <x-form.input name="name" id="name" label="Nama" :value="old('name', $member->name ?? '')" placeholder="Nama lengkap" required />
-                        <x-form.input name="nim" id="nim" label="NIM" :value="old('nim', $member->nim ?? '')" placeholder="Nomor induk" />
+                        <x-form.input name="nim" id="nim" label="NIM" :value="old('nim', $member->nim ?? '')" placeholder="Nomor induk"
+                            inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required />
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div>
@@ -65,34 +60,44 @@
                         </div>
                         <x-form.input name="phone" id="phone" label="Telepon" :value="old('phone', $member->phone ?? '')" placeholder="Nomor telepon" />
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                        <div>
-                            <label for="division_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Divisi</label>
-                            <select name="division_id" id="division_id" required class="csa-input">
-                                <option value="">Pilih divisi</option>
-                                @foreach($divisions as $division)
-                                    <option value="{{ $division->id }}" @selected(old('division_id', $member->division_id ?? '') == $division->id)>{{ $division->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('division_id')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
+
+                    @php
+                        $levelDivisionIds = collect($divisions)->where('has_levels', true)->pluck('id')->map(fn ($id) => (string) $id)->all();
+                    @endphp
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4"
+                        x-data="{
+                            divisionId: '{{ old('division_id', $member->division_id ?? '') }}',
+                            levelDivisions: @js($levelDivisionIds),
+                            get needsLevel() { return this.levelDivisions.includes(String(this.divisionId)); }
+                        }">
+                        <x-form.select name="division_id" id="division_id" label="Divisi" required
+                            :value="old('division_id', $member->division_id ?? '')"
+                            x-model="divisionId"
+                            placeholder="Pilih divisi"
+                            :options="collect($divisions)->mapWithKeys(fn ($d) => [$d->id => $d->name])->all()" />
+                        <x-form.select name="semester" id="semester" label="Semester" required
+                            :value="old('semester', $member->semester ?? '')"
+                            placeholder="Pilih semester"
+                            :options="collect(range(1, 8))->mapWithKeys(fn ($i) => [$i => 'Semester ' . $i])->all()" />
+                        <div x-show="needsLevel" x-cloak class="sm:col-span-2">
+                            <x-form.select name="level" id="level" label="Tingkatan" 
+                                :value="old('level', $member->level ?? '')"
+                                placeholder="Pilih tingkatan"
+                                :options="collect(\App\Models\Member::LEVELS)->mapWithKeys(fn ($l, $v) => [$v => $l['label'] . ' · ' . $l['name'] . ' (' . $l['description'] . ')'])->all()"
+                                hint="Hanya untuk divisi bertingkat seperti Pemrograman." />
                         </div>
-                        <div>
-                            <label for="position_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Jabatan</label>
-                            <select name="position_id" id="position_id" class="csa-input">
-                                <option value="">Belum ada</option>
-                                @foreach($positions as $position)
-                                    <option value="{{ $position->id }}" @selected(old('position_id', $member->position_id ?? '') == $position->id)>{{ $position->name }}</option>
-                                @endforeach
-                            </select>
-                            @error('position_id')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
-                        </div>
+                    </div>
+                        <x-form.select name="position_id" id="position_id" label="Jabatan"
+                            :value="old('position_id', $member->position_id ?? '')"
+                            placeholder="Belum ada"
+                            :options="collect($positions)->mapWithKeys(fn ($p) => [$p->id => $p->name])->all()" />
                     </div>
                     <div class="mt-4">
                         <x-form.textarea name="bio" id="bio" label="Bio" :value="old('bio', $member->bio ?? '')" placeholder="Deskripsi singkat..." rows="3" />
                     </div>
                 </section>
 
-                <section class="csa-card p-5">
+                <section class="csa-panel p-5">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">
                         {{ $hasAccount ? 'Akun Login' : ($isEdit ? 'Buat Akun (Opsional)' : 'Password Akun') }}
                     </h3>
@@ -132,7 +137,7 @@
                     @endif
                 </section>
 
-                <section class="csa-card p-5">
+                <section class="csa-panel p-5">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Media Sosial</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <x-form.input name="linkedin" id="linkedin" type="url" label="LinkedIn" :value="old('linkedin', $member->linkedin ?? '')" placeholder="LinkedIn URL" />
@@ -142,7 +147,7 @@
                 </section>
 
                 @if($isEdit)
-                    <section class="csa-card p-4">
+                    <section class="csa-panel p-4">
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="hidden" name="is_active" value="0">
                             <input type="checkbox" name="is_active" value="1" class="peer sr-only" {{ old('is_active', $member->is_active) ? 'checked' : '' }}>
@@ -167,20 +172,3 @@
     </form>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    function previewPhoto(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const preview = document.getElementById('photo-preview');
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-            document.getElementById('photo-placeholder').classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-    }
-</script>
-@endpush

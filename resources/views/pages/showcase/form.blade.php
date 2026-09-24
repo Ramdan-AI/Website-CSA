@@ -21,7 +21,7 @@
     </div>
 
     @if ($errors->any())
-        <div class="csa-card p-4 border-l-2 border-red-500 space-y-1.5">
+        <div class="csa-panel p-4 border-l-2 border-red-500 space-y-1.5">
             <p class="text-[13px] font-medium text-red-500">Periksa kembali data berikut:</p>
             <ul class="space-y-1">
                 @foreach ($errors->all() as $message)
@@ -36,7 +36,7 @@
         @csrf
         @if ($isEdit) @method('PUT') @endif
 
-        <div class="csa-card p-5 sm:p-6 space-y-4">
+        <div class="csa-panel p-5 sm:p-6 space-y-4">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Informasi Proyek</h2>
 
             <x-form.input name="title" id="title" label="Judul Proyek" :value="old('title', $project->title ?? '')"
@@ -53,7 +53,7 @@
                 placeholder="Laravel, Vue, MySQL" hint="Pisahkan dengan koma." />
         </div>
 
-        <div class="csa-card p-5 sm:p-6 space-y-4">
+        <div class="csa-panel p-5 sm:p-6 space-y-4">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Tautan</h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -64,7 +64,7 @@
             </div>
         </div>
 
-        <div class="csa-card p-5 sm:p-6 space-y-4">
+        <div class="csa-panel p-5 sm:p-6 space-y-4">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Gambar</h2>
 
             <div>
@@ -116,7 +116,7 @@
             ])->values();
         @endphp
 
-        <div class="csa-card p-5 sm:p-6 space-y-4"
+        <div class="csa-panel p-5 sm:p-6 space-y-4"
             x-data="{
                 query: '',
                 members: @js($memberPayload),
@@ -167,16 +167,12 @@
             </p>
         </div>
 
-        <div class="csa-card p-5 sm:p-6 space-y-4">
+        <div class="csa-panel p-5 sm:p-6 space-y-4">
             <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Publikasi</h2>
 
-            <div>
-                <label for="status" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Status</label>
-                <select name="status" id="status" class="csa-input">
-                    <option value="published" @selected(old('status', $project->status ?? 'published') === 'published')>Tayang di publik</option>
-                    <option value="draft" @selected(old('status', $project->status ?? '') === 'draft')>Simpan sebagai draf</option>
-                </select>
-            </div>
+            <x-form.select name="status" id="status" label="Status"
+                :value="old('status', $project->status ?? 'published')"
+                :options="['published' => 'Tayang di publik', 'draft' => 'Simpan sebagai draf']" />
 
             <label class="flex items-center gap-3 cursor-pointer">
                 <input type="hidden" name="featured" value="0">

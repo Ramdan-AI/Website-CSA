@@ -67,9 +67,25 @@
                             <span class="text-[var(--ink-faint)] block text-[10px] uppercase font-semibold">Nomor WhatsApp</span>
                             <span class="font-semibold text-[var(--ink)]">{{ $user->whatsapp ?? '-' }}</span>
                         </div>
+                        @if ($member?->semester)
+                            <div class="bg-[var(--paper)]/90 rounded-xl px-3.5 py-2.5 border border-[var(--line)]">
+                                <span class="text-[var(--ink-faint)] block text-[10px] uppercase font-semibold">Semester</span>
+                                <span class="font-semibold text-[var(--ink)]">Semester {{ $member->semester }}</span>
+                            </div>
+                        @endif
+                        @if ($member?->level)
+                            <div class="bg-[var(--paper)]/90 rounded-xl px-3.5 py-2.5 border border-[var(--line)]">
+                                <span class="text-[var(--ink-faint)] block text-[10px] uppercase font-semibold">Tingkatan</span>
+                                <span class="font-semibold text-[var(--ink)]">
+                                    {{ \App\Models\Member::LEVELS[$member->level]['label'] ?? 'Tingkat ' . $member->level }}
+                                    · {{ $member->level_name }}
+                                </span>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
+
 
             {{-- Grup WhatsApp: langkah wajib setelah daftar --}}
             <div class="rounded-xl border p-6 text-center" style="border-color: var(--line); background: var(--paper-sunken);">

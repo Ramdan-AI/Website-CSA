@@ -25,36 +25,24 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div class="lg:col-span-1">
-                <div class="csa-card p-5">
-                    <label class="block text-[13px] font-medium text-[var(--text-secondary)] mb-2">Foto</label>
-                    <div class="w-full aspect-square rounded-2xl border border-dashed border-[var(--border-strong)] flex items-center justify-center overflow-hidden bg-[var(--bg-muted)] hover:border-[var(--accent)] transition-colors cursor-pointer"
-                        onclick="document.getElementById('image-input').click()">
-                        <img id="image-preview" src="{{ $hasImage ? $imageUrl : '#' }}" alt="Pratinjau foto" class="{{ $hasImage ? 'w-full h-full object-cover' : 'hidden' }}">
-                        <div id="image-placeholder" class="{{ $hasImage ? 'hidden' : 'flex' }} flex-col items-center text-[var(--text-muted)]">
-                            <x-admin.icon name="image" :size="22" />
-                            <span class="text-[12px] font-medium mt-2">Klik untuk upload</span>
-                            <span class="text-[11px] mt-0.5">JPG, PNG, WEBP</span>
-                        </div>
-                    </div>
-                    <input type="file" name="image" id="image-input" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="previewImage(event)" {{ $isEdit ? '' : 'required' }}>
-                    @error('image')<p class="text-[12px] text-red-500 mt-2">{{ $message }}</p>@enderror
-                    <p class="text-[11px] text-[var(--text-muted)] mt-2">Maksimal 5MB. Format JPG, PNG, WEBP.</p>
+                <div class="csa-panel p-5">
+                    <x-form.file-crop
+                        name="image"
+                        label="Foto"
+                        :current="$hasImage ? $imageUrl : null"
+                        :aspect="1"
+                        preview-size="w-24 h-24"
+                        :required="! $isEdit"
+                        hint="Maksimal 5MB. JPG, PNG, WEBP." />
                 </div>
             </div>
 
             <div class="lg:col-span-2">
-                <section class="csa-card p-5 space-y-4">
+                <section class="csa-panel p-5 space-y-4">
                     <h3 class="text-[14px] font-semibold text-[var(--text-primary)]">Informasi Foto</h3>
-                    <div>
-                        <label for="album_id" class="block text-[13px] font-medium text-[var(--text-secondary)] mb-1.5">Album</label>
-                        <select name="album_id" id="album_id" required class="csa-input">
-                            <option value="">Pilih album</option>
-                            @foreach($albums as $album)
-                                <option value="{{ $album->id }}" @selected(old('album_id', $gallery->album_id ?? '') == $album->id)>{{ $album->title }}</option>
-                            @endforeach
-                        </select>
-                        @error('album_id')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
-                    </div>
+                    <x-form.select name="album_id" id="album_id" label="Album" required
+                        :value="old('album_id', $gallery->album_id ?? '')" placeholder="Pilih album"
+                        :options="collect($albums)->mapWithKeys(fn ($a) => [$a->id => $a->title])->all()" />
                     <x-form.input name="caption" id="caption" label="Keterangan" :value="old('caption', $gallery->caption ?? '')" placeholder="Deskripsi singkat foto ini..." />
                 </section>
             </div>
@@ -70,20 +58,3 @@
     </form>
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    function previewImage(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const preview = document.getElementById('image-preview');
-            preview.src = e.target.result;
-            preview.classList.remove('hidden');
-            document.getElementById('image-placeholder').classList.add('hidden');
-        };
-        reader.readAsDataURL(file);
-    }
-</script>
-@endpush
