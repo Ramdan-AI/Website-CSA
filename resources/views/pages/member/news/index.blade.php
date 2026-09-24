@@ -12,10 +12,10 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Baca berita dan informasi terbaru dari UKM CSA.</p>
     </div>
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
+    <form method="GET" data-ajax-filter class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau isi berita..." class="csa-input pl-10" aria-label="Cari berita">
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau isi berita..." class="csa-input !pl-[42px] !rounded-full csa-search-input" aria-label="Cari berita">
         </div>
         <x-form.select name="category_id" :value="request('category_id')" onchange="this.form.submit()" class="sm:w-44" aria-label="Kategori"
             placeholder="Semua Kategori"

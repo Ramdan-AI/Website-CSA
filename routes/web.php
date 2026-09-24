@@ -213,14 +213,15 @@ Route::prefix('{roleSlug}')
         Route::get('events/{event}/scan/{code}', [AttendanceManagerController::class, 'scanAttendance'])->name('attendance.scan');
 
         // News & Documents
+        // Kategori berita dikelola lewat modal di halaman Berita, jadi hanya
+        // butuh aksi tulis (store/update/destroy).
         Route::middleware(['can:manage-news'])->group(function () {
-            Route::resource('news-categories', NewsCategoryController::class)->except(['show']);
+            Route::resource('news-categories', NewsCategoryController::class)->only(['store', 'update', 'destroy']);
             Route::resource('news', NewsController::class)->except(['show']);
         });
 
         // Akses baca untuk semua role. Didaftarkan setelah resource CRUD agar
         // route {news} tidak menangkap "create"/"edit".
-        Route::resource('news-categories', NewsCategoryController::class)->only(['show']);
         Route::resource('news', NewsController::class)->only(['show']);
 
         Route::middleware(['can:manage-documents'])->group(function () {

@@ -33,14 +33,11 @@ class AttendanceManagerController extends Controller
                 'attendances as sick_count' => fn ($q) => $q->where('status', 'sick'),
                 'attendances as absent_count' => fn ($q) => $q->where('status', 'absent'),
             ])
-            ->when($validated['search'] ?? null, fn ($query, $search) =>
-                $query->where('title', 'like', "%{$search}%")
+            ->when($validated['search'] ?? null, fn ($query, $search) => $query->where('title', 'like', "%{$search}%")
             )
-            ->when($validated['date_from'] ?? null, fn ($query, $date) =>
-                $query->whereDate('event_date', '>=', $date)
+            ->when($validated['date_from'] ?? null, fn ($query, $date) => $query->whereDate('event_date', '>=', $date)
             )
-            ->when($validated['date_to'] ?? null, fn ($query, $date) =>
-                $query->whereDate('event_date', '<=', $date)
+            ->when($validated['date_to'] ?? null, fn ($query, $date) => $query->whereDate('event_date', '<=', $date)
             )
             ->when($sort === 'date_asc', fn ($query) => $query->orderBy('event_date'))
             ->when($sort === 'date_desc', fn ($query) => $query->orderByDesc('event_date'))
@@ -79,16 +76,16 @@ class AttendanceManagerController extends Controller
         Gate::authorize('manage-attendances');
 
         try {
-            $enabled = !$event->attendance_enabled;
-            $event->update([
-                'attendance_enabled' => $enabled,
-                'attendance_code' => $enabled ? strtoupper(Str::random(6)) : null,
-            ]);
+            $enabled = ! $event->self_attendance_enabled;
+            $event->update(['self_attendance_enabled' => $enabled]);
 
-            return redirect()->back()->with('success', $enabled ? 'Presensi mandiri diaktifkan.' : 'Presensi mandiri dinonaktifkan.');
+            return redirect()->back()->with('success', $enabled
+                ? 'Presensi mandiri diaktifkan.'
+                : 'Presensi mandiri dinonaktifkan. Anggota harus scan QR.');
         } catch (\Exception $e) {
-            Log::error('Toggle attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
-            return redirect()->back()->with('error', 'Gagal mengubah status presensi.');
+            Log::error('Toggle self attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
+            return redirect()->back()->with('error', 'Gagal mengubah status presensi mandiri.');
         }
     }
 
@@ -98,6 +95,8 @@ class AttendanceManagerController extends Controller
 
         try {
             $event->update([
+                'attendance_enabled' => true,
+                'attendance_code' => $event->attendance_code ?: strtoupper(Str::random(6)),
                 'attendance_opened_at' => now(),
                 'attendance_closed_at' => null,
             ]);
@@ -105,6 +104,7 @@ class AttendanceManagerController extends Controller
             return redirect()->back()->with('success', 'Sesi presensi dibuka.');
         } catch (\Exception $e) {
             Log::error('Open attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal membuka sesi presensi.');
         }
     }
@@ -114,10 +114,37 @@ class AttendanceManagerController extends Controller
         Gate::authorize('manage-attendances');
 
         try {
-            $event->update(['attendance_closed_at' => now()]);
-            return redirect()->back()->with('success', 'Sesi presensi ditutup.');
+            $event->update([
+                'attendance_closed_at' => now(),
+                'self_attendance_enabled' => false,
+            ]);
+
+            // Setelah sesi ditutup, anggota yang belum hadir/izin/sakit otomatis Alfa.
+            $recorded = Attendance::where('event_id', $event->id)->pluck('member_id');
+
+            $absent = Member::whereNotIn('id', $recorded)
+                ->where('is_active', true)
+                ->pluck('id');
+
+            $now = now();
+            $rows = $absent->map(fn ($memberId) => [
+                'event_id' => $event->id,
+                'member_id' => $memberId,
+                'status' => 'absent',
+                'note' => null,
+                'check_in_at' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ])->all();
+
+            if ($rows !== []) {
+                Attendance::insert($rows);
+            }
+
+            return redirect()->back()->with('success', 'Sesi presensi ditutup. '.count($rows).' anggota ditandai Alfa.');
         } catch (\Exception $e) {
             Log::error('Close attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal menutup sesi presensi.');
         }
     }
@@ -127,12 +154,12 @@ class AttendanceManagerController extends Controller
         Gate::authorize('manage-attendances');
 
         try {
-            if (!$event->attendance_enabled) {
+            if (! $event->attendance_enabled) {
                 $event->update([
                     'attendance_enabled' => true,
                     'attendance_code' => strtoupper(Str::random(6)),
                 ]);
-            } elseif (!$event->attendance_code) {
+            } elseif (! $event->attendance_code) {
                 $event->update(['attendance_code' => strtoupper(Str::random(6))]);
             }
 
@@ -145,6 +172,7 @@ class AttendanceManagerController extends Controller
             ]);
         } catch (\Exception $e) {
             Log::error('Generate QR failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal membuat QR presensi.');
         }
     }
@@ -153,7 +181,7 @@ class AttendanceManagerController extends Controller
     {
         Gate::authorize('manage-attendances');
 
-        if (!$event->attendance_enabled || !$event->attendance_code) {
+        if (! $event->attendance_enabled || ! $event->attendance_code) {
             $event->update([
                 'attendance_enabled' => true,
                 'attendance_code' => strtoupper(Str::random(6)),
@@ -192,14 +220,14 @@ class AttendanceManagerController extends Controller
             return redirect()->back()->with('success', 'Data presensi berhasil diperbarui.');
         } catch (\Exception $e) {
             Log::error('Bulk attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal memperbarui data presensi.');
         }
     }
 
-
     public function scanAttendance(Request $request, Event $event, $code)
     {
-        if (!$event->attendance_enabled || $event->attendance_code !== $code) {
+        if (! $event->attendance_enabled || $event->attendance_code !== $code) {
             return response()->json(['error' => 'Kode presensi tidak valid'], 403);
         }
 
@@ -208,7 +236,7 @@ class AttendanceManagerController extends Controller
         }
 
         $member = auth()->user()->member;
-        if (!$member) {
+        if (! $member) {
             return response()->json(['error' => 'Data anggota tidak ditemukan'], 404);
         }
 
@@ -232,17 +260,18 @@ class AttendanceManagerController extends Controller
 
             return response()->json([
                 'message' => 'Kehadiran berhasil dicatat',
-                'attendance' => $attendance
+                'attendance' => $attendance,
             ]);
         } catch (\Exception $e) {
             Log::error('Scan attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
             return response()->json(['error' => 'Gagal mencatat kehadiran'], 500);
         }
     }
 
     public function selfAttendance(Request $request, Event $event)
     {
-        if (!$event->attendance_enabled) {
+        if (! $event->attendance_enabled) {
             return redirect()->back()->with('error', 'Presensi belum diaktifkan untuk kegiatan ini.');
         }
 
@@ -251,7 +280,7 @@ class AttendanceManagerController extends Controller
         }
 
         $member = auth()->user()->member;
-        if (!$member) {
+        if (! $member) {
             return redirect()->back()->with('error', 'Data anggota tidak ditemukan.');
         }
 
@@ -276,6 +305,7 @@ class AttendanceManagerController extends Controller
             return redirect()->back()->with('success', 'Kehadiran berhasil dicatat.');
         } catch (\Exception $e) {
             Log::error('Self attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal mencatat kehadiran. Silakan coba lagi.');
         }
     }
@@ -311,6 +341,7 @@ class AttendanceManagerController extends Controller
             return redirect()->back()->with('success', 'Data kehadiran berhasil disimpan.');
         } catch (\Exception $e) {
             Log::error('Manual attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);
+
             return redirect()->back()->with('error', 'Gagal menyimpan data kehadiran.');
         }
     }
@@ -323,24 +354,24 @@ class AttendanceManagerController extends Controller
             ->where('event_id', $event->id)
             ->get();
 
-        $filename = "presensi_{$event->slug}_" . date('Y-m-d') . '.csv';
+        $filename = "presensi_{$event->slug}_".date('Y-m-d').'.csv';
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function() use ($attendances, $event) {
+        $callback = function () use ($attendances, $event) {
             $file = fopen('php://output', 'w');
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
-            
+
             fputcsv($file, [
-                'Kegiatan', 
-                'Nama', 
-                'NIM', 
+                'Kegiatan',
+                'Nama',
+                'NIM',
                 'Divisi',
                 'Status',
                 'Waktu Check-in',
-                'Dicatat Pada'
+                'Dicatat Pada',
             ]);
 
             foreach ($attendances as $attendance) {
@@ -351,7 +382,7 @@ class AttendanceManagerController extends Controller
                     $attendance->member->division->name ?? '-',
                     ['present' => 'Hadir', 'permit' => 'Izin', 'sick' => 'Sakit', 'absent' => 'Alfa'][$attendance->status] ?? $attendance->status,
                     $attendance->check_in_at ? $attendance->check_in_at->format('d/m/Y H:i:s') : '-',
-                    $attendance->created_at->format('d/m/Y H:i:s')
+                    $attendance->created_at->format('d/m/Y H:i:s'),
                 ]);
             }
 
@@ -377,7 +408,7 @@ class AttendanceManagerController extends Controller
             'permit' => $stats->permit ?? 0,
             'sick' => $stats->sick ?? 0,
             'absent' => $stats->absent ?? 0,
-            'attendance_rate' => $stats->total > 0 ? round(($stats->present / $stats->total) * 100, 1) : 0
+            'attendance_rate' => $stats->total > 0 ? round(($stats->present / $stats->total) * 100, 1) : 0,
         ]);
     }
 }

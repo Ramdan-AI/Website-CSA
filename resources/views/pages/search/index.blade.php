@@ -9,9 +9,9 @@
 
     <form method="GET" action="{{ route('admin.search') }}" class="csa-panel p-3 sm:p-4">
         <div class="relative">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <x-admin.icon name="search" :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="q" value="{{ $query }}" placeholder="Ketik minimal 2 huruf..."
-                class="csa-input pl-10" aria-label="Cari di seluruh sistem" autofocus>
+                class="csa-input !pl-[42px]" aria-label="Cari di seluruh sistem" autofocus>
             @error('q')<p class="text-[12px] text-red-500 mt-2">{{ $message }}</p>@enderror
         </div>
     </form>

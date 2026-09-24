@@ -6,7 +6,7 @@
 @endphp
 
 @section('content')
-<div class="space-y-4 sm:space-y-5 max-w-3xl">
+<div class="space-y-6 max-w-3xl">
     <div>
         <a href="{{ route('admin.events.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
             <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Kegiatan
@@ -31,7 +31,7 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <x-form.input name="event_date" id="event_date" type="date" label="Tanggal Pelaksanaan"
+            <x-form.date name="event_date" id="event_date" label="Tanggal Pelaksanaan"
                 :value="old('event_date', isset($event) && $event->event_date ? $event->event_date->format('Y-m-d') : '')" required />
             <x-form.select name="status" id="status" label="Status" required
                 :value="old('status', $event->status ?? 'draft')"

@@ -25,11 +25,11 @@
         @endforeach
     </section>
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
+    <form method="GET" data-ajax-filter class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
             <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama kegiatan..."
-                class="csa-input pl-10" aria-label="Cari kegiatan">
+                class="csa-input !pl-[42px] !rounded-full csa-search-input" aria-label="Cari kegiatan">
         </div>
         <x-form.select name="status" :value="request('status')" onchange="this.form.submit()" class="sm:w-40" aria-label="Filter status"
             placeholder="Semua Status"
@@ -67,6 +67,9 @@
                             <td class="csa-table-td whitespace-nowrap">{{ $attendance->event->event_date?->translatedFormat('d M Y') }}</td>
                             <td class="csa-table-td">
                                 <span class="csa-chip {{ $statusMap[$attendance->status][1] ?? 'csa-chip-blue' }}">{{ $statusMap[$attendance->status][0] ?? 'Tercatat' }}</span>
+                                @if ($attendance->note)
+                                    <p class="text-[11px] text-[var(--text-muted)] mt-1 max-w-[200px]">{{ $attendance->note }}</p>
+                                @endif
                             </td>
                             <td class="csa-table-td whitespace-nowrap">{{ $attendance->check_in_at?->format('H:i') ?? '-' }}</td>
                         </tr>

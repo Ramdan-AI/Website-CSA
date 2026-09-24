@@ -9,7 +9,7 @@
 @endphp
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <a href="{{ route('admin.events.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">

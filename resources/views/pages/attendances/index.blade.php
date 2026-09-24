@@ -1,24 +1,27 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div>
         <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Presensi Kegiatan</h1>
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Rekap kehadiran seluruh kegiatan UKM CSA.</p>
     </div>
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+    <form method="GET" data-ajax-filter class="csa-panel p-4 space-y-3">
         <div class="relative">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama kegiatan..." class="csa-input pl-10" aria-label="Cari kegiatan">
+            <x-admin.icon name="search" :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama kegiatan..." class="csa-input !pl-[48px] !rounded-full csa-search-input" aria-label="Cari kegiatan">
         </div>
-        <input type="date" name="date_from" value="{{ request('date_from') }}" class="csa-input" aria-label="Dari tanggal">
-        <input type="date" name="date_to" value="{{ request('date_to') }}" class="csa-input" aria-label="Sampai tanggal">
-        <x-form.select name="sort" :value="request('sort', 'date_desc')" onchange="this.form.submit()" aria-label="Urutkan"
-            :options="['date_desc' => 'Tanggal terbaru', 'date_asc' => 'Tanggal terlama', 'title_asc' => 'Nama A-Z', 'title_desc' => 'Nama Z-A']" />
-        <div class="flex gap-2">
-            <button type="submit" class="csa-btn csa-btn-primary flex-1">Cari</button>
-            <a href="{{ route('admin.attendances.index') }}" class="csa-btn csa-btn-ghost">Reset</a>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <x-form.date name="date_from" :value="request('date_from')" placeholder="Dari tanggal" aria-label="Dari tanggal" />
+            <x-form.date name="date_to" :value="request('date_to')" placeholder="Sampai tanggal" aria-label="Sampai tanggal" />
+            <x-form.select name="sort" :value="request('sort', 'date_desc')" onchange="this.form.submit()" aria-label="Urutkan"
+                :options="['date_desc' => 'Tanggal terbaru', 'date_asc' => 'Tanggal terlama', 'title_asc' => 'Nama A-Z', 'title_desc' => 'Nama Z-A']" />
+            <div class="flex gap-2">
+                <button type="submit" class="csa-btn csa-btn-primary flex-1">Cari</button>
+                <a href="{{ route('admin.attendances.index') }}" class="csa-btn csa-btn-ghost">Reset</a>
+            </div>
         </div>
     </form>
 

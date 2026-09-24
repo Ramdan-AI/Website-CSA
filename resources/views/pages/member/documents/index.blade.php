@@ -25,10 +25,10 @@
         <p class="text-[13px] text-[var(--text-muted)] mt-1">Akses dan unduh dokumen penting UKM CSA.</p>
     </div>
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
+    <form method="GET" data-ajax-filter class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
         <div class="relative">
             <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama dokumen..." class="csa-input pl-10" aria-label="Cari dokumen">
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama dokumen..." class="csa-input !pl-[42px] !rounded-full csa-search-input" aria-label="Cari dokumen">
         </div>
         <x-form.select name="sort" :value="request('sort', 'newest')" onchange="this.form.submit()" class="sm:w-48" aria-label="Urutkan"
             :options="['newest' => 'Terbaru', 'oldest' => 'Terlama', 'title_asc' => 'Nama A-Z', 'title_desc' => 'Nama Z-A']" />

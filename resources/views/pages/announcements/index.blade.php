@@ -16,19 +16,17 @@
         <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
-    <form method="GET" class="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div class="relative flex-1">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau isi pengumuman..."
-                class="csa-input pl-10 !rounded-full" aria-label="Cari pengumuman">
-        </div>
-        <x-form.select name="category" :value="$category" onchange="this.form.submit()" class="sm:w-48"
-            placeholder="Semua kategori"
-            :options="['info' => 'Informasi', 'penting' => 'Penting', 'urgent' => 'Penting Sekali']" />
-        <button type="submit" class="csa-btn csa-btn-primary sm:w-auto">
-            <x-admin.icon name="search" :size="16" /> Cari
-        </button>
-    </form>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <x-admin.search-bar name="search" :value="request('search')" placeholder="Cari judul atau isi pengumuman..." class="flex-1" />
+        <form method="GET" class="sm:w-48">
+            @if (request('search'))
+                <input type="hidden" name="search" value="{{ request('search') }}">
+            @endif
+            <x-form.select name="category" :value="$category" onchange="this.form.submit()"
+                placeholder="Semua kategori"
+                :options="['info' => 'Informasi', 'penting' => 'Penting', 'urgent' => 'Penting Sekali']" />
+        </form>
+    </div>
 
     @if ($announcements->isEmpty())
         <div class="csa-panel p-16 text-center">

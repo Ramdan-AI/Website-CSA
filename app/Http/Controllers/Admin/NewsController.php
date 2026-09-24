@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\NewsRequest;
+use App\Models\News;
+use App\Models\NewsCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use App\Models\News;
-use App\Models\NewsCategory;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\NewsRequest;
 
 class NewsController extends Controller
 {
@@ -24,17 +24,14 @@ class NewsController extends Controller
         $sort = $validated['sort'] ?? 'newest';
 
         $news = News::with(['category', 'author'])
-            ->when($validated['search'] ?? null, fn ($query, $search) =>
-                $query->where(function ($sub) use ($search) {
-                    $sub->where('title', 'like', "%{$search}%")
-                        ->orWhere('content', 'like', "%{$search}%");
-                })
+            ->when($validated['search'] ?? null, fn ($query, $search) => $query->where(function ($sub) use ($search) {
+                $sub->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            })
             )
-            ->when($validated['category_id'] ?? null, fn ($query, $categoryId) =>
-                $query->where('category_id', $categoryId)
+            ->when($validated['category_id'] ?? null, fn ($query, $categoryId) => $query->where('category_id', $categoryId)
             )
-            ->when($validated['status'] ?? null, fn ($query, $status) =>
-                $query->where('status', $status)
+            ->when($validated['status'] ?? null, fn ($query, $status) => $query->where('status', $status)
             )
             ->when($sort === 'oldest', fn ($query) => $query->oldest())
             ->when($sort === 'title_asc', fn ($query) => $query->orderBy('title'))
@@ -82,12 +79,16 @@ class NewsController extends Controller
             }
         }
 
+        $thumbnail = $request->hasFile('thumbnail')
+            ? $request->file('thumbnail')->store('news', 'public')
+            : ($images[0] ?? null);
+
         News::create([
             'category_id' => $request->category_id,
             'user_id' => Auth::id(),
             'title' => $request->title,
             'content' => $request->content,
-            'thumbnail' => $images[0] ?? null,
+            'thumbnail' => $thumbnail,
             'images' => $images,
             'status' => $request->status,
             'published_at' => $request->published_at,
@@ -136,11 +137,22 @@ class NewsController extends Controller
             }
         }
 
+        $thumbnail = $news->thumbnail;
+
+        if ($request->hasFile('thumbnail')) {
+            if ($news->thumbnail) {
+                Storage::disk('public')->delete($news->thumbnail);
+            }
+            $thumbnail = $request->file('thumbnail')->store('news', 'public');
+        } elseif (empty($images) === false && ! $news->thumbnail) {
+            $thumbnail = $images[0];
+        }
+
         $news->update([
             'category_id' => $request->category_id,
             'title' => $request->title,
             'content' => $request->content,
-            'thumbnail' => $images[0] ?? null,
+            'thumbnail' => $thumbnail,
             'images' => $images,
             'status' => $request->status,
             'published_at' => $request->published_at,

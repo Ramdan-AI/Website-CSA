@@ -35,7 +35,6 @@ return [
         'admin.minutes' => 'Notulen Rapat',
         'admin.announcements' => 'Pengumuman',
 
-        'admin.news-categories' => 'Kategori Berita',
         'admin.news' => 'Berita',
         'admin.documents' => 'Dokumen',
         'admin.albums' => 'Album',
@@ -133,14 +132,13 @@ return [
             ],
         ],
 
-        // Publikasi: berita dan dokumen yang tampil ke publik.
+        // Publikasi: berita (termasuk kategori) dan dokumen.
         [
             'id' => 'publication',
             'label' => 'Publikasi',
             'color' => 'teal',
             'permissions' => ['manage-news', 'manage-documents'],
             'items' => [
-                ['icon' => 'tags', 'label' => 'Kategori Berita', 'route' => 'admin.news-categories.index', 'pattern' => 'admin.news-categories.*', 'permission' => 'manage-news'],
                 ['icon' => 'newspaper', 'label' => 'Berita', 'route' => 'admin.news.index', 'pattern' => 'admin.news.*', 'permission' => 'manage-news'],
                 ['icon' => 'folder-open', 'label' => 'Dokumen', 'route' => 'admin.documents.index', 'pattern' => 'admin.documents.*', 'permission' => 'manage-documents'],
             ],
@@ -173,23 +171,14 @@ return [
         ],
 
         [
-            'id' => 'operational',
-            'label' => 'Keanggotaan',
-            'color' => 'orange',
-            'permissions' => ['manage-members', 'manage-attendances'],
-            'items' => [
-                ['icon' => 'users', 'label' => 'Anggota', 'route' => 'admin.members.index', 'pattern' => 'admin.members.*', 'permission' => 'manage-members'],
-                ['icon' => 'clipboard-check', 'label' => 'Kehadiran', 'route' => 'admin.attendances.index', 'pattern' => 'admin.attendances.*', 'permission' => 'manage-attendances'],
-            ],
-        ],
-
-        [
             'id' => 'events',
             'label' => 'Kegiatan',
             'color' => 'cyan',
-            'permissions' => ['manage-events', 'view-events'],
+            'permissions' => ['manage-events', 'view-events', 'manage-members', 'manage-attendances'],
             'items' => [
                 ['icon' => 'calendar-days', 'label' => 'Acara', 'route' => 'admin.events.index', 'pattern' => 'admin.events.*'],
+                ['icon' => 'users', 'label' => 'Anggota', 'route' => 'admin.members.index', 'pattern' => 'admin.members.*', 'permission' => 'manage-members'],
+                ['icon' => 'clipboard-check', 'label' => 'Kehadiran', 'route' => 'admin.attendances.index', 'pattern' => 'admin.attendances.*', 'permission' => 'manage-attendances'],
             ],
         ],
 

@@ -6,7 +6,7 @@
         $title = $isEdit ? 'Edit Jabatan' : 'Tambah Jabatan';
     @endphp
 
-    <div class="space-y-4 sm:space-y-5">
+    <div class="space-y-6">
         <div>
             <a href="{{ route('admin.positions.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
                 <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Jabatan

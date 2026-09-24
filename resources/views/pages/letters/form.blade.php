@@ -35,7 +35,7 @@
                 :value="old('type', $letter->type ?? 'incoming')"
                 :options="['incoming' => 'Surat Masuk', 'outgoing' => 'Surat Keluar']" />
 
-            <x-form.input name="letter_date" id="letter_date" type="date" label="Tanggal Surat"
+            <x-form.date name="letter_date" id="letter_date" label="Tanggal Surat"
                 :value="old('letter_date', $isEdit ? $letter->letter_date->format('Y-m-d') : now()->format('Y-m-d'))" required />
         </div>
 

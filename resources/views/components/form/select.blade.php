@@ -151,10 +151,17 @@
                     this.$dispatch('select-changed', { value: this.value });
 
                     if (this.onChange) {
-                        // Pastikan hidden input sudah ter-update sebelum submit.
                         const form = this.$el.closest('form');
                         this.$nextTick(() => {
-                            new Function('event', this.onChange).call({ form }, { target: this.$el });
+                            // Filter AJAX: kirim lewat helper agar data diperbarui
+                            // tanpa reload. Fallback ke onchange inline bila lain.
+                            if (form && form.hasAttribute('data-ajax-filter') && window.adminAjaxSubmit) {
+                                window.adminAjaxSubmit(form);
+                            } else if (form && this.onChange.includes('submit()')) {
+                                form.requestSubmit();
+                            } else {
+                                new Function('event', this.onChange).call({ form }, { target: this.$el });
+                            }
                         });
                     }
                 },

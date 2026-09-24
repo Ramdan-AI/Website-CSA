@@ -1,16 +1,18 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Jabatan</h1>
             <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola jabatan dan atur anggota untuk setiap posisi.</p>
         </div>
-        <a href="{{ route('admin.positions.create') }}" class="csa-btn csa-btn-primary">
+        <a href="{{ route('admin.positions.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
             <x-admin.icon name="plus" :size="16" /> Tambah Jabatan
         </a>
     </div>
+
+    <x-admin.search-bar name="search" :value="request('search')" placeholder="Cari nama atau deskripsi jabatan..." class="max-w-md" />
 
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         @forelse($positions as $position)

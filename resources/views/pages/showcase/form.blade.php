@@ -140,7 +140,7 @@
             <div class="relative">
                 <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
                 <input type="search" x-model="query" placeholder="Cari nama atau NIM anggota..."
-                    class="csa-input pl-10" aria-label="Cari anggota">
+                    class="csa-input !pl-[42px]" aria-label="Cari anggota">
             </div>
 
             <div class="max-h-72 overflow-y-auto rounded-xl border border-[var(--border-soft)] divide-y divide-[var(--border-soft)]">

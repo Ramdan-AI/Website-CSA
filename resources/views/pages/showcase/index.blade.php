@@ -16,10 +16,10 @@
         <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
-        <div class="relative">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari proyek..." class="csa-input pl-10" aria-label="Cari proyek">
+    <form method="GET" class="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="relative flex-1">
+            <x-admin.icon name="search" :size="17" class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari proyek..." class="csa-input !pl-[42px] !rounded-full csa-search-input" aria-label="Cari proyek">
         </div>
 
         @if ($canManageAll)

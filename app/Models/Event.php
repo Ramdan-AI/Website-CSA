@@ -21,6 +21,7 @@ class Event extends Model
         'registration_link',
         'status',
         'attendance_enabled',
+        'self_attendance_enabled',
         'attendance_code',
         'qr_code',
         'attendance_opened_at',
@@ -42,6 +43,7 @@ class Event extends Model
             'event_date' => 'date',
             'status' => 'string',
             'attendance_enabled' => 'boolean',
+            'self_attendance_enabled' => 'boolean',
             'attendance_opened_at' => 'datetime',
             'attendance_closed_at' => 'datetime',
         ];

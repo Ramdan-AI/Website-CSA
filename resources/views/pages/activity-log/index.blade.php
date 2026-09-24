@@ -85,10 +85,10 @@
         </form>
     </div>
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-3">
+    <form method="GET" data-ajax-filter class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto_auto] gap-3">
         <div class="relative">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari deskripsi atau nama entitas..." class="csa-input pl-10" aria-label="Cari log">
+            <x-admin.icon name="search" :size="17" class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari deskripsi atau nama entitas..." class="csa-input !pl-[42px] !rounded-full csa-search-input" aria-label="Cari log">
         </div>
         <x-form.select name="action" :value="$action" onchange="this.form.submit()" class="sm:w-40" aria-label="Jenis aksi"
             placeholder="Semua aksi"

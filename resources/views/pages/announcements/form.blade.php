@@ -56,10 +56,10 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <x-form.input name="starts_at" id="starts_at" type="date" label="Mulai Tampil"
+                <x-form.date name="starts_at" id="starts_at" label="Mulai Tampil"
                     :value="old('starts_at', $isEdit && $announcement->starts_at ? $announcement->starts_at->format('Y-m-d') : '')"
                     hint="Kosongkan bila langsung tampil." />
-                <x-form.input name="ends_at" id="ends_at" type="date" label="Akhir Tampil"
+                <x-form.date name="ends_at" id="ends_at" label="Akhir Tampil"
                     :value="old('ends_at', $isEdit && $announcement->ends_at ? $announcement->ends_at->format('Y-m-d') : '')"
                     hint="Kosongkan bila tampil terus." />
             </div>

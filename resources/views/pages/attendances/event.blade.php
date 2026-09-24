@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <a href="{{ route('admin.attendances.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
@@ -13,8 +13,9 @@
         <div class="flex flex-wrap gap-2">
             <form method="POST" action="{{ route('admin.attendance.toggle', $event) }}">
                 @csrf
-                <button class="csa-btn {{ $event->attendance_enabled ? 'csa-btn-danger' : 'csa-btn-ghost' }} !min-h-[40px] !px-4 !text-[12px]">
-                    {{ $event->attendance_enabled ? 'Nonaktifkan Mandiri' : 'Aktifkan Mandiri' }}
+                <button class="csa-btn {{ $event->self_attendance_enabled ? 'csa-btn-danger' : 'csa-btn-ghost' }} !min-h-[40px] !px-4 !text-[12px]"
+                    @disabled(! $event->attendance_enabled || $event->attendance_closed_at)>
+                    {{ $event->self_attendance_enabled ? 'Nonaktifkan Mandiri' : 'Aktifkan Mandiri' }}
                 </button>
             </form>
             @if($event->attendance_enabled && !$event->attendance_closed_at)
@@ -25,7 +26,7 @@
             @else
                 <form method="POST" action="{{ route('admin.attendance.open', $event) }}">
                     @csrf
-                    <button class="csa-btn csa-btn-ghost !min-h-[40px] !px-4 !text-[12px]">Buka Sesi</button>
+                    <button class="csa-btn csa-btn-primary !min-h-[40px] !px-4 !text-[12px]">Buka Sesi</button>
                 </form>
             @endif
             <a href="{{ route('admin.attendances.qr', $event) }}" class="csa-btn csa-btn-ghost !min-h-[40px] !px-4 !text-[12px]">

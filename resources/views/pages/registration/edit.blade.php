@@ -37,10 +37,10 @@
             </label>
 
             <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <x-form.input name="registration_opens_at" id="registration_opens_at" type="datetime-local" label="Buka Pendaftaran"
+                <x-form.date name="registration_opens_at" id="registration_opens_at" :withTime="true" label="Buka Pendaftaran"
                     :value="old('registration_opens_at', $setting->registration_opens_at?->format('Y-m-d\TH:i'))"
                     hint="Kosongkan bila tidak memakai jadwal." />
-                <x-form.input name="registration_closes_at" id="registration_closes_at" type="datetime-local" label="Tutup Pendaftaran"
+                <x-form.date name="registration_closes_at" id="registration_closes_at" :withTime="true" label="Tutup Pendaftaran"
                     :value="old('registration_closes_at', $setting->registration_closes_at?->format('Y-m-d\TH:i'))"
                     hint="Setelah tanggal ini, pendaftaran otomatis ditutup." />
             </div>

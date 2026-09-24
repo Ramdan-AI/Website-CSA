@@ -1,24 +1,26 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div>
         <a href="{{ route('admin.news.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
             <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Berita
         </a>
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mt-2">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mt-3">
             <div>
-                <span class="text-[11px] font-medium text-[var(--accent-bright)]">{{ $news->category?->name ?? 'Tanpa Kategori' }}</span>
-                <h1 class="text-[22px] sm:text-[26px] font-bold text-[var(--text-primary)] tracking-[-0.03em] leading-tight mt-1">{{ $news->title }}</h1>
+                <span class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--accent-bright)]">{{ $news->category?->name ?? 'Tanpa Kategori' }}</span>
+                <h1 class="text-[22px] sm:text-[28px] font-bold text-[var(--text-primary)] tracking-[-0.03em] leading-tight mt-1.5">{{ $news->title }}</h1>
                 <div class="flex flex-wrap items-center gap-4 mt-3 text-[12px] text-[var(--text-muted)]">
                     <span class="inline-flex items-center gap-1.5"><x-admin.icon name="user-round" :size="14" /> {{ $news->author?->name ?? '-' }}</span>
                     <span class="inline-flex items-center gap-1.5"><x-admin.icon name="calendar-days" :size="14" /> {{ $news->published_at?->translatedFormat('d M Y') ?? $news->created_at->translatedFormat('d M Y') }}</span>
                     <span class="csa-chip {{ $news->status === 'published' ? 'csa-chip-green' : 'csa-chip-amber' }}">{{ ucfirst($news->status) }}</span>
                 </div>
             </div>
-            <a href="{{ route('admin.news.edit', $news) }}" class="csa-btn csa-btn-ghost shrink-0">
-                <x-admin.icon name="pen" :size="16" /> Edit
-            </a>
+            @can('manage-news')
+                <a href="{{ route('admin.news.edit', $news) }}" class="csa-btn csa-btn-ghost shrink-0">
+                    <x-admin.icon name="pen" :size="16" /> Edit
+                </a>
+            @endcan
         </div>
     </div>
 

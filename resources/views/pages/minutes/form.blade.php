@@ -43,7 +43,7 @@
                 placeholder="Contoh: Rapat Koordinasi Bulanan" required autofocus />
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <x-form.input name="meeting_date" id="meeting_date" type="date" label="Tanggal Rapat"
+                <x-form.date name="meeting_date" id="meeting_date" label="Tanggal Rapat"
                     :value="old('meeting_date', $isEdit ? $minute->meeting_date->format('Y-m-d') : now()->format('Y-m-d'))" required />
                 <x-form.input name="location" id="location" label="Tempat" :value="old('location', $minute->location ?? '')"
                     placeholder="Contoh: Ruang Rapat / Google Meet" />
@@ -76,7 +76,7 @@
 
             <div class="relative">
                 <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-                <input type="search" x-model="query" placeholder="Cari nama atau NIM anggota..." class="csa-input pl-10" aria-label="Cari peserta">
+                <input type="search" x-model="query" placeholder="Cari nama atau NIM anggota..." class="csa-input !pl-[42px]" aria-label="Cari peserta">
             </div>
 
             <div class="max-h-72 overflow-y-auto rounded-xl border border-[var(--border-soft)] divide-y divide-[var(--border-soft)]">

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="max-w-xl mx-auto space-y-4 sm:space-y-5">
+<div class="max-w-xl mx-auto space-y-6">
     <div>
         <a href="{{ route('admin.attendances.event', $event) }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
             <x-admin.icon name="arrow-left" :size="14" /> Kembali
@@ -21,15 +21,6 @@
         <div class="inline-block p-4 rounded-2xl bg-white">
             <img src="{{ $qrApiUrl }}" alt="QR Presensi" class="w-48 h-48 sm:w-56 sm:h-56">
         </div>
-
-        <div class="mt-6 p-4 rounded-xl bg-[var(--bg-muted)]">
-            <p class="text-[11px] font-medium text-[var(--text-muted)]">Kode Manual</p>
-            <p class="text-[26px] sm:text-[30px] font-bold font-mono tracking-[0.3em] text-[var(--text-primary)] mt-1 break-all">{{ $event->attendance_code }}</p>
-        </div>
-
-        <a href="{{ $scanUrl }}" target="_blank" rel="noopener" class="csa-btn csa-btn-ghost mt-4">
-            <x-admin.icon name="external-link" :size="16" /> Buka Link Presensi
-        </a>
     </div>
 </div>
 @endsection

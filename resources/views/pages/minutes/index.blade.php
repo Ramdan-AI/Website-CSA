@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Notulen Rapat</h1>
             <p class="text-[13px] text-[var(--text-muted)] mt-1">Catatan rapat, agenda, dan keputusan organisasi.</p>
         </div>
-        <a href="{{ route('admin.minutes.create') }}" class="csa-btn csa-btn-primary">
+        <a href="{{ route('admin.minutes.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
             <x-admin.icon name="plus" :size="16" /> Tambah Notulen
         </a>
     </div>
@@ -16,13 +16,7 @@
         <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
     @endif
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
-        <div class="relative">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari judul atau agenda rapat..." class="csa-input pl-10" aria-label="Cari notulen">
-        </div>
-        <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
-    </form>
+    <x-admin.search-bar name="search" :value="request('search')" placeholder="Cari judul atau agenda rapat..." class="max-w-md" />
 
     @if ($minutes->isEmpty())
         <div class="csa-panel p-12 text-center">

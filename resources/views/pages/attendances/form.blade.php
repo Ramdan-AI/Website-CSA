@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5 max-w-2xl">
+<div class="space-y-6 max-w-2xl">
     <div>
         <a href="{{ route('admin.attendances.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
             <x-admin.icon name="arrow-left" :size="14" /> Kembali

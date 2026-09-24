@@ -90,12 +90,16 @@
                             <p class="text-[12px] text-[var(--text-muted)] mt-0.5 inline-flex items-center gap-1.5"><x-admin.icon name="map-pin" :size="13" /> {{ $event->location ?? 'Online' }}</p>
                         </div>
                         @if($event->attendance_enabled && !$event->attendance_closed_at)
-                            <form action="{{ route('admin.member.attendance.self', $event) }}" method="POST" class="shrink-0">
-                                @csrf
-                                <button type="submit" class="csa-btn csa-btn-primary !min-h-[38px] !text-[12px] !px-4">
-                                    <x-admin.icon name="user-check" :size="14" /> Check-In
-                                </button>
-                            </form>
+                            @if($event->self_attendance_enabled)
+                                <form action="{{ route('admin.member.attendance.self', $event) }}" method="POST" class="shrink-0">
+                                    @csrf
+                                    <button type="submit" class="csa-btn csa-btn-primary !min-h-[38px] !text-[12px] !px-4">
+                                        <x-admin.icon name="user-check" :size="14" /> Presensi Mandiri
+                                    </button>
+                                </form>
+                            @else
+                                <span class="csa-chip csa-chip-amber shrink-0">Scan QR untuk presensi</span>
+                            @endif
                         @elseif($event->attendance_closed_at)
                             <span class="csa-chip shrink-0">Selesai</span>
                         @else
@@ -120,18 +124,20 @@
                         <th class="csa-table-th">Kegiatan</th>
                         <th class="csa-table-th">Tanggal</th>
                         <th class="csa-table-th">Status</th>
-                        <th class="csa-table-th">Check-in</th>
+                        <th class="csa-table-th">Waktu Presensi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($recentAttendances as $attendance)
+                        @php
+                            $statusLabel = ['present' => 'Hadir', 'permit' => 'Izin', 'sick' => 'Sakit', 'absent' => 'Alfa'][$attendance->status] ?? ucfirst($attendance->status);
+                            $statusClass = ['present' => 'csa-chip-green', 'permit' => 'csa-chip-amber', 'sick' => 'csa-chip-blue', 'absent' => 'csa-chip-red'][$attendance->status] ?? '';
+                        @endphp
                         <tr class="csa-table-row">
                             <td class="csa-table-td font-medium text-[var(--text-primary)]">{{ $attendance->event->title }}</td>
                             <td class="csa-table-td">{{ $attendance->event->event_date->translatedFormat('d M Y') }}</td>
                             <td class="csa-table-td">
-                                <span class="csa-chip {{ $attendance->status === 'present' ? 'csa-chip-green' : 'csa-chip-red' }}">
-                                    {{ $attendance->status === 'present' ? 'Hadir' : 'Absen' }}
-                                </span>
+                                <span class="csa-chip {{ $statusClass }}">{{ $statusLabel }}</span>
                             </td>
                             <td class="csa-table-td">{{ $attendance->check_in_at?->format('H:i') ?? '-' }}</td>
                         </tr>

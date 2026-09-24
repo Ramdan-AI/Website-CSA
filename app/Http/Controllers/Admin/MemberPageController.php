@@ -31,7 +31,7 @@ class MemberPageController extends Controller
     {
         $member = $this->member();
 
-        if (!$member) {
+        if (! $member) {
             abort(redirect()->route('admin.dashboard')
                 ->with('error', 'Akun Anda belum terhubung dengan data anggota.'));
         }
@@ -44,7 +44,7 @@ class MemberPageController extends Controller
         $member = $this->requireMember();
 
         $statsRow = Attendance::where('member_id', $member->id)
-            ->selectRaw("COUNT(*) as total")
+            ->selectRaw('COUNT(*) as total')
             ->selectRaw("SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present")
             ->selectRaw("SUM(CASE WHEN status = 'permit' THEN 1 ELSE 0 END) as permit")
             ->selectRaw("SUM(CASE WHEN status = 'sick' THEN 1 ELSE 0 END) as sick")
@@ -68,11 +68,9 @@ class MemberPageController extends Controller
 
         $attendances = Attendance::with('event')
             ->where('member_id', $member->id)
-            ->when($validated['search'] ?? null, fn ($query, $search) =>
-                $query->whereHas('event', fn ($sub) => $sub->where('title', 'like', "%{$search}%"))
+            ->when($validated['search'] ?? null, fn ($query, $search) => $query->whereHas('event', fn ($sub) => $sub->where('title', 'like', "%{$search}%"))
             )
-            ->when($validated['status'] ?? null, fn ($query, $status) =>
-                $query->where('status', $status)
+            ->when($validated['status'] ?? null, fn ($query, $status) => $query->where('status', $status)
             )
             ->when($sort === 'date_asc', fn ($query) => $query->orderBy(
                 Event::select('event_date')->whereColumn('events.id', 'attendances.event_id')
@@ -104,14 +102,12 @@ class MemberPageController extends Controller
 
         $news = News::with(['category', 'author'])
             ->where('status', 'published')
-            ->when($validated['search'] ?? null, fn ($query, $search) =>
-                $query->where(function ($sub) use ($search) {
-                    $sub->where('title', 'like', "%{$search}%")
-                        ->orWhere('content', 'like', "%{$search}%");
-                })
+            ->when($validated['search'] ?? null, fn ($query, $search) => $query->where(function ($sub) use ($search) {
+                $sub->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            })
             )
-            ->when($validated['category_id'] ?? null, fn ($query, $categoryId) =>
-                $query->where('category_id', $categoryId)
+            ->when($validated['category_id'] ?? null, fn ($query, $categoryId) => $query->where('category_id', $categoryId)
             )
             ->when($sort === 'published_asc', fn ($query) => $query->orderBy('published_at'))
             ->when($sort === 'published_desc', fn ($query) => $query->orderByDesc('published_at'))
@@ -136,8 +132,7 @@ class MemberPageController extends Controller
 
         $documents = Document::query()
             ->with('user')
-            ->when($validated['search'] ?? null, fn ($query, $search) =>
-                $query->where('title', 'like', "%{$search}%")
+            ->when($validated['search'] ?? null, fn ($query, $search) => $query->where('title', 'like', "%{$search}%")
             )
             ->when($sort === 'newest', fn ($query) => $query->latest())
             ->when($sort === 'oldest', fn ($query) => $query->oldest())
@@ -163,6 +158,7 @@ class MemberPageController extends Controller
                 'event_date',
                 'status',
                 'attendance_enabled',
+                'self_attendance_enabled',
                 'attendance_code',
                 'attendance_closed_at',
             ]);
@@ -181,17 +177,16 @@ class MemberPageController extends Controller
     {
         $member = $this->requireMember();
 
-        if (!$member->division) {
+        if (! $member->division) {
             return redirect()->route('admin.dashboard')->with('error', 'Anda belum memiliki divisi.');
         }
 
         $members = $member->division->members()
             ->with(['position'])
-            ->when($request->filled('search'), fn ($query) =>
-                $query->where(function ($sub) use ($request) {
-                    $sub->where('name', 'like', "%{$request->search}%")
-                        ->orWhere('nim', 'like', "%{$request->search}%");
-                })
+            ->when($request->filled('search'), fn ($query) => $query->where(function ($sub) use ($request) {
+                $sub->where('name', 'like', "%{$request->search}%")
+                    ->orWhere('nim', 'like', "%{$request->search}%");
+            })
             )
             ->orderBy('name')
             ->paginate(20)
@@ -225,8 +220,12 @@ class MemberPageController extends Controller
     {
         $member = $this->requireMember();
 
-        if ($error = $this->attendanceGuard($event, requireClosed: false)) {
-            return back()->with('error', $error);
+        if (! $event->attendance_enabled || $event->attendance_closed_at) {
+            return back()->with('error', 'Sesi presensi belum dibuka atau sudah ditutup.');
+        }
+
+        if (! $event->self_attendance_enabled) {
+            return back()->with('error', 'Presensi mandiri tidak diaktifkan. Silakan scan QR presensi.');
         }
 
         if ($this->attendanceTodayPassed($event)) {
@@ -244,7 +243,8 @@ class MemberPageController extends Controller
 
         $member = $this->requireMember();
 
-        if (!$event->attendance_enabled || $event->attendance_code !== $request->code) {
+        // QR hanya butuh sesi aktif, tidak bergantung preset mandiri.
+        if (! $event->attendance_enabled || $event->attendance_code !== $request->code) {
             return back()->with('error', 'Kode QR tidak valid atau tidak sesuai dengan kegiatan ini.');
         }
 
@@ -263,33 +263,45 @@ class MemberPageController extends Controller
     {
         $member = $this->requireMember();
 
-        if ($error = $this->attendanceGuard($event)) {
+        if ($error = $this->attendanceWindowGuard($event)) {
             return back()->with('error', $error);
         }
 
-        return $this->recordPresence($event, $member, 'sick', 'Status dicatat sebagai SAKIT.');
+        $validated = $request->validate([
+            'note' => ['required', 'string', 'max:255'],
+        ], [
+            'note.required' => 'Mohon isi alasan sakit Anda.',
+        ]);
+
+        return $this->recordPresence($event, $member, 'sick', 'Status dicatat sebagai SAKIT.', $validated['note']);
     }
 
     public function permitAttendance(Request $request, Event $event)
     {
         $member = $this->requireMember();
 
-        if ($error = $this->attendanceGuard($event)) {
+        if ($error = $this->attendanceWindowGuard($event)) {
             return back()->with('error', $error);
         }
 
-        return $this->recordPresence($event, $member, 'permit', 'Status dicatat sebagai IZIN.');
+        $validated = $request->validate([
+            'note' => ['required', 'string', 'max:255'],
+        ], [
+            'note.required' => 'Mohon isi alasan izin Anda.',
+        ]);
+
+        return $this->recordPresence($event, $member, 'permit', 'Status dicatat sebagai IZIN.', $validated['note']);
     }
 
     public function alfaAttendance(Request $request, Event $event)
     {
         $member = $this->requireMember();
 
-        if (!$event->attendance_enabled) {
+        if (! $event->attendance_enabled) {
             return back()->with('error', 'Presensi belum dibuka untuk kegiatan ini.');
         }
 
-        if (!$event->attendance_closed_at) {
+        if (! $event->attendance_closed_at) {
             return back()->with('error', 'Sesi presensi belum ditutup, tidak bisa menandai Alfa.');
         }
 
@@ -299,18 +311,13 @@ class MemberPageController extends Controller
     // ==================== HELPERS ====================
 
     /**
-     * Shared preconditions for member-driven attendance actions.
+     * Guard untuk aksi dalam sesi presensi (sakit/izin): sesi harus aktif
+     * dan belum ditutup. Tidak bergantung pada preset mandiri.
      */
-    private function attendanceGuard(Event $event, bool $requireClosed = false): ?string
+    private function attendanceWindowGuard(Event $event): ?string
     {
-        if (!$event->attendance_enabled) {
+        if (! $event->attendance_enabled) {
             return 'Presensi belum dibuka untuk kegiatan ini.';
-        }
-
-        if ($requireClosed) {
-            return !$event->attendance_closed_at
-                ? 'Sesi presensi belum ditutup.'
-                : null;
         }
 
         if ($event->attendance_closed_at) {
@@ -332,7 +339,7 @@ class MemberPageController extends Controller
     /**
      * Create or update the single attendance row for this member/event pair.
      */
-    private function recordPresence(Event $event, $member, string $status, string $message)
+    private function recordPresence(Event $event, $member, string $status, string $message, ?string $note = null)
     {
         $existing = Attendance::where('event_id', $event->id)
             ->where('member_id', $member->id)
@@ -340,6 +347,7 @@ class MemberPageController extends Controller
 
         $attributes = [
             'status' => $status,
+            'note' => $note,
             'check_in_at' => $status === 'present' ? now() : null,
         ];
 

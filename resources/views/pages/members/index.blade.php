@@ -1,23 +1,23 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Anggota</h1>
             <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola data anggota dan struktur keanggotaan CSA.</p>
         </div>
         @can('manage-members')
-            <a href="{{ route('admin.members.create') }}" class="csa-btn csa-btn-primary">
+            <a href="{{ route('admin.members.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
                 <x-admin.icon name="plus" :size="16" /> Tambah Anggota
             </a>
         @endcan
     </div>
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto] gap-3">
+    <form method="GET" data-ajax-filter class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto] gap-3">
         <div class="relative">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, email..." class="csa-input pl-10" aria-label="Cari anggota">
+            <x-admin.icon name="search" :size="17" class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, email..." class="csa-input !pl-[42px] !rounded-full csa-search-input" aria-label="Cari anggota">
         </div>
         <x-form.select name="division_id" :value="request('division_id')" onchange="this.form.submit()" aria-label="Filter divisi"
             placeholder="Semua Divisi"
@@ -39,6 +39,7 @@
             ['label' => 'Kontak'],
             ['label' => 'Divisi'],
             ['label' => 'Jabatan'],
+            ['label' => 'Tingkat', 'width' => 'w-28'],
             ['label' => 'Status'],
             ['label' => 'Aksi', 'width' => 'w-24'],
         ]"
@@ -81,6 +82,13 @@
                 </td>
                 <td class="csa-table-td">{{ $member->division->name ?? '-' }}</td>
                 <td class="csa-table-td">{{ $member->position->name ?? 'Belum ada' }}</td>
+                <td class="csa-table-td">
+                    @if ($member->level)
+                        <span class="csa-chip csa-chip-blue">{{ \App\Models\Member::LEVELS[$member->level]['label'] ?? 'Tingkat ' . $member->level }}</span>
+                    @else
+                        <span class="text-[12px] text-[var(--text-muted)]">—</span>
+                    @endif
+                </td>
                 <td class="csa-table-td">
                     <span class="csa-chip {{ $member->is_active ? 'csa-chip-green' : '' }}">{{ $member->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                 </td>

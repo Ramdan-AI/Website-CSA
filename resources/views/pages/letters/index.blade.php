@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Surat & Arsip</h1>
             <p class="text-[13px] text-[var(--text-muted)] mt-1">Catat surat masuk dan keluar organisasi.</p>
         </div>
-        <a href="{{ route('admin.letters.create') }}" class="csa-btn csa-btn-primary">
+        <a href="{{ route('admin.letters.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
             <x-admin.icon name="plus" :size="16" /> Catat Surat
         </a>
     </div>
@@ -27,16 +27,18 @@
         </div>
     </div>
 
-    <form method="GET" class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-[1fr_auto_auto] gap-3">
-        <div class="relative">
-            <x-admin.icon name="search" :size="16" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
-            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nomor, perihal, atau pengirim..." class="csa-input pl-10" aria-label="Cari surat">
+    <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+        <x-admin.search-bar name="search" :value="request('search')" placeholder="Cari nomor, perihal, atau pengirim..." class="lg:max-w-md flex-1" />
+
+        <div class="inline-flex items-center gap-1 p-1 rounded-full bg-[var(--bg-muted)] lg:ml-auto w-fit">
+            @foreach (['' => 'Semua', 'incoming' => 'Masuk', 'outgoing' => 'Keluar'] as $value => $label)
+                <a href="{{ route('admin.letters.index', array_filter(['type' => $value, 'search' => request('search')])) }}" data-ajax-link
+                    class="px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-colors {{ $type === $value ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]' }}">
+                    {{ $label }}
+                </a>
+            @endforeach
         </div>
-        <x-form.select name="type" :value="$type" onchange="this.form.submit()" aria-label="Jenis surat"
-            placeholder="Semua jenis"
-            :options="['incoming' => 'Surat Masuk', 'outgoing' => 'Surat Keluar']" />
-        <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
-    </form>
+    </div>
 
     <x-admin.table :headers="[
         ['label' => 'Nomor'],
