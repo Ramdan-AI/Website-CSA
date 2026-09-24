@@ -1,275 +1,241 @@
 @extends('layouts.admin')
 
+@php
+    $rupiah = fn ($value) => 'Rp ' . number_format((float) $value, 0, ',', '.');
+    $compact = function ($value) {
+        $value = (float) $value;
+        if ($value >= 1_000_000_000) return 'Rp ' . rtrim(rtrim(number_format($value / 1_000_000_000, 1, ',', '.'), '0'), '.') . ' M';
+        if ($value >= 1_000_000) return 'Rp ' . rtrim(rtrim(number_format($value / 1_000_000, 1, ',', '.'), '0'), '.') . ' jt';
+        if ($value >= 1_000) return 'Rp ' . rtrim(rtrim(number_format($value / 1_000, 1, ',', '.'), '0'), '.') . ' rb';
+        return 'Rp ' . number_format($value, 0, ',', '.');
+    };
+    $statItems = [
+        ['label' => 'Saldo Kas', 'value' => $rupiah($balance)],
+        ['label' => 'Masuk bulan ini', 'value' => $compact($incomeThisMonth), 'note' => 'Total masuk ' . $compact($totalIncome)],
+        ['label' => 'Keluar bulan ini', 'value' => $compact($expenseThisMonth), 'note' => 'Total keluar ' . $compact($totalExpense)],
+    ];
+    $chartLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+@endphp
+
 @section('content')
-    <div class="space-y-6">
+<div class="space-y-6">
 
+    {{-- Header: konteks waktu, bukan sekumpulan angka. --}}
+    <div class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest">Overview</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Selamat datang, {{ explode(' ', Auth::user()->name)[0] }}</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Berikut ringkasan keuangan dan aktivitas sistem Anda hari
-                ini.</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Dashboard</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
         </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-
-            <div
-                class="relative bg-white/80 backdrop-blur-xl rounded-[28px] p-5 border border-white/60 shadow-[0_8px_32px_rgba(59,130,246,0.06)] overflow-hidden group hover:shadow-[0_8px_32px_rgba(59,130,246,0.12)] transition-all duration-300">
-                <div
-                    class="absolute -top-8 -right-8 w-24 h-24 bg-blue-400/20 rounded-full blur-2xl group-hover:bg-blue-400/30 transition-colors">
-                </div>
-                <div class="relative flex items-center justify-between mb-4">
-                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Saldo</span>
-                    <div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
-                        <i class="fas fa-wallet text-sm"></i>
-                    </div>
-                </div>
-                <p class="text-[26px] font-bold text-gray-900 tracking-tight">Rp
-                    {{ number_format($balance ?? 0, 0, ',', '.') }}</p>
-                <p class="text-[11px] text-gray-400 mt-1 font-medium">Total dana kas</p>
-            </div>
-
-            <div
-                class="relative bg-white/80 backdrop-blur-xl rounded-[28px] p-5 border border-white/60 shadow-[0_8px_32px_rgba(16,185,129,0.06)] overflow-hidden group hover:shadow-[0_8px_32px_rgba(16,185,129,0.12)] transition-all duration-300">
-                <div
-                    class="absolute -top-8 -right-8 w-24 h-24 bg-emerald-400/20 rounded-full blur-2xl group-hover:bg-emerald-400/30 transition-colors">
-                </div>
-                <div class="relative flex items-center justify-between mb-4">
-                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pemasukan</span>
-                    <div class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600">
-                        <i class="fas fa-arrow-trend-down text-sm"></i>
-                    </div>
-                </div>
-                <p class="text-[26px] font-bold text-gray-900 tracking-tight">Rp
-                    {{ number_format($totalIncome ?? 0, 0, ',', '.') }}</p>
-                <p class="text-[11px] text-gray-400 mt-1 font-medium">Total pemasukan</p>
-            </div>
-
-            <div
-                class="relative bg-white/80 backdrop-blur-xl rounded-[28px] p-5 border border-white/60 shadow-[0_8px_32px_rgba(244,63,94,0.06)] overflow-hidden group hover:shadow-[0_8px_32px_rgba(244,63,94,0.12)] transition-all duration-300">
-                <div
-                    class="absolute -top-8 -right-8 w-24 h-24 bg-rose-400/20 rounded-full blur-2xl group-hover:bg-rose-400/30 transition-colors">
-                </div>
-                <div class="relative flex items-center justify-between mb-4">
-                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Pengeluaran</span>
-                    <div class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
-                        <i class="fas fa-arrow-trend-up text-sm"></i>
-                    </div>
-                </div>
-                <p class="text-[26px] font-bold text-gray-900 tracking-tight">Rp
-                    {{ number_format($totalExpense ?? 0, 0, ',', '.') }}</p>
-                <p class="text-[11px] text-gray-400 mt-1 font-medium">Total pengeluaran</p>
-            </div>
-
-            <div
-                class="relative bg-white/80 backdrop-blur-xl rounded-[28px] p-5 border border-white/60 shadow-[0_8px_32px_rgba(139,92,246,0.06)] overflow-hidden group hover:shadow-[0_8px_32px_rgba(139,92,246,0.12)] transition-all duration-300">
-                <div
-                    class="absolute -top-8 -right-8 w-24 h-24 bg-violet-400/20 rounded-full blur-2xl group-hover:bg-violet-400/30 transition-colors">
-                </div>
-                <div class="relative flex items-center justify-between mb-4">
-                    <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Anggota</span>
-                    <div class="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600">
-                        <i class="fas fa-users text-sm"></i>
-                    </div>
-                </div>
-                <p class="text-[26px] font-bold text-gray-900 tracking-tight">{{ number_format($totalMembers ?? 0) }}</p>
-                <p class="text-[11px] text-gray-400 mt-1 font-medium">Anggota aktif</p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-            <div
-                class="xl:col-span-2 relative bg-white/80 backdrop-blur-xl rounded-[28px] p-6 border border-white/60 shadow-[0_8px_32px_rgba(59,130,246,0.05)]">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-900">Arus Kas</h3>
-                        <p class="text-xs text-gray-400 mt-0.5 font-medium">Perbandingan pemasukan & pengeluaran</p>
-                    </div>
-                    <div class="flex items-center gap-3 text-xs font-semibold">
-                        <span class="flex items-center gap-1.5"><span
-                                class="w-2.5 h-2.5 rounded-full bg-green-500"></span>Masuk</span>
-                        <span class="flex items-center gap-1.5"><span
-                                class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>Keluar</span>
-                    </div>
-                </div>
-                <div class="h-72">
-                    <canvas id="financeChart"></canvas>
-                </div>
-            </div>
-
-            <div
-                class="relative bg-white/80 backdrop-blur-xl rounded-[28px] p-6 border border-white/60 shadow-[0_8px_32px_rgba(59,130,246,0.05)]">
-                <h3 class="text-lg font-bold text-gray-900 mb-5">Aktivitas Data</h3>
-
-                <div class="space-y-2">
-                    <a href="{{ route('admin.news.index') }}"
-                        class="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/70 transition-all duration-200 group">
-                        <div
-                            class="w-11 h-11 rounded-2xl bg-sky-100 flex items-center justify-center text-sky-600 group-hover:scale-105 transition-transform">
-                            <i class="fas fa-newspaper"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900">Berita</p>
-                            <p class="text-xs text-gray-400">{{ number_format($totalNews ?? 0) }} artikel</p>
-                        </div>
-                        <i
-                            class="fas fa-chevron-right text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
-                    </a>
-
-                    <a href="{{ route('admin.events.index') }}"
-                        class="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/70 transition-all duration-200 group">
-                        <div
-                            class="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-105 transition-transform">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900">Acara</p>
-                            <p class="text-xs text-gray-400">{{ number_format($totalEvents ?? 0) }} event</p>
-                        </div>
-                        <i
-                            class="fas fa-chevron-right text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
-                    </a>
-
-                    <a href="{{ route('admin.documents.index') }}"
-                        class="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/70 transition-all duration-200 group">
-                        <div
-                            class="w-11 h-11 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-105 transition-transform">
-                            <i class="fas fa-folder-open"></i>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold text-gray-900">Dokumen</p>
-                            <p class="text-xs text-gray-400">{{ number_format($totalDocuments ?? 0) }} file</p>
-                        </div>
-                        <i
-                            class="fas fa-chevron-right text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
-                    </a>
-
-                    @if (auth()->user()->role->slug === 'super-admin')
-                        <a href="{{ route('admin.divisions.index') }}"
-                            class="flex items-center gap-4 p-3 rounded-2xl hover:bg-white/70 transition-all duration-200 group">
-                            <div
-                                class="w-11 h-11 rounded-2xl bg-violet-100 flex items-center justify-center text-violet-600 group-hover:scale-105 transition-transform">
-                                <i class="fas fa-sitemap"></i>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-semibold text-gray-900">Divisi</p>
-                                <p class="text-xs text-gray-400">{{ number_format($totalDivisions ?? 0) }} departemen</p>
-                            </div>
-                            <i
-                                class="fas fa-chevron-right text-gray-300 group-hover:text-gray-600 group-hover:translate-x-0.5 transition-all text-xs"></i>
-                        </a>
-                    @endif
-                </div>
-            </div>
-        </div>
+        <a href="{{ route('admin.finance-report.index') }}"
+            class="inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--accent-bright)] transition-colors self-start sm:self-auto">
+            Laporan keuangan
+            <x-admin.icon name="arrow-right" :size="14" />
+        </a>
     </div>
+
+    {{-- Pengumuman: hal pertama yang harus dibaca pengurus. --}}
+    <x-admin.announcement-feed :announcements="$announcements" />
+
+    {{-- Keuangan: satu baris angka ringkas, lalu grafik arus kas. --}}
+    <section class="csa-panel p-5 sm:p-6">
+        <x-admin.stat-strip :lead="true" :items="$statItems" />
+
+        <div class="mt-6 pt-6 border-t border-[var(--border-soft)]">
+            <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 mb-5">
+                <h2 class="text-[15px] font-semibold text-[var(--text-primary)]">Arus Kas {{ now()->year }}</h2>
+                <span class="flex items-center gap-1.5 text-[11px] text-[var(--text-secondary)]">
+                    <span class="w-2.5 h-0.5 rounded bg-emerald-500"></span>Pemasukan
+                </span>
+                <span class="flex items-center gap-1.5 text-[11px] text-[var(--text-secondary)]">
+                    <span class="w-2.5 h-0.5 rounded bg-red-500"></span>Pengeluaran
+                </span>
+            </div>
+            <div class="h-60 sm:h-72"><canvas id="financeChart"></canvas></div>
+        </div>
+    </section>
+
+    {{-- Berita terbaru: visual, dengan jalan pintas ke halaman berita. --}}
+    <x-admin.panel
+        title="Berita Terbaru"
+        subtitle="Artikel yang baru terbit di situs"
+        :moreRoute="route('admin.news.index')">
+        @if ($recentNews->isEmpty())
+            <p class="text-[13px] text-[var(--text-muted)] py-8 text-center">Belum ada berita terbit.</p>
+        @else
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                @foreach ($recentNews as $item)
+                    <a href="{{ route('admin.news.show', $item) }}" class="group block">
+                        <div class="aspect-[16/10] rounded-xl overflow-hidden bg-[var(--bg-muted)]">
+                            @if ($item->thumbnail_url)
+                                <img src="{{ $item->thumbnail_url }}" alt="{{ $item->title }}"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+                                    <x-admin.icon name="newspaper" :size="24" />
+                                </div>
+                            @endif
+                        </div>
+                        <p class="text-[11px] font-medium text-[var(--accent-bright)] mt-3">{{ $item->category?->name ?? 'Tanpa kategori' }}</p>
+                        <h3 class="text-[14px] font-semibold text-[var(--text-primary)] leading-snug mt-1 line-clamp-2 group-hover:text-[var(--accent-bright)] transition-colors">{{ $item->title }}</h3>
+                        <p class="text-[12px] text-[var(--text-muted)] mt-1.5">
+                            {{ $item->author?->name ?? 'CSA' }} · {{ $item->published_at?->translatedFormat('d M Y') ?? $item->created_at->translatedFormat('d M Y') }}
+                        </p>
+                    </a>
+                @endforeach
+            </div>
+        @endif
+    </x-admin.panel>
+
+    {{-- Tiga kolom konten: agenda, dokumen, showcase. --}}
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {{-- Agenda terdekat --}}
+        <x-admin.panel
+            title="Agenda Terdekat"
+            :moreRoute="route('admin.events.index')">
+            @if ($upcomingEvents->isEmpty())
+                <p class="text-[13px] text-[var(--text-muted)] py-6 text-center">Tidak ada kegiatan mendatang.</p>
+            @else
+                <ul class="space-y-1">
+                    @foreach ($upcomingEvents as $event)
+                        <li>
+                            <a href="{{ route('admin.events.show', $event) }}" class="csa-row">
+                                <div class="w-11 shrink-0 text-center rounded-lg bg-[var(--bg-muted)] py-1.5">
+                                    <p class="text-[15px] font-bold text-[var(--text-primary)] leading-none">{{ $event->event_date?->format('d') }}</p>
+                                    <p class="text-[10px] font-medium text-[var(--text-muted)] uppercase mt-0.5">{{ $event->event_date?->translatedFormat('M') }}</p>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $event->title }}</p>
+                                    <p class="text-[12px] text-[var(--text-muted)] truncate">{{ $event->location ?: 'Lokasi belum ditentukan' }}</p>
+                                </div>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </x-admin.panel>
+
+        {{-- Dokumen terbaru --}}
+        <x-admin.panel
+            title="Dokumen Terbaru"
+            :moreRoute="route('admin.documents.index')">
+            @if ($recentDocuments->isEmpty())
+                <p class="text-[13px] text-[var(--text-muted)] py-6 text-center">Belum ada dokumen diunggah.</p>
+            @else
+                <ul class="space-y-1">
+                    @foreach ($recentDocuments as $doc)
+                        <li>
+                            <a href="{{ route('admin.documents.download', $doc) }}" class="csa-row">
+                                <span class="w-9 h-9 rounded-lg bg-[var(--bg-muted)] flex items-center justify-center shrink-0 text-[var(--text-secondary)]">
+                                    <x-admin.icon name="file-text" :size="16" />
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $doc->title }}</p>
+                                    <p class="text-[12px] text-[var(--text-muted)] truncate">{{ $doc->user?->name ?? 'CSA' }} · {{ $doc->created_at->diffForHumans() }}</p>
+                                </div>
+                                <x-admin.icon name="download" :size="15" class="text-[var(--text-muted)] shrink-0" />
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </x-admin.panel>
+
+        {{-- Showcase: siapa mengerjakan apa. --}}
+        <x-admin.panel
+            title="Showcase Proyek"
+            :moreRoute="route('admin.showcase.index')">
+            @if ($recentProjects->isEmpty())
+                <p class="text-[13px] text-[var(--text-muted)] py-6 text-center">Belum ada proyek dipublikasikan.</p>
+            @else
+                <ul class="space-y-1">
+                    @foreach ($recentProjects as $project)
+                        <li>
+                            <a href="{{ route('admin.showcase.preview', $project) }}" target="_blank" rel="noopener" class="csa-row">
+                                <span class="w-9 h-9 rounded-lg overflow-hidden bg-[var(--bg-muted)] shrink-0">
+                                    @if ($project->thumbnail_url)
+                                        <img src="{{ $project->thumbnail_url }}" alt="" class="w-full h-full object-cover" loading="lazy">
+                                    @else
+                                        <span class="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+                                            <x-admin.icon name="rocket" :size="16" />
+                                        </span>
+                                    @endif
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $project->title }}</p>
+                                    <p class="text-[12px] text-[var(--text-muted)] truncate">{{ $project->contributors }}</p>
+                                </div>
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </x-admin.panel>
+    </section>
+
+    {{-- Aktivitas sistem: hanya untuk pemegang izin log (sudah difilter). --}}
+    <x-admin.activity-feed :logs="$systemActivity" />
+</div>
 @endsection
 
 @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
+<script>
+    (() => {
+        const initChart = () => {
             const canvas = document.getElementById('financeChart');
-            if (!canvas) return;
+            if (!canvas || !window.Chart || canvas.dataset.initialized === 'true') return;
 
-            const ctx = canvas.getContext('2d');
-            const incomes = @json($chartIncomes ?? array_fill(0, 12, 0));
-            const expenses = @json($chartExpenses ?? array_fill(0, 12, 0));
+            const context = canvas.getContext('2d');
+            const incomeFill = context.createLinearGradient(0, 0, 0, 300);
+            incomeFill.addColorStop(0, 'rgba(16, 185, 129, 0.20)');
+            incomeFill.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            const expenseFill = context.createLinearGradient(0, 0, 0, 300);
+            expenseFill.addColorStop(0, 'rgba(239, 68, 68, 0.14)');
+            expenseFill.addColorStop(1, 'rgba(239, 68, 68, 0)');
+            const dark = document.documentElement.classList.contains('dark');
+            const muted = dark ? '#8b92a8' : '#64748b';
+            const grid = dark ? 'rgba(255,255,255,0.06)' : 'rgba(15,23,42,0.08)';
 
-            const gradientIncomes = ctx.createLinearGradient(0, 0, 0, 300);
-            gradientIncomes.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-            gradientIncomes.addColorStop(1, 'rgba(16, 185, 129, 0)');
-
-            const gradientExpenses = ctx.createLinearGradient(0, 0, 0, 300);
-            gradientExpenses.addColorStop(0, 'rgba(244, 63, 94, 0.2)');
-            gradientExpenses.addColorStop(1, 'rgba(244, 63, 94, 0)');
-
-            new Chart(canvas, {
+            new window.Chart(canvas, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov',
-                        'Des'
-                    ],
-                    datasets: [{
-                            label: 'Pemasukan',
-                            data: incomes,
-                            borderColor: '#10B981',
-                            backgroundColor: gradientIncomes,
-                            borderWidth: 2.5,
-                            tension: 0.4,
-                            fill: true,
-                            pointBackgroundColor: '#10B981',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointRadius: 3,
-                            pointHoverRadius: 6,
-                        },
-                        {
-                            label: 'Pengeluaran',
-                            data: expenses,
-                            borderColor: '#F43F5E',
-                            backgroundColor: gradientExpenses,
-                            borderWidth: 2,
-                            tension: 0.4,
-                            fill: true,
-                            pointBackgroundColor: '#F43F5E',
-                            pointBorderColor: '#ffffff',
-                            pointBorderWidth: 2,
-                            pointRadius: 3,
-                            pointHoverRadius: 6,
-                        }
+                    labels: @json($chartLabels),
+                    datasets: [
+                        { label: 'Pemasukan', data: @json($chartIncomes), borderColor: '#10b981', backgroundColor: incomeFill, borderWidth: 2, tension: .4, pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: '#10b981', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2, fill: true },
+                        { label: 'Pengeluaran', data: @json($chartExpenses), borderColor: '#ef4444', backgroundColor: expenseFill, borderWidth: 2, tension: .4, pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: '#ef4444', pointHoverBorderColor: '#fff', pointHoverBorderWidth: 2, fill: true },
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: {
-                            display: false
-                        }
+                        legend: { display: false },
+                        tooltip: { backgroundColor: dark ? '#1a1f2e' : '#ffffff', titleColor: dark ? '#e6e9f0' : '#0f172a', bodyColor: muted, borderColor: grid, borderWidth: 1, cornerRadius: 10, padding: 12, titleFont: { weight: '600', family: 'Plus Jakarta Sans' } }
                     },
-                    interaction: {
-                        mode: 'index',
-                        intersect: false
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            border: {
-                                display: false
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                },
-                                color: '#9CA3AF',
-                                padding: 6
-                            }
-                        },
-                        y: {
-                            border: {
-                                display: false
-                            },
-                            grid: {
-                                color: '#F3F4F6'
-                            },
-                            ticks: {
-                                font: {
-                                    size: 11,
-                                    weight: '500'
-                                },
-                                color: '#9CA3AF',
-                                padding: 6,
-                                maxTicksLimit: 5,
-                                callback: (v) => v >= 1000000 ? (v / 1000000) + 'M' : v >= 1000 ? (v /
-                                    1000) + 'k' : v
-                            }
-                        }
+                        x: { grid: { display: false }, border: { display: false }, ticks: { color: muted, font: { size: 11, family: 'Plus Jakarta Sans' } } },
+                        y: { grid: { color: grid }, border: { display: false }, ticks: { color: muted, font: { size: 11, family: 'Plus Jakarta Sans' }, maxTicksLimit: 5, callback: (value) => value >= 1000000 ? (value / 1000000) + 'M' : value >= 1000 ? (value / 1000) + 'K' : value } }
                     }
                 }
             });
-        });
-    </script>
+            canvas.dataset.initialized = 'true';
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initChart);
+        } else {
+            initChart();
+        }
+        window.addEventListener('load', initChart);
+        let retries = 0;
+        const interval = setInterval(() => {
+            initChart();
+            retries++;
+            if (retries > 10 || document.getElementById('financeChart')?.dataset.initialized === 'true') {
+                clearInterval(interval);
+            }
+        }, 150);
+    })();
+</script>
 @endpush

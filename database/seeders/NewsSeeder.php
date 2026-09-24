@@ -6,6 +6,7 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class NewsSeeder extends Seeder
 {
@@ -28,6 +29,7 @@ class NewsSeeder extends Seeder
 
         if (empty($categories)) {
             $this->command->warn('NewsCategorySeeder harus dijalankan terlebih dahulu.');
+
             return;
         }
 
@@ -79,6 +81,7 @@ class NewsSeeder extends Seeder
                 'category_id' => $categories[$item['category']] ?? null,
                 'user_id' => $author?->id,
                 'title' => $item['title'],
+                'slug' => Str::slug($item['title']),
                 'content' => $item['content'],
                 'thumbnail' => $thumbnail,
                 'status' => 'published',

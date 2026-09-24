@@ -16,25 +16,49 @@ class NewsRequest extends FormRequest
         return [
             'category_id' => [
                 'required',
-                'exists:news_categories,id'
+                'exists:news_categories,id',
             ],
             'title' => [
                 'required',
                 'string',
-                'max:255'
+                'max:255',
             ],
             'content' => [
                 'required',
-                'string'
+                'string',
+            ],
+            'thumbnail' => [
+                'nullable',
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+            ],
+            'images' => [
+                'nullable',
+                'array',
+                'max:8',
+            ],
+            'images.*' => [
+                'image',
+                'mimes:jpeg,png,jpg,webp',
+                'max:2048',
+            ],
+            'removed_images' => [
+                'nullable',
+                'array',
+            ],
+            'removed_images.*' => [
+                'string',
+                'max:255',
             ],
             'status' => [
                 'required',
-                'in:draft,published'
+                'in:draft,published',
             ],
             'published_at' => [
                 'nullable',
-                'date'
-            ]
+                'date',
+            ],
         ];
     }
 

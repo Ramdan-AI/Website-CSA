@@ -1,37 +1,105 @@
-{{-- KEGIATAN --}}
-<section id="kegiatan" class="relative py-20 md:py-32 lg:py-40 bg-[#fafafa] scroll-mt-24 overflow-hidden">
-    <div class="absolute top-24 right-[-120px] w-[340px] h-[340px] rounded-full bg-[radial-gradient(circle,rgba(54,100,175,0.05)_0%,transparent_70%)] pointer-events-none hidden lg:block" data-parallax="-110"></div>
-    <div class="max-w-[1200px] mx-auto px-5 sm:px-8">
-        <div class="mb-10 sm:mb-16" data-parallax="-10">
-            <p class="text-[11px] sm:text-xs font-semibold text-[#3664AF] tracking-[0.15em] uppercase mb-4 sm:mb-6" data-reveal="down">Kegiatan</p>
-            <h2 class="text-[clamp(1.75rem,5.5vw,3rem)] font-bold text-gray-900 leading-[1.15] lg:leading-[1.1] tracking-[-0.03em] max-w-[600px]" data-reveal="curtain" data-reveal-delay="0.15">
-                Berita dan aktivitas terkini
-            </h2>
+{{-- Berita: satu feature besar + grid kartu editorial --}}
+@php
+    $featured = $news->first();
+    $rest = $news->skip(1)->take(4);
+    $fmt = fn ($n) => $n->published_at?->translatedFormat('d M Y') ?? $n->created_at->translatedFormat('d M Y');
+@endphp
+
+<section id="kegiatan" class="scroll-mt-16" style="background: var(--paper); border-top: 1px solid var(--line);">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-24">
+
+        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5 mb-12">
+            <div class="max-w-[680px]" data-reveal="up">
+                <p class="text-[13px] font-medium mb-3 inline-flex items-center gap-2" style="color: var(--accent);">
+                    <span class="w-6 h-px" style="background: var(--accent);"></span> Publikasi
+                </p>
+                <h2 class="text-[clamp(1.7rem,3.8vw,2.4rem)] font-bold leading-[1.22] tracking-[-0.025em]" style="color: var(--ink);">
+                    Berita terbaru
+                </h2>
+                <p class="text-[16px] leading-[1.8] mt-4" style="color: var(--ink-soft);">
+                    Kabar kegiatan, program kerja, dan pencapaian anggota CSA.
+                </p>
+            </div>
+            <a href="{{ route('berita') }}"
+                class="shrink-0 inline-flex items-center gap-2 text-[15px] font-medium hover:gap-3 transition-all" style="color: var(--accent);">
+                Lihat semua berita
+                <i class="fas fa-arrow-right text-[12px]"></i>
+            </a>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8" data-reveal-stagger data-parallax="12">
-            @forelse($news as $item)
-                <div class="rounded-[20px] sm:rounded-[24px] bg-white border border-gray-100 overflow-hidden hover:shadow-[0_8px_32px_-12px_rgba(0,0,0,0.08)] transition-shadow duration-300">
-                    <div class="h-44 sm:h-48 bg-gray-50 flex items-center justify-center overflow-hidden">
-                        @if($item->thumbnail)
-                            <img src="{{ asset('storage/' . $item->thumbnail) }}" alt="{{ $item->title }}" class="w-full h-full object-cover" loading="lazy" decoding="async">
+        @if ($featured)
+            <div class="grid lg:grid-cols-12 gap-5">
+                {{-- Feature --}}
+                <a href="{{ route('berita.show', $featured->slug) }}" data-reveal="up"
+                    class="lg:col-span-7 group relative flex flex-col rounded-2xl border overflow-hidden transition-colors hover:border-[var(--line-strong)]"
+                    style="background: var(--paper); border-color: var(--line);">
+                    <div class="aspect-[16/10] overflow-hidden" style="background: var(--paper-sunken);">
+                        @if ($featured->thumbnail_url)
+                            <img src="{{ $featured->thumbnail_url }}" alt="{{ $featured->title }}"
+                                width="960" height="600" fetchpriority="high" decoding="async"
+                                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]">
                         @else
-                            <i class="fas fa-newspaper text-3xl sm:text-4xl text-gray-300"></i>
+                            <div class="w-full h-full flex items-center justify-center" style="color: var(--ink-faint);">
+                                <i class="fas fa-newspaper text-4xl"></i>
+                            </div>
                         @endif
                     </div>
-                    <div class="p-5 sm:p-6">
-                        @if($item->category)
-                            <span class="text-[10px] font-semibold text-[#3664AF] uppercase tracking-wider">{{ $item->category->name }}</span>
+                    <div class="p-6 sm:p-8 flex flex-col flex-1">
+                        @if ($featured->category)
+                            <span class="text-[13px] font-medium" style="color: var(--accent);">{{ $featured->category->name }}</span>
                         @endif
-                        <h3 class="text-[14px] sm:text-[15px] font-bold text-gray-900 mt-1.5 mb-2 leading-snug">{{ $item->title }}</h3>
-                        <p class="text-xs text-gray-400 leading-relaxed">{{ Str::limit(strip_tags($item->content), 120) }}</p>
+                        <h3 class="text-[22px] sm:text-[26px] font-bold mt-2.5 leading-[1.28] tracking-[-0.02em] group-hover:text-[var(--accent)] transition-colors" style="color: var(--ink);">
+                            {{ $featured->title }}
+                        </h3>
+                        <p class="text-[15px] leading-[1.8] mt-3 line-clamp-2" style="color: var(--ink-soft);">
+                            {{ $featured->excerpt ?? Str::limit(strip_tags($featured->content), 160) }}
+                        </p>
+                        <div class="flex items-center gap-3 mt-auto pt-5 text-[13px]" style="color: var(--ink-faint);">
+                            <span class="font-medium" style="color: var(--ink-soft);">{{ $featured->author?->name ?? 'CSA' }}</span>
+                            <span class="w-1 h-1 rounded-full" style="background: var(--line-strong);"></span>
+                            <span>{{ $fmt($featured) }}</span>
+                        </div>
                     </div>
-                </div>
-            @empty
-                <div class="sm:col-span-2 lg:col-span-3 text-center py-16">
-                    <p class="text-sm text-gray-400">Belum ada berita yang dipublikasikan.</p>
-                </div>
-            @endforelse
-        </div>
+                </a>
+
+                {{-- Empat kartu --}}
+                @if ($rest->isNotEmpty())
+                    <div class="lg:col-span-5 flex flex-col gap-5" data-reveal-stagger>
+                        @foreach ($rest as $item)
+                            <a href="{{ route('berita.show', $item->slug) }}"
+                                class="group flex gap-4 rounded-2xl border p-3 transition-colors hover:border-[var(--line-strong)]"
+                                style="background: var(--paper); border-color: var(--line);">
+                                <div class="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-xl overflow-hidden" style="background: var(--paper-sunken);">
+                                    @if ($item->thumbnail_url)
+                                        <img src="{{ $item->thumbnail_url }}" alt="{{ $item->title }}"
+                                            width="240" height="240" loading="lazy" decoding="async"
+                                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]">
+                                    @else
+                                        <div class="w-full h-full flex items-center justify-center" style="color: var(--ink-faint);">
+                                            <i class="fas fa-newspaper text-xl"></i>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="min-w-0 flex flex-col justify-center py-1">
+                                    @if ($item->category)
+                                        <span class="text-[12px] font-medium" style="color: var(--accent);">{{ $item->category->name }}</span>
+                                    @endif
+                                    <h3 class="text-[15px] font-semibold mt-1.5 leading-[1.4] line-clamp-2 group-hover:text-[var(--accent)] transition-colors" style="color: var(--ink);">
+                                        {{ $item->title }}
+                                    </h3>
+                                    <p class="text-[12px] mt-2" style="color: var(--ink-faint);">{{ $fmt($item) }}</p>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+        @else
+            <div class="text-center py-16 rounded-2xl border" style="background: var(--paper-sunken); border-color: var(--line);">
+                <i class="fas fa-newspaper text-3xl" style="color: var(--line-strong);"></i>
+                <p class="text-[15px] mt-4" style="color: var(--ink-soft);">Belum ada berita yang dipublikasikan.</p>
+            </div>
+        @endif
+
     </div>
 </section>

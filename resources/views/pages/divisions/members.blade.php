@@ -1,117 +1,107 @@
-{{-- resources/views/pages/admin/divisions/members.blade.php --}}
 @extends('layouts.admin')
 
 @section('content')
-    <div class="space-y-6">
-
+<div class="space-y-4 sm:space-y-5">
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
-            <a href="{{ route('admin.divisions.index') }}"
-                class="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-blue-600 transition-colors mb-3">
-                <i class="fas fa-arrow-left text-xs"></i>
-                Kembali ke Divisi
+            <a href="{{ route('admin.divisions.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+                <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Divisi
             </a>
-            <div class="flex items-center gap-4">
-                <div class="relative">
-                    <div class="absolute -inset-1 bg-gradient-to-br from-blue-400/40 to-purple-400/40 rounded-2xl blur-md">
-                    </div>
-                    <div class="relative w-14 h-14 rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(59,130,246,0.3)]">
-                        @if ($division->image)
-                            <img src="{{ asset('storage/' . $division->image) }}" alt="{{ $division->name }}"
-                                class="w-full h-full object-cover">
-                        @else
-                            <div
-                                class="w-full h-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white font-bold text-xl">
-                                {{ strtoupper(substr($division->name, 0, 2)) }}
-                            </div>
-                        @endif
-                    </div>
-                </div>
+            <div class="flex items-center gap-3 mt-2">
+                @if ($division->image)
+                    <img src="{{ asset('storage/' . $division->image) }}" alt="{{ $division->name }}" class="w-11 h-11 rounded-xl object-cover">
+                @else
+                    <div class="w-11 h-11 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-secondary)] font-semibold">{{ strtoupper(substr($division->name, 0, 2)) }}</div>
+                @endif
                 <div>
-                    <p class="text-xs font-semibold text-blue-400 uppercase tracking-widest">Divisi</p>
-                    <h1 class="text-3xl font-bold text-gray-900">{{ $division->name }}</h1>
-                    <p class="text-sm text-gray-400 mt-1">{{ $division->description ?: 'Tidak ada deskripsi.' }} ·
-                        {{ $members->total() }} anggota</p>
+                    <h1 class="text-[22px] sm:text-[26px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">{{ $division->name }}</h1>
+                    <p class="text-[13px] text-[var(--text-muted)] mt-0.5">{{ $members->total() }} anggota</p>
                 </div>
             </div>
         </div>
-
-        <div class="relative group/card">
-            <div
-                class="absolute -inset-1 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-[32px] blur-md opacity-0 group-hover/card:opacity-100 transition-opacity duration-500">
-            </div>
-            <div
-                class="relative bg-white/80 backdrop-blur-xl rounded-[28px] border border-white/60 shadow-[0_8px_32px_rgba(59,130,246,0.05)] overflow-hidden">
-                <div
-                    class="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-purple-400/5 rounded-[28px] pointer-events-none">
-                </div>
-                <div class="relative p-6">
-                    <div class="flex items-center gap-2 mb-5">
-                        <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-                            <i class="fas fa-users text-xs"></i>
-                        </div>
-                        <h3 class="text-sm font-bold text-gray-900">Daftar Anggota ({{ $members->total() }})</h3>
-                    </div>
-
-                    @if ($members->count() > 0)
-                        <div class="space-y-2">
-                            @foreach ($members as $member)
-                                <div
-                                    class="flex items-center justify-between p-3 rounded-xl bg-gray-50/80 hover:bg-blue-50/80 transition-colors">
-                                    <div class="flex items-center gap-3">
-                                        <div class="relative">
-                                            <div
-                                                class="w-10 h-10 rounded-xl overflow-hidden shadow-[0_4px_8px_rgba(59,130,246,0.2)] shrink-0">
-                                                <img src="{{ $member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
-                                            </div>
-                                            <div
-                                                class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-white shadow-[0_0_6px_rgba(16,185,129,0.5)]">
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-semibold text-gray-900">{{ $member->name }}</p>
-                                            <div class="flex items-center gap-2 text-[11px] text-gray-400">
-                                                <span>{{ $member->position?->name ?? 'Tanpa Jabatan' }}</span>
-                                                @if ($member->nim)
-                                                    <span>·</span>
-                                                    <span>{{ $member->nim }}</span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center gap-1">
-                                        <a href="{{ route('admin.members.edit', $member) }}"
-                                            class="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white hover:shadow-[0_4px_8px_rgba(59,130,246,0.2)] transition-all duration-200">
-                                            <i class="fas fa-pen text-[10px]"></i>
-                                        </a>
-                                        <button type="button"
-                                            onclick="openDeleteModal('deleteModal', '{{ route('admin.divisions.remove-member', [$division, $member->id]) }}')"
-                                            class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white hover:shadow-[0_4px_8px_rgba(239,68,68,0.2)] transition-all duration-200">
-                                            <i class="fas fa-user-minus text-[10px]"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        @if ($members->hasPages())
-                            <div class="mt-4">
-                                {{ $members->links() }}
-                            </div>
-                        @endif
-                    @else
-                        <div class="text-center py-12">
-                            <div class="relative w-14 h-14 mx-auto mb-4">
-                                <div class="absolute inset-0 bg-blue-400/20 rounded-xl blur-lg"></div>
-                                <div class="relative w-full h-full rounded-xl bg-white/80 flex items-center justify-center">
-                                    <i class="fas fa-user-slash text-xl text-blue-300"></i>
-                                </div>
-                            </div>
-                            <p class="text-sm font-semibold text-gray-900 mb-1">Belum ada anggota</p>
-                            <p class="text-xs text-gray-400">Anggota belum ditambahkan ke divisi ini</p>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
+        <button type="button" onclick="document.getElementById('addMembersPanel').classList.toggle('hidden')" class="csa-btn csa-btn-primary">
+            <x-admin.icon name="user-plus" :size="16" /> Tambah Anggota
+        </button>
     </div>
+
+    <div id="addMembersPanel" class="hidden csa-panel overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-[var(--border-soft)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+                <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Tambah Anggota</h2>
+                <p class="text-[12px] text-[var(--text-muted)] mt-0.5">Pilih anggota yang belum memiliki divisi.</p>
+            </div>
+            <form method="GET" action="{{ route('admin.divisions.members', $division) }}" class="flex gap-2">
+                <input type="text" name="candidate_search" value="{{ request('candidate_search') }}" placeholder="Cari kandidat..." class="csa-input sm:w-56" aria-label="Cari kandidat">
+                <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
+            </form>
+        </div>
+        <form method="POST" action="{{ route('admin.divisions.add-members', $division) }}">
+            @csrf
+            <div class="max-h-96 overflow-y-auto divide-y divide-[var(--border-soft)]">
+                @forelse($availableMembers as $candidate)
+                    <label class="flex items-center gap-3 p-4 hover:bg-[var(--bg-hover)] cursor-pointer min-h-[56px]">
+                        <input type="checkbox" name="member_ids[]" value="{{ $candidate->id }}" class="w-4 h-4 rounded border-[var(--border-strong)] accent-[var(--accent)]">
+                        <span class="w-9 h-9 rounded-full bg-[var(--bg-muted)] flex items-center justify-center text-[12px] font-semibold text-[var(--text-secondary)] shrink-0">{{ substr($candidate->name, 0, 1) }}</span>
+                        <span class="min-w-0">
+                            <span class="block text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $candidate->name }}</span>
+                            <span class="block text-[12px] text-[var(--text-muted)]">{{ $candidate->nim ?: '-' }} · {{ $candidate->position?->name ?: 'Tanpa Jabatan' }}</span>
+                        </span>
+                    </label>
+                @empty
+                    <div class="p-8 text-center text-[13px] text-[var(--text-muted)]">Tidak ada kandidat anggota tersedia.</div>
+                @endforelse
+            </div>
+            <div class="p-4 sm:p-5 border-t border-[var(--border-soft)] flex justify-end gap-2">
+                <button type="button" onclick="document.getElementById('addMembersPanel').classList.add('hidden')" class="csa-btn csa-btn-ghost">Batal</button>
+                <button type="submit" class="csa-btn csa-btn-primary">Tambahkan Terpilih</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="csa-panel overflow-hidden">
+        <div class="p-4 sm:p-5 border-b border-[var(--border-soft)] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 class="text-[14px] font-semibold text-[var(--text-primary)]">Anggota Saat Ini</h2>
+            <form method="GET" action="{{ route('admin.divisions.members', $division) }}" class="flex gap-2">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama / NIM..." class="csa-input sm:w-56" aria-label="Cari anggota">
+                <button type="submit" class="csa-btn csa-btn-ghost">Cari</button>
+                @if(request()->hasAny(['search', 'candidate_search']))
+                    <a href="{{ route('admin.divisions.members', $division) }}" class="csa-btn csa-btn-ghost">Reset</a>
+                @endif
+            </form>
+        </div>
+
+        <div class="divide-y divide-[var(--border-soft)]">
+            @forelse ($members as $member)
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-[var(--bg-hover)]">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <img src="{{ $member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-10 h-10 rounded-full object-cover bg-[var(--bg-muted)] shrink-0">
+                        <div class="min-w-0">
+                            <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $member->name }}</p>
+                            <p class="text-[12px] text-[var(--text-muted)]">{{ $member->nim ?: '-' }} · {{ $member->position?->name ?? 'Tanpa Jabatan' }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <a href="{{ route('admin.members.edit', $member) }}" class="csa-icon-btn" title="Edit" aria-label="Edit anggota">
+                            <x-admin.icon name="pen" :size="16" />
+                        </a>
+                        <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.divisions.remove-member', [$division, $member]) }}')" class="csa-icon-btn hover:!text-red-500" title="Keluarkan" aria-label="Keluarkan anggota">
+                            <x-admin.icon name="user-minus" :size="16" />
+                        </button>
+                    </div>
+                </div>
+            @empty
+                <div class="p-12 text-center">
+                    <x-admin.icon name="users" :size="30" class="mx-auto text-[var(--text-muted)]" />
+                    <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada anggota pada divisi ini</p>
+                </div>
+            @endforelse
+        </div>
+
+        @if ($members->hasPages())
+            <div class="p-4 sm:p-5 border-t border-[var(--border-soft)]">
+                {{ $members->links() }}
+            </div>
+        @endif
+    </div>
+</div>
 @endsection

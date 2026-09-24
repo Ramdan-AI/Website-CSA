@@ -23,15 +23,18 @@ return new class extends Migration
                 ->constrained()
                 ->cascadeOnDelete();
 
-            $table->enum('status', [
-                'present',
-                'absent'
-            ])->default('present');
+            // String (bukan enum) agar portabel lintas driver; nilai yang sah
+            // dijaga oleh validasi aplikasi (present/permit/sick/absent).
+            $table->string('status', 20)->default('present');
+
+            $table->string('note')->nullable();
 
             $table->timestamp('check_in_at')
                 ->nullable();
 
             $table->timestamps();
+
+            $table->unique(['event_id', 'member_id'], 'attendances_event_member_unique');
         });
     }
 

@@ -27,7 +27,7 @@ class AttendanceRequest extends FormRequest
 
             'status' => [
                 'required',
-                'in:present,absent'
+                'in:present,permit,sick,absent'
             ]
 
         ];

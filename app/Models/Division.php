@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Support\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Division extends Model
 {
+    use LogsActivity;
     use SoftDeletes;
 
     protected $fillable = [
@@ -17,12 +20,14 @@ class Division extends Model
         'image',
         'description',
         'skills',
+        'has_levels',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'skills' => 'array',
+        'has_levels' => 'boolean',
     ];
 
     protected static function booted()
@@ -50,14 +55,14 @@ class Division extends Model
         $originalSlug = $slug;
         $counter = 1;
 
-        while (static::where('slug', $slug)
-            ->whereNull('deleted_at')
+        while (static::withTrashed()
+            ->where('slug', $slug)
             ->when($ignoreId, function ($query) use ($ignoreId) {
                 return $query->where('id', '!=', $ignoreId);
             })
             ->exists()
         ) {
-            $slug = $originalSlug . '-' . $counter;
+            $slug = $originalSlug.'-'.$counter;
             $counter++;
         }
 
@@ -66,11 +71,11 @@ class Division extends Model
 
     public function getImageUrlAttribute()
     {
-        if (!$this->image) {
+        if (! $this->image) {
             return null;
         }
 
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk('public');
 
         return $disk->url($this->image);

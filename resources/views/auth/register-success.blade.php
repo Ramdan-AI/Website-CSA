@@ -1,0 +1,138 @@
+@extends('layouts.landing')
+
+@section('content')
+<div class="min-h-screen flex items-center justify-center px-4 sm:px-6 py-20">
+    <div class="w-full max-w-xl">
+
+        {{-- Top Success Animation / Icon --}}
+        <div class="text-center mb-8">
+            <div class="relative w-20 h-20 mx-auto mb-5">
+                <div class="absolute inset-0 rounded-3xl bg-emerald-400/20 blur-xl animate-pulse"></div>
+                <div class="relative w-20 h-20 rounded-2xl bg-emerald-500 flex items-center justify-center text-[var(--on-accent)] text-3xl">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase bg-emerald-50 text-emerald-700 border border-emerald-200/70 mb-3">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                Pendaftaran Berhasil
+            </span>
+
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[var(--ink)] tracking-tight">
+                Selamat Datang di UKM CSA!
+            </h1>
+            <p class="text-[14px] sm:text-[15px] text-[var(--ink-soft)] mt-2 max-w-md mx-auto leading-relaxed">
+                Akunmu telah aktif. Kamu kini resmi bergabung dalam perjalanan berkarya bersama Creative Student Association.
+            </p>
+        </div>
+
+        {{-- Main Container Card --}}
+        <div class="relative rounded-2xl border border-white/50 bg-[var(--paper)]/80   p-6 sm:p-9 space-y-6">
+            
+
+            {{-- Recap Card: Division & Info --}}
+            <div class="relative bg-[var(--paper-sunken)] border border-[var(--line)] rounded-xl p-5">
+                <p class="text-[11px] font-bold text-[var(--ink-faint)] uppercase tracking-wider mb-3.5">
+                    Data Pendaftaran Anda
+                </p>
+
+                <div class="space-y-3">
+                    {{-- Selected Division --}}
+                    @if ($member && $member->division)
+                        <div class="flex items-center gap-3.5 bg-[var(--paper)] rounded-2xl p-3 border border-[var(--line)] shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-[var(--accent-soft)] border border-[var(--line)] p-2 flex items-center justify-center shrink-0">
+                                @if ($member->division->image)
+                                    <img src="{{ asset('storage/' . $member->division->image) }}" alt="{{ $member->division->name }}" class="w-full h-full object-contain">
+                                @else
+                                    <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="{{ $member->division->name }}" class="w-full h-full object-contain">
+                                @endif
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <span class="inline-block text-[10px] font-bold tracking-wider text-blue-600 uppercase">Divisi Terpilih</span>
+                                <h3 class="text-[14px] font-bold text-[var(--ink)] truncate">{{ $member->division->name }}</h3>
+                            </div>
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 shrink-0">
+                                Anggota
+                            </span>
+                        </div>
+                    @endif
+
+                    {{-- Name, Email & WhatsApp --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[12px] pt-1">
+                        <div class="bg-[var(--paper)]/90 rounded-xl px-3.5 py-2.5 border border-[var(--line)]">
+                            <span class="text-[var(--ink-faint)] block text-[10px] uppercase font-semibold">Nama Lengkap</span>
+                            <span class="font-semibold text-[var(--ink)]">{{ $user->name }}</span>
+                        </div>
+                        <div class="bg-[var(--paper)]/90 rounded-xl px-3.5 py-2.5 border border-[var(--line)]">
+                            <span class="text-[var(--ink-faint)] block text-[10px] uppercase font-semibold">Nomor WhatsApp</span>
+                            <span class="font-semibold text-[var(--ink)]">{{ $user->whatsapp ?? '-' }}</span>
+                        </div>
+                        @if ($member?->semester)
+                            <div class="bg-[var(--paper)]/90 rounded-xl px-3.5 py-2.5 border border-[var(--line)]">
+                                <span class="text-[var(--ink-faint)] block text-[10px] uppercase font-semibold">Semester</span>
+                                <span class="font-semibold text-[var(--ink)]">Semester {{ $member->semester }}</span>
+                            </div>
+                        @endif
+                        @if ($member?->level)
+                            <div class="bg-[var(--paper)]/90 rounded-xl px-3.5 py-2.5 border border-[var(--line)]">
+                                <span class="text-[var(--ink-faint)] block text-[10px] uppercase font-semibold">Tingkatan</span>
+                                <span class="font-semibold text-[var(--ink)]">
+                                    {{ \App\Models\Member::LEVELS[$member->level]['label'] ?? 'Tingkat ' . $member->level }}
+                                    · {{ $member->level_name }}
+                                </span>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+
+            {{-- Grup WhatsApp: langkah wajib setelah daftar --}}
+            <div class="rounded-xl border p-6 text-center" style="border-color: var(--line); background: var(--paper-sunken);">
+                <div class="w-14 h-14 rounded-xl bg-emerald-500 text-[var(--on-accent)] flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+
+                <h3 class="text-[17px] font-bold leading-snug" style="color: var(--ink);">
+                    Masuk grup WhatsApp CSA
+                </h3>
+                <p class="text-[14px] leading-[1.7] mt-2 max-w-md mx-auto" style="color: var(--ink-soft);">
+                    Grup resmi CSA berisi info orientasi, jadwal kumpul perdana, dan diskusi dengan pengurus.
+                </p>
+
+                <div class="mt-5">
+                    @if ($whatsappGroupLink)
+                        <a href="{{ $whatsappGroupLink }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center justify-center gap-2.5 w-full min-h-[48px] px-6 bg-emerald-500 hover:bg-emerald-600 text-[var(--on-accent)] text-[15px] font-medium rounded-lg transition-colors">
+                            <i class="fab fa-whatsapp text-[18px]"></i>
+                            <span>Gabung grup WhatsApp</span>
+                        </a>
+                        <p class="text-[13px] mt-2" style="color: var(--ink-faint);">
+                            Tautan resmi, dibuka di aplikasi WhatsApp.
+                        </p>
+                    @else
+                        <div class="p-3.5 rounded-lg border text-[13px] leading-relaxed text-left" style="background: var(--paper); border-color: var(--line); color: var(--ink-soft);">
+                            <i class="fas fa-circle-info text-emerald-500 mr-1"></i>
+                            Link grup WhatsApp sedang diperbarui oleh pengurus. Silakan pantau pesan WhatsApp yang akan dikirimkan ke nomor Anda.
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Action Buttons --}}
+            <div class="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                <a href="{{ route('admin.dashboard', ['roleSlug' => $user->role->slug ?? 'anggota']) }}"
+                   class="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 bg-[var(--accent-solid)] hover:opacity-90 text-[var(--on-accent)] text-[13px] font-semibold rounded-2xl shadow-[0_4px_16px_-4px_rgba(0,0,0,0.15)] hover:scale-[1.01] active:scale-[0.99] transition-all duration-200">
+                    <span>Lanjut ke Dashboard Saya</span>
+                    <i class="fas fa-arrow-right text-[11px]"></i>
+                </a>
+
+                <a href="{{ route('home') }}"
+                   class="inline-flex items-center justify-center py-3.5 px-5 text-[var(--ink-soft)] hover:text-[var(--ink)] text-[13px] font-semibold rounded-2xl hover:bg-[var(--paper-sunken)] transition-all duration-200 w-full sm:w-auto">
+                    Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

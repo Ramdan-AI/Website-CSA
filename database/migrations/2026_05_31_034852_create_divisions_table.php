@@ -14,6 +14,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('image')->nullable();
             $table->text('description')->nullable();
+            $table->json('skills')->nullable();
+            $table->boolean('has_levels')->default(false);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

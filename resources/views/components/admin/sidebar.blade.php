@@ -6,87 +6,84 @@
     $isActive = fn (string $pattern) => request()->routeIs($pattern);
 @endphp
 
-<aside
-    x-data="{
+<div x-data="{
+        mobileOpen: false,
         expanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true'),
-        hoveredItem: null,
+        animated: false,
         toggle() {
+            this.animated = true;
             this.expanded = !this.expanded;
-            localStorage.setItem('sidebar-expanded', this.expanded);
-            this.$dispatch('sidebar-toggled', { expanded: this.expanded });
-            document.documentElement.classList.toggle('sidebar-collapsed', !this.expanded);
         }
     }"
-    class="csa-sidebar-root fixed left-4 top-4 h-[calc(100vh-32px)] z-50 flex flex-col gap-3"
-    :class="expanded ? 'w-[264px]' : 'w-[80px]'"
-    x-effect="localStorage.setItem('sidebar-expanded', expanded)">
+    @sidebar-mobile-toggle.window="mobileOpen = !mobileOpen; document.body.classList.toggle('overflow-hidden', mobileOpen)"
+    x-effect="localStorage.setItem('sidebar-expanded', expanded); $dispatch('sidebar-toggled', { expanded })">
+    <div x-show="mobileOpen" x-transition.opacity.duration.200
+        class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+        @click="mobileOpen = false; document.body.classList.remove('overflow-hidden')"></div>
 
-    <button @click="toggle()"
-        class="absolute top-1/2 -translate-y-1/2 -right-3 w-6 h-12 rounded-full bg-white/90 backdrop-blur-xl border border-black/5 flex items-center justify-center cursor-pointer z-50 shadow-sm hover:shadow-md hover:bg-white transition-all duration-300 focus:outline-none group/toggle">
-        <span class="w-1 h-3 rounded-full bg-gray-300 group-hover/toggle:bg-gray-500 group-hover/toggle:h-4 transition-all duration-300"></span>
-    </button>
+    <aside
+        @sidebar-mobile-close.window="mobileOpen = false; document.body.classList.remove('overflow-hidden')"
+        :class="[
+            mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+            expanded ? 'lg:w-[240px]' : 'lg:w-[72px]',
+            animated ? 'transition-all duration-300' : ''
+        ]"
+        class="csa-sidebar fixed inset-y-0 left-0 z-50 flex flex-col">
 
-    <div class="relative shrink-0 rounded-[22px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] h-[72px] flex items-center overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-400/[0.04] to-purple-400/[0.04] pointer-events-none"></div>
-        <a href="{{ route('admin.dashboard') }}" class="relative flex items-center gap-3.5 px-4 w-full">
-            <div class="w-10 h-10 flex items-center justify-center shrink-0 rounded-xl bg-white/70 shadow-sm">
-                <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-7 h-7 object-contain">
-            </div>
-            <div class="csa-sidebar-hideable overflow-hidden whitespace-nowrap"
-                x-show="expanded" x-transition:enter="transition delay-75" x-transition:leave="transition duration-150">
-                <span class="font-extrabold text-[15px] text-gray-900 tracking-tight block leading-none">CSA</span>
-                <span class="text-[10px] text-gray-400 font-medium">Panel Admin</span>
-            </div>
-        </a>
-    </div>
+        <div class="flex items-center gap-2.5 px-4 h-14 shrink-0">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5 min-w-0 flex-1">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                    style="background: var(--sidebar-logo-surface); border: 1px solid var(--sidebar-border);">
+                    @php
+                        $appSetting = \App\Models\Setting::first();
+                        $logoPath = ($appSetting && $appSetting->logo) ? asset('storage/' . $appSetting->logo) : asset('storage/system/logos/csa-logo.png');
+                    @endphp
+                    <img src="{{ $logoPath }}" alt="CSA" class="w-5 h-5 object-contain">
+                </div>
+                <div class="overflow-hidden whitespace-nowrap" x-show="expanded" x-cloak>
+                    <p class="text-[13px] font-bold tracking-tight leading-none" style="color: var(--sidebar-text-strong);">CSA</p>
+                </div>
+            </a>
+            <button @click="toggle()"
+                class="csa-sidebar-toggle hidden lg:flex w-7 h-7 rounded-md items-center justify-center transition-colors shrink-0"
+                aria-label="Toggle sidebar">
+                <x-admin.icon name="panel-left" :size="14" />
+            </button>
+        </div>
 
-    <nav id="csa-sidebar-nav"
-        onscroll="sessionStorage.setItem('csa_sidebar_scroll', this.scrollTop)"
-        class="relative flex-1 overflow-y-auto no-scrollbar rounded-[22px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-3"
-        data-lenis-prevent>
-
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-400/[0.03] to-purple-400/[0.03] rounded-[22px] pointer-events-none"></div>
-
-        <div class="relative z-10 flex flex-col gap-5 py-1">
+        <nav id="csa-sidebar-nav" class="flex-1 overflow-y-auto no-scrollbar px-2 py-3">
             @foreach ($groups as $group)
-                <div>
-                    <div class="csa-sidebar-nav-header px-3 h-5 overflow-hidden mb-1.5"
-                        x-show="expanded" x-transition:enter="transition delay-75">
-                        <span class="text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 select-none">
-                            {{ $group['label'] }}
-                        </span>
+                <div class="mb-3">
+                    <p class="csa-sidebar-group" x-show="expanded" x-cloak>{{ $group['label'] }}</p>
+                    <div class="flex flex-col gap-0.5">
+                        @foreach ($group['items'] as $item)
+                            <x-admin.sidebar-item
+                                :href="route($item['route'])"
+                                :icon="$item['icon']"
+                                :label="$item['label']"
+                                :active="$isActive($item['pattern'])" />
+                        @endforeach
                     </div>
-
-                    @foreach ($group['items'] as $item)
-                        <x-admin.sidebar-item
-                            :href="route($item['route'])"
-                            :icon="$item['icon']"
-                            :label="$item['label']"
-                            :active="$isActive($item['pattern'])"
-                            :color="$group['color']"
-                            hoverId="{{ $group['id'] }}-{{ $loop->index }}" />
-                    @endforeach
                 </div>
             @endforeach
-        </div>
-    </nav>
 
-    @if (count($settings) > 0)
-        <div class="relative shrink-0 rounded-[22px] bg-white/80 backdrop-blur-xl border border-white/60 shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col items-stretch overflow-hidden pt-1 pb-1.5">
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-400/[0.04] to-purple-400/[0.04] pointer-events-none"></div>
-
-            @foreach ($settings as $item)
-                <x-admin.sidebar-item
-                    :href="route($item['route'])"
-                    :icon="$item['icon']"
-                    :label="$item['label']"
-                    :active="$isActive($item['pattern'])"
-                    color="gray"
-                    hoverId="settings-{{ $loop->index }}" />
-            @endforeach
-        </div>
-    @endif
-</aside>
+            @if (count($settings))
+                <div class="mb-3">
+                    <p class="csa-sidebar-group" x-show="expanded" x-cloak>Pengaturan</p>
+                    <div class="flex flex-col gap-0.5">
+                        @foreach ($settings as $item)
+                            <x-admin.sidebar-item
+                                :href="route($item['route'])"
+                                :icon="$item['icon']"
+                                :label="$item['label']"
+                                :active="$isActive($item['pattern'])" />
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </nav>
+    </aside>
+</div>
 
 <script>
     (() => {
@@ -94,14 +91,6 @@
         if (!nav) return;
         const pos = sessionStorage.getItem('csa_sidebar_scroll');
         if (pos !== null) nav.scrollTop = parseInt(pos, 10);
+        nav.addEventListener('scroll', () => sessionStorage.setItem('csa_sidebar_scroll', nav.scrollTop));
     })();
 </script>
-
-<style>
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-
-    .csa-sidebar-root {
-        transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-</style>

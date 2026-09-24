@@ -2,79 +2,40 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\NewsCategory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\NewsCategoryRequest;
+use App\Models\NewsCategory;
 
 class NewsCategoryController extends Controller
 {
-    public function index()
+    /**
+     * Kategori berita dikelola lewat modal di halaman Berita.
+     * Controller ini hanya menangani aksi tulis.
+     */
+    public function store(NewsCategoryRequest $request)
     {
-        $categories = NewsCategory::latest()
-            ->paginate(10);
-
-        return view('pages.news-categories.index',
-            compact('categories')
-        );
-    }
-
-    public function create()
-    {
-        return view('pages.news-categories.create'
-        );
-    }
-
-    public function store(
-        NewsCategoryRequest $request
-    ) {
-        NewsCategory::create(
-            $request->validated()
-        );
+        NewsCategory::create($request->validated());
 
         return redirect()
-            ->route(
-                'admin.news-categories.index'
-            )
-            ->with(
-                'success',
-                'Kategori berhasil ditambahkan'
-            );
+            ->route('admin.news.index')
+            ->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    public function edit(
-        NewsCategory $newsCategory
-    ) {
-        return view('pages.news-categories.edit',
-            compact('newsCategory')
-        );
-    }
-
-    public function update(
-        NewsCategoryRequest $request,
-        NewsCategory $newsCategory
-    ) {
-        $newsCategory->update(
-            $request->validated()
-        );
+    public function update(NewsCategoryRequest $request, NewsCategory $newsCategory)
+    {
+        $newsCategory->update($request->validated());
 
         return redirect()
-            ->route(
-                'admin.news-categories.index'
-            )
-            ->with(
-                'success',
-                'Kategori berhasil diupdate'
-            );
+            ->route('admin.news.index')
+            ->with('success', 'Kategori berhasil diperbarui.');
     }
 
-    public function destroy(
-        NewsCategory $newsCategory
-    ) {
+    public function destroy(NewsCategory $newsCategory)
+    {
         $newsCategory->delete();
 
-        return back()->with(
-            'success',
-            'Kategori berhasil dihapus'
-        );
+        return redirect()
+            ->route('admin.news.index')
+            ->with('success', 'Kategori berhasil dihapus.');
     }
 }

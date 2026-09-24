@@ -15,12 +15,15 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('role_id')
+                ->nullable()
                 ->constrained()
                 ->cascadeOnUpdate()
                 ->restrictOnDelete();
 
             $table->string('name');
             $table->string('email')->unique();
+
+            $table->string('whatsapp')->nullable();
 
             $table->timestamp('email_verified_at')->nullable();
 

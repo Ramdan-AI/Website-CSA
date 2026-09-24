@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Division;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DivisionSeeder extends Seeder
 {
@@ -31,6 +32,7 @@ class DivisionSeeder extends Seeder
 
         if ($photoPool->isEmpty()) {
             $this->command->warn('Tidak ada gambar yang tersedia untuk divisi. Letakkan gambar di storage lalu jalankan ulang seeder.');
+
             return;
         }
 
@@ -40,6 +42,7 @@ class DivisionSeeder extends Seeder
                 'description' => 'Divisi Pemrograman Web fokus pada pengembangan aplikasi berbasis web dengan teknologi terkini. Anggota akan belajar tentang front-end, back-end, dan fullstack development.',
                 'image_keyword' => 'pemograman',
                 'skills' => ['HTML/CSS', 'PHP', 'JavaScript', 'React', 'Laravel', 'Node.js'],
+                'has_levels' => true,
             ],
             [
                 'name' => 'Divisi Multimedia',
@@ -55,14 +58,18 @@ class DivisionSeeder extends Seeder
             $keyword = $data['image_keyword'];
             unset($data['image_keyword']);
 
+            // Slug ditetapkan eksplisit karena WithoutModelEvents pada
+            // DatabaseSeeder menonaktifkan hook pembuat slug otomatis.
+            $data['slug'] = Str::slug($data['name']);
+
             // Cari gambar yang namanya relevan dengan divisi (pemograman/mulmed).
             $image = $photoPool->first(fn (string $file) => str_contains($file, $keyword));
 
-            if (!$image && !$photoPool->isEmpty()) {
+            if (! $image && ! $photoPool->isEmpty()) {
                 $image = $photoPool[$fallbackIndex++];
             }
 
-            if ($image && (!array_key_exists('image', $data) || !$data['image'])) {
+            if ($image && (! array_key_exists('image', $data) || ! $data['image'])) {
                 $data['image'] = $image;
             }
 

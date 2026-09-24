@@ -1,86 +1,89 @@
-{{-- TENTANG: simple two-column — understand CSA at a glance --}}
-<section id="tentang" class="relative py-20 md:py-28 lg:py-32 bg-white scroll-mt-24 overflow-hidden">
+{{-- Tentang CSA --}}
+@php
+    $years = range(2015, 2026);
+    $founded = 2017;
+@endphp
 
-    <div class="max-w-[1200px] mx-auto px-5 sm:px-8">
-        {{-- Header --}}
-        <div class="max-w-[760px] mb-12 sm:mb-16">
-            <p class="text-[11px] sm:text-xs font-semibold text-[#3664AF] tracking-[0.18em] uppercase mb-4" data-reveal="down">Tentang CSA</p>
-            <h2 class="text-[clamp(1.8rem,4.5vw,3rem)] font-bold text-gray-900 leading-[1.12] tracking-tight" data-reveal="curtain" data-reveal-delay="0.1">
-                Organisasi mahasiswa IT yang lahir dari kebutuhan untuk <span class="text-[#3664AF]">mencipta</span>
-            </h2>
-            <p class="text-[15px] sm:text-lg text-gray-500 leading-relaxed mt-5" data-reveal="fade" data-reveal-delay="0.25">
-                CSA (Creative Student Association) adalah organisasi kemahasiswaan berbasis IT di STMIK Mardira Indonesia yang berdiri sejak <span class="font-semibold text-gray-900">2017</span> — menyatukan pemrograman dan multimedia.
-            </p>
-        </div>
+<section id="tentang" class="scroll-mt-16" style="background: var(--paper-sunken); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+    <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-24">
 
-        <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {{-- Photo --}}
-            <div class="relative" data-reveal="up">
-                <div class="relative rounded-3xl overflow-hidden bg-[#eef3fb] border border-gray-100 aspect-[4/3] shadow-[0_24px_64px_-24px_rgba(54,100,175,0.25)]">
-                    @php $tentangPhoto = $heroPhotos->first(); @endphp
-                    @if ($tentangPhoto)
-                        <img src="{{ $imageUrl($tentangPhoto, 1280) }}" alt="{{ $tentangPhoto->caption ?? 'Kegiatan CSA' }}"
-                            class="w-full h-[130%] object-cover"
-                            data-parallax-deep="150" loading="lazy" decoding="async">
-                    @else
-                        <div class="w-full h-full flex items-center justify-center">
-                            <i class="fas fa-users text-6xl text-[#3664AF]/30"></i>
-                        </div>
-                    @endif
+        <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+
+            {{-- Kolom kiri: teks --}}
+            <div class="lg:col-span-6">
+                <p class="text-[13px] font-medium mb-3" style="color: var(--accent);">Tentang CSA</p>
+                <h2 class="text-[clamp(1.7rem,3.8vw,2.4rem)] font-bold leading-[1.22] tracking-[-0.025em]" style="color: var(--ink);">
+                    Organisasi mahasiswa IT di STMIK Mardira Indonesia
+                </h2>
+                <p class="text-[16px] leading-[1.8] mt-5" style="color: var(--ink-soft);">
+                    CSA menyatukan mahasiswa yang tertarik pada pemrograman dan multimedia. Anggotanya belajar bersama,
+                    mengerjakan proyek, dan mempersiapkan diri untuk dunia kerja.
+                </p>
+
+                {{-- Kartu divisi: logo asli, tanpa kotak ikon --}}
+                <div class="grid grid-cols-2 gap-4 mt-9">
+                    @foreach ($divisions->take(2) as $division)
+                        <a href="#divisi" class="group flex items-center gap-3.5 rounded-xl border p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--line-strong)]"
+                            style="background: var(--paper); border-color: var(--line);">
+                            @php $logo = $division->image ? asset('storage/' . $division->image) : null; @endphp
+                            @if ($logo)
+                                <img src="{{ $logo }}" alt="{{ $division->name }}" width="40" height="40"
+                                    class="w-10 h-10 object-contain shrink-0 transition-transform duration-300 group-hover:scale-105" loading="lazy" decoding="async">
+                            @endif
+                            <span class="min-w-0">
+                                <span class="block text-[15px] font-semibold truncate" style="color: var(--ink);">{{ $division->name }}</span>
+                                <span class="block text-[13px] mt-0.5" style="color: var(--ink-faint);">{{ $division->members_count ?? 0 }} anggota</span>
+                            </span>
+                        </a>
+                    @endforeach
                 </div>
 
-                <div class="absolute -bottom-5 left-6 sm:left-8 flex items-center gap-4 bg-white border border-gray-100 rounded-2xl px-6 py-4 shadow-[0_16px_48px_-16px_rgba(0,0,0,0.15)]" data-reveal="up" data-reveal-delay="0.3">
-                    <p class="text-3xl sm:text-4xl font-extrabold text-[#3664AF] tracking-tight leading-none">2017</p>
-                    <div>
-                        <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-gray-400">Berdiri sejak</p>
-                        <p class="text-[13px] text-gray-600 mt-0.5 leading-snug">Diawali dari HMJ IF yang non-aktif</p>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Sejarah / Visi / Misi --}}
-            <div class="grid gap-5" data-reveal-stagger>
-                <div class="rounded-2xl border border-gray-100 bg-[#fcfcfc] p-6 sm:p-7 hover:border-[#3664AF]/25 hover:bg-white hover:shadow-[0_12px_32px_-16px_rgba(54,100,175,0.25)] transition-all duration-300">
-                    <div class="flex items-center gap-4">
-                        <div class="w-11 h-11 rounded-xl bg-[#3664AF]/10 flex items-center justify-center shrink-0">
-                            <i class="fas fa-seedling text-[#3664AF] text-lg"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 tracking-tight">Sejarah</h3>
-                    </div>
-                    <p class="text-sm sm:text-[15px] text-gray-600 leading-relaxed mt-4">
-                        Berawal dari non-aktifnya UKM pemrograman HMJ IF. Di akhir <span class="font-semibold text-gray-900">2017</span>, sekumpulan mahasiswa kreatif mengaktifkan kembali organisasi yang berfokus pada pemrograman dan informatika — dan CSA lahir.
-                    </p>
-                </div>
-
-                <div class="rounded-2xl border border-gray-100 bg-[#fcfcfc] p-6 sm:p-7 hover:border-[#3664AF]/25 hover:bg-white hover:shadow-[0_12px_32px_-16px_rgba(54,100,175,0.25)] transition-all duration-300">
-                    <div class="flex items-center gap-4">
-                        <div class="w-11 h-11 rounded-xl bg-[#3664AF]/10 flex items-center justify-center shrink-0">
-                            <i class="fas fa-bullseye text-[#3664AF] text-lg"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 tracking-tight">Visi</h3>
-                    </div>
-                    <p class="text-sm sm:text-[15px] text-gray-600 leading-relaxed mt-4">
-                        Menjadi komunitas kreatif dan inovatif yang mendorong kolaborasi lintas divisi untuk menghasilkan karya unggulan yang berdampak nyata bagi kampus, masyarakat, dan industri.
-                    </p>
-                </div>
-
-                <div class="rounded-2xl border border-gray-100 bg-[#fcfcfc] p-6 sm:p-7 hover:border-[#3664AF]/25 hover:bg-white hover:shadow-[0_12px_32px_-16px_rgba(54,100,175,0.25)] transition-all duration-300">
-                    <div class="flex items-center gap-4">
-                        <div class="w-11 h-11 rounded-xl bg-[#3664AF]/10 flex items-center justify-center shrink-0">
-                            <i class="fas fa-list-check text-[#3664AF] text-lg"></i>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 tracking-tight">Misi</h3>
-                    </div>
-                    <ul class="mt-4 space-y-2.5">
-                        @foreach (['Mengembangkan potensi anggota secara kreatif', 'Mendorong inovasi lewat proyek kolaboratif', 'Memperkenalkan karya anggota secara luas', 'Menciptakan lingkungan kolaboratif yang inspiratif', 'Menguatkan solidaritas antaranggota'] as $misi)
-                            <li class="flex items-start gap-3 text-sm sm:text-[15px] text-gray-600 leading-relaxed">
-                                <i class="fas fa-check text-[#3664AF] text-xs mt-1 shrink-0"></i>
-                                <span>{{ $misi }}</span>
-                            </li>
+                {{-- Kalender tahunan: hanya tahun, 2017 disorot --}}
+                <div class="mt-9">
+                    <p class="text-[13px] font-medium mb-3" style="color: var(--ink-faint);">Berdiri sejak</p>
+                    <div data-calendar class="flex flex-wrap gap-x-5 gap-y-2.5">
+                        @foreach ($years as $year)
+                            <span data-cal-year-cell data-year="{{ $year }}"
+                                class="text-[20px] sm:text-[22px] font-bold tabular-nums transition-colors duration-300 {{ $year === $founded ? 'px-3 py-1 rounded-lg' : '' }}"
+                                style="color: var(--ink-faint);">{{ $year }}</span>
                         @endforeach
-                    </ul>
+                    </div>
+                </div>
+
+                <a href="#cerita"
+                    class="inline-flex items-center gap-2 mt-9 px-6 min-h-[48px] text-[var(--on-accent)] text-[15px] font-medium rounded-lg transition-opacity hover:opacity-90"
+                    style="background: var(--accent-solid);">
+                    Lihat perjalanan CSA <i class="fas fa-arrow-right text-[12px]"></i>
+                </a>
+            </div>
+
+            {{-- Kolom kanan: foto + kartu cerita --}}
+            <div class="lg:col-span-6">
+                @php $tentangPhoto = $heroPhotos->first(); @endphp
+                @if ($tentangPhoto)
+                    <div class="rounded-xl overflow-hidden aspect-[4/3]" style="background: var(--line);" data-reveal="up">
+                        <img src="{{ $imageUrl($tentangPhoto, 960) }}" alt="{{ $tentangPhoto->caption ?? 'Kegiatan CSA' }}"
+                            width="960" height="720" class="w-full h-full object-cover" loading="lazy" decoding="async">
+                    </div>
+                @endif
+
+                <div class="grid sm:grid-cols-2 gap-4 mt-6" data-reveal-stagger>
+                    @foreach ([
+                        ['Sejarah', 'Berawal dari UKM pemrograman HMJ IF yang tidak aktif. Akhir 2017, sekelompok mahasiswa menghidupkannya kembali dengan fokus pemrograman dan informatika.'],
+                        ['Visi', 'Menjadi komunitas kreatif dan inovatif yang mendorong kolaborasi lintas divisi, sehingga menghasilkan karya berdampak bagi kampus, masyarakat, dan industri.'],
+                        ['Misi', 'Mengembangkan potensi anggota, mendorong inovasi lewat proyek kolaboratif, dan memperkenalkan karya anggota secara luas.'],
+                        ['Fokus', 'Dua bidang belajar: pemrograman untuk produk digital, multimedia untuk karya visual dan interaktif.'],
+                    ] as [$label, $body])
+                        <article class="rounded-xl border p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--line-strong)]"
+                            style="background: var(--paper); border-color: var(--line);">
+                            <h3 class="text-[15px] font-semibold" style="color: var(--ink);">{{ $label }}</h3>
+                            <p class="text-[14px] leading-[1.75] mt-2" style="color: var(--ink-soft);">{{ $body }}</p>
+                        </article>
+                    @endforeach
                 </div>
             </div>
+
         </div>
+
     </div>
 </section>

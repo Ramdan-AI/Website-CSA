@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Role;
+use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
 {
@@ -16,36 +15,36 @@ class RoleSeeder extends Seeder
         Role::insert([
             [
                 'name' => 'Super Admin',
-                'slug' => 'super-admin'
+                'slug' => 'super-admin',
             ],
             [
                 'name' => 'Ketua',
-                'slug' => 'ketua'
+                'slug' => 'ketua',
             ],
             [
                 'name' => 'Wakil Ketua',
-                'slug' => 'wakil-ketua'
+                'slug' => 'wakil-ketua',
             ],
             [
                 'name' => 'Ketua Divisi',
-                'slug' => 'ketua-divisi'
+                'slug' => 'ketua-divisi',
             ],
             [
                 'name' => 'Wakil Ketua Divisi',
-                'slug' => 'wakil-ketua-divisi'
+                'slug' => 'wakil-ketua-divisi',
             ],
             [
                 'name' => 'Sekretaris',
-                'slug' => 'sekretaris'
+                'slug' => 'sekretaris',
             ],
             [
                 'name' => 'Bendahara',
-                'slug' => 'bendahara'
+                'slug' => 'bendahara',
             ],
             [
                 'name' => 'Anggota',
-                'slug' => 'anggota'
-            ]
+                'slug' => 'anggota',
+            ],
         ]);
     }
 }

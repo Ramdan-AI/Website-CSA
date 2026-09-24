@@ -1,159 +1,108 @@
-{{-- resources/views/pages/admin/members/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('content')
 <div class="space-y-6">
-    
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-blue-400 uppercase tracking-widest">Keanggotaan</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Anggota</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola data anggota dan struktur keanggotaan CSA.</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Anggota</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola data anggota dan struktur keanggotaan CSA.</p>
         </div>
-        <a href="{{ route('admin.members.create') }}" 
-           class="relative inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm font-semibold rounded-2xl shadow-[0_4px_20px_rgba(59,130,246,0.3)] hover:shadow-[0_4px_25px_rgba(59,130,246,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
-            <div class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <span class="relative flex items-center gap-2">
-                <i class="fas fa-plus text-xs"></i>
-                Tambah Anggota
-            </span>
-        </a>
+        @can('manage-members')
+            <a href="{{ route('admin.members.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
+                <x-admin.icon name="plus" :size="16" /> Tambah Anggota
+            </a>
+        @endcan
     </div>
 
-    <x-admin.table 
+    <form method="GET" data-ajax-filter class="csa-panel p-3 sm:p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1fr_auto] gap-3">
+        <div class="relative">
+            <x-admin.icon name="search" :size="17" class="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] pointer-events-none" />
+            <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama, NIM, email..." class="csa-input !pl-[42px] !rounded-full csa-search-input" aria-label="Cari anggota">
+        </div>
+        <x-form.select name="division_id" :value="request('division_id')" onchange="this.form.submit()" aria-label="Filter divisi"
+            placeholder="Semua Divisi"
+            :options="collect($divisions)->mapWithKeys(fn ($d) => [$d->id => $d->name])->all()" />
+        <x-form.select name="position_id" :value="request('position_id')" onchange="this.form.submit()" aria-label="Filter jabatan"
+            placeholder="Semua Jabatan"
+            :options="collect($positions)->mapWithKeys(fn ($p) => [$p->id => $p->name])->all()" />
+        <x-form.select name="status" :value="request('status')" onchange="this.form.submit()" aria-label="Filter status"
+            placeholder="Semua Status"
+            :options="['active' => 'Aktif', 'inactive' => 'Nonaktif']" />
+        <x-form.select name="sort" :value="request('sort', 'newest')" onchange="this.form.submit()" aria-label="Urutkan"
+            :options="['newest' => 'Terbaru', 'name_asc' => 'Nama A-Z', 'name_desc' => 'Nama Z-A']" />
+        <a href="{{ route('admin.members.index') }}" class="csa-btn csa-btn-ghost">Reset</a>
+    </form>
+
+    <x-admin.table
         :headers="[
-            ['label' => 'Anggota', 'width' => ''],
-            ['label' => 'Kontak', 'width' => ''],
-            ['label' => 'Divisi', 'width' => ''],
-            ['label' => 'Jabatan', 'width' => ''],
-            ['label' => 'Status', 'width' => ''],
+            ['label' => 'NIM'],
+            ['label' => 'Anggota'],
+            ['label' => 'Kontak'],
+            ['label' => 'Divisi'],
+            ['label' => 'Jabatan'],
+            ['label' => 'Status'],
             ['label' => 'Aksi', 'width' => 'w-24'],
         ]"
-        :hasPages="$members->hasPages()"
+        empty-icon="users"
+        empty-title="Belum ada anggota"
+        empty-description="Tambahkan anggota pertama untuk memulai."
+        :create-route="route('admin.members.create')"
+        create-label="Tambah Anggota"
+        :has-pages="$members->hasPages()"
         :paginator="$members"
     >
         @forelse($members as $member)
-            <tr class="hover:bg-blue-50/30 transition-colors duration-200">
-                {{-- Kolom Anggota --}}
-                <td class="py-4 px-6">
+            <tr class="csa-table-row">
+                <td class="csa-table-td">
+                    <span class="text-[12px] font-mono text-[var(--text-secondary)]">{{ $member->nim ?? '—' }}</span>
+                </td>
+                <td class="csa-table-td">
                     <div class="flex items-center gap-3">
-                        {{-- Avatar bulat --}}
-                        <div class="relative group/avatar shrink-0 {{ $member->photo_url ? 'cursor-pointer' : '' }}" 
-                             @if($member->photo_url)
-                             onclick="openImagePreview('imagePreviewModal', '{{ $member->photo_url }}', '{{ $member->name }}')"
-                             @endif>
-                            <div class="w-11 h-11 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm shadow-[0_4px_12px_rgba(59,130,246,0.25)] group-hover/avatar:shadow-[0_4px_20px_rgba(59,130,246,0.4)] transition-all duration-300 ring-2 ring-white/80">
-                                @if($member->photo_url)
-                                    <img src="{{ $member->photo_url }}" alt="{{ $member->name }}" class="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300">
-                                @else
-                                    <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover group-hover/avatar:scale-110 transition-transform duration-300">
-                                @endif
-                            </div>
-                            @if($member->photo_url)
-                                <div class="absolute inset-0 rounded-full bg-black/0 group-hover/avatar:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-                                    <i class="fas fa-search text-white text-xs opacity-0 group-hover/avatar:opacity-100 transition-opacity duration-300 drop-shadow-lg"></i>
-                                </div>
-                            @endif
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-muted)] shrink-0 {{ $member->photo_url ? 'cursor-pointer' : '' }}"
+                             @if($member->photo_url) onclick="openImagePreview('imagePreviewModal', '{{ $member->photo_url }}', '{{ $member->name }}')" @endif>
+                            <img src="{{ $member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                         </div>
                         <div class="min-w-0">
-                            <p class="text-sm font-bold text-gray-900 truncate">{{ $member->name }}</p>
-                            @if($member->nim)
-                                <p class="text-[10px] text-gray-400 font-mono tracking-wide">{{ $member->nim }}</p>
+                            <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $member->name }}</p>
+                            @if($member->email)
+                                <p class="text-[11px] text-[var(--text-muted)] truncate">{{ $member->email }}</p>
                             @endif
                         </div>
                     </div>
                 </td>
-
-                {{-- Kolom Kontak --}}
-                <td class="py-4 px-6">
-                    <div class="space-y-1">
+                <td class="csa-table-td">
+                    <div class="space-y-1 text-[12px]">
                         @if($member->email)
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <i class="fas fa-envelope text-blue-400/60 w-3.5 text-[10px]"></i>
-                                <span class="text-gray-600 truncate">{{ $member->email }}</span>
-                            </div>
+                            <p class="text-[var(--text-secondary)] truncate">{{ $member->email }}</p>
                         @endif
                         @if($member->phone)
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <i class="fas fa-phone text-purple-400/60 w-3.5 text-[10px]"></i>
-                                <span class="text-gray-600">{{ $member->phone }}</span>
-                            </div>
+                            <p class="text-[var(--text-muted)]">{{ $member->phone }}</p>
                         @endif
                         @if(!$member->email && !$member->phone)
-                            <span class="text-xs text-gray-300">-</span>
+                            <span class="text-[var(--text-muted)]">-</span>
                         @endif
                     </div>
                 </td>
-
-                {{-- Kolom Divisi --}}
-                <td class="py-4 px-6">
-                    @if($member->division)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-xs font-semibold text-blue-700 border border-blue-100/50">
-                            {{ $member->division->name }}
-                        </span>
-                    @else
-                        <span class="text-xs text-gray-300">-</span>
-                    @endif
+                <td class="csa-table-td">{{ $member->division->name ?? '-' }}</td>
+                <td class="csa-table-td">{{ $member->position->name ?? 'Belum ada' }}</td>
+                <td class="csa-table-td">
+                    <span class="csa-chip {{ $member->is_active ? 'csa-chip-green' : '' }}">{{ $member->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                 </td>
-
-                {{-- Kolom Jabatan --}}
-                <td class="py-4 px-6">
-                    @if($member->position)
-                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-purple-50 text-xs font-semibold text-purple-700 border border-purple-100/50">
-                            {{ $member->position->name }}
-                        </span>
-                    @else
-                        <span class="text-xs text-gray-300">Belum ada</span>
-                    @endif
-                </td>
-
-                {{-- Kolom Status --}}
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-2">
-                        @if($member->is_active)
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-[11px] font-semibold text-emerald-600 border border-emerald-100/50">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)] animate-pulse"></span>
-                                Aktif
-                            </span>
-                        @else
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 text-[11px] font-semibold text-gray-400 border border-gray-200/50">
-                                <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
-                                Nonaktif
-                            </span>
-                        @endif
-                        @if($member->user_id)
-                            <span class="text-[10px] text-blue-400" title="Terhubung dengan akun">
-                                <i class="fas fa-link"></i>
-                            </span>
-                        @endif
-                    </div>
-                </td>
-
-                {{-- Kolom Aksi --}}
-                <td class="py-4 px-6">
+                <td class="csa-table-td">
                     <div class="flex items-center gap-1">
-                        <a href="{{ route('admin.members.edit', $member) }}" 
-                           class="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(59,130,246,0.3)]"
-                           title="Edit">
-                            <i class="fas fa-pen text-[10px]"></i>
+                        <a href="{{ route('admin.members.show', $member) }}" class="csa-icon-btn" title="Detail" aria-label="Detail anggota">
+                            <x-admin.icon name="eye" :size="16" />
                         </a>
-                        <button onclick="openDeleteModal('deleteModal', '{{ route('admin.members.destroy', $member) }}')"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
-                                title="Hapus">
-                            <i class="fas fa-trash text-[10px]"></i>
+                        <a href="{{ route('admin.members.edit', $member) }}" class="csa-icon-btn" title="Edit" aria-label="Edit anggota">
+                            <x-admin.icon name="pen" :size="16" />
+                        </a>
+                        <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.members.destroy', $member) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus anggota">
+                            <x-admin.icon name="trash-2" :size="16" />
                         </button>
                     </div>
                 </td>
             </tr>
         @empty
-            <x-admin.empty-state 
-                icon="fa-users"
-                title="Belum ada anggota"
-                description="Tambahkan anggota pertama untuk memulai"
-                :createRoute="route('admin.members.create')"
-                createLabel="Tambah Anggota Pertama"
-                :colspan="6"
-            />
         @endforelse
     </x-admin.table>
 </div>

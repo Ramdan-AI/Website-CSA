@@ -3,27 +3,41 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DocumentRequest;
 use App\Models\Document;
 use App\Models\DocumentDownload;
-use App\Http\Requests\DocumentRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DocumentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $documents = Document::with('user')
-            ->latest()
-            ->paginate(12);
+        $validated = $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+        ]);
 
-        return view('pages.documents.index', compact('documents'));
+        $documents = Document::with('user')
+            ->when($validated['search'] ?? null, fn ($query, $search) => $query->where(function ($sub) use ($search) {
+                $sub->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            })
+            )
+            ->latest()
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('pages.documents.index', [
+            'documents' => $documents,
+        ]);
     }
 
     public function create()
     {
-        $document = new Document();
+        $document = new Document;
+
         return view('pages.documents.form', compact('document'));
     }
 
@@ -33,7 +47,7 @@ class DocumentController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filename = Str::slug($validated['title']) . '-' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = Str::slug($validated['title']).'-'.time().'.'.$file->getClientOriginalExtension();
             $validated['file'] = $file->storeAs('documents', $filename, 'public');
         }
 
@@ -62,13 +76,13 @@ class DocumentController extends Controller
             }
             // Format nama file baru
             $file = $request->file('file');
-            $filename = Str::slug($validated['title']) . '-' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = Str::slug($validated['title']).'-'.time().'.'.$file->getClientOriginalExtension();
             $validated['file'] = $file->storeAs('documents', $filename, 'public');
         } else {
             // If title changed, use Storage facade to move the file
             if ($document->title !== $validated['title'] && $document->file) {
                 $extension = pathinfo($document->file, PATHINFO_EXTENSION);
-                $newFilename = 'documents/' . Str::slug($validated['title']) . '-' . $document->created_at->timestamp . '.' . $extension;
+                $newFilename = 'documents/'.Str::slug($validated['title']).'-'.$document->created_at->timestamp.'.'.$extension;
 
                 if (Storage::disk('public')->exists($document->file)) {
                     Storage::disk('public')->move($document->file, $newFilename);
@@ -88,7 +102,7 @@ class DocumentController extends Controller
 
     public function download(Document $document)
     {
-        if (!Storage::disk('public')->exists($document->file)) {
+        if (! Storage::disk('public')->exists($document->file)) {
             return back()->with('error', 'File tidak ditemukan.');
         }
 
@@ -100,7 +114,7 @@ class DocumentController extends Controller
         ]);
 
         // Download dengan nama yang rapi: Judul Dokumen.extension
-        $downloadName = Str::slug($document->title) . '.' . pathinfo($document->file, PATHINFO_EXTENSION);
+        $downloadName = Str::slug($document->title).'.'.pathinfo($document->file, PATHINFO_EXTENSION);
 
         return Storage::disk('public')->download($document->file, $downloadName);
     }

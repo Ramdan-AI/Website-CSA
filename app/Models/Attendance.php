@@ -10,11 +10,12 @@ class Attendance extends Model
         'event_id',
         'member_id',
         'status',
-        'check_in_at'
+        'note',
+        'check_in_at',
     ];
 
     protected $casts = [
-        'check_in_at' => 'datetime'
+        'check_in_at' => 'datetime',
     ];
 
     public function event()

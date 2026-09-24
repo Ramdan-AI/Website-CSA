@@ -4,7 +4,7 @@
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeDocumentPreview(event)"></div>
 
     <div id="documentPreviewModalContent"
-        class="relative bg-white rounded-[28px] shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden mx-4"
+        class="relative bg-white rounded-2xl shadow-md border border-gray-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden mx-4"
         style="transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
 
         <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
@@ -35,6 +35,13 @@
                 class="w-full h-[70vh] rounded-2xl border border-gray-200 bg-white" frameborder="0">
             </iframe>
 
+            <object id="documentPreviewPdf" type="application/pdf" data=""
+                class="w-full h-[70vh] rounded-2xl border border-gray-200 bg-white hidden">
+                <p class="text-sm text-gray-500 text-center p-4">PDF tidak dapat ditampilkan. 
+                    <a id="pdfDownloadFallback" href="#" class="text-teal-600 underline">Download file</a>
+                </p>
+            </object>
+
             <div id="documentPreviewUnsupported" class="hidden flex items-center justify-center h-[70vh]">
                 <div class="text-center">
                     <div class="w-20 h-20 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
@@ -43,7 +50,7 @@
                     <p class="text-sm font-semibold text-gray-900 mb-1">Preview Tidak Tersedia</p>
                     <p class="text-xs text-gray-400 mb-4">Format file tidak mendukung preview langsung.</p>
                     <a href="#" id="documentPreviewModalDownloadAlt"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all">
+                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-teal-600 text-white text-sm font-semibold rounded-lg hover:bg-teal-700 transition-colors">
                         <i class="fas fa-download text-xs"></i>
                         Download File
                     </a>
@@ -60,24 +67,34 @@
         const modal = document.getElementById('documentPreviewModal');
         const content = document.getElementById('documentPreviewModalContent');
         const frame = document.getElementById('documentPreviewFrame');
+        const pdfObj = document.getElementById('documentPreviewPdf');
         const unsupported = document.getElementById('documentPreviewUnsupported');
         const titleEl = document.getElementById('documentPreviewModalTitle');
         const downloadLink = document.getElementById('documentPreviewModalDownload');
         const downloadLinkAlt = document.getElementById('documentPreviewModalDownloadAlt');
+        const pdfFallback = document.getElementById('pdfDownloadFallback');
 
         titleEl.textContent = title;
         downloadLink.href = downloadUrl;
         downloadLinkAlt.href = downloadUrl;
+        pdfFallback.href = downloadUrl;
 
         const ext = fileUrl.split('.').pop().toLowerCase();
-        const previewableExts = ['pdf', 'jpg', 'jpeg', 'png', 'gif', 'webp', 'txt'];
+        const previewableExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'txt'];
 
-        if (previewableExts.includes(ext)) {
+        if (ext === 'pdf') {
+            pdfObj.data = fileUrl;
+            pdfObj.classList.remove('hidden');
+            frame.classList.add('hidden');
+            unsupported.classList.add('hidden');
+        } else if (previewableExts.includes(ext)) {
             frame.src = fileUrl;
             frame.classList.remove('hidden');
+            pdfObj.classList.add('hidden');
             unsupported.classList.add('hidden');
         } else {
             frame.classList.add('hidden');
+            pdfObj.classList.add('hidden');
             unsupported.classList.remove('hidden');
         }
 
@@ -97,6 +114,7 @@
         const modal = document.getElementById('documentPreviewModal');
         const content = document.getElementById('documentPreviewModalContent');
         const frame = document.getElementById('documentPreviewFrame');
+        const pdfObj = document.getElementById('documentPreviewPdf');
 
         modal.style.opacity = '0';
         content.style.transform = 'scale(0.95)';
@@ -105,7 +123,8 @@
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             document.body.style.overflow = '';
-            frame.src = ''; // Reset iframe
+            frame.src = '';
+            pdfObj.data = '';
         }, 300);
     }
 

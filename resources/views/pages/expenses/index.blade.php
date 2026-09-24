@@ -1,92 +1,84 @@
-{{-- resources/views/pages/admin/expenses/index.blade.php --}}
 @extends('layouts.admin')
 
 @section('content')
 <div class="space-y-6">
-    
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-red-400 uppercase tracking-widest">Keuangan</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Pengeluaran</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola data pengeluaran dan keuangan organisasi CSA.</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Pengeluaran</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Catat semua pengeluaran kas organisasi.</p>
         </div>
-        <a href="{{ route('admin.expenses.create') }}" 
-           class="relative inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm font-semibold rounded-2xl shadow-[0_4px_20px_rgba(239,68,68,0.3)] hover:shadow-[0_4px_25px_rgba(239,68,68,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
-            <div class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <span class="relative flex items-center gap-2">
-                <i class="fas fa-plus text-xs"></i>
-                Tambah Pengeluaran
-            </span>
-        </a>
+        @can('manage-finance')
+            <a href="{{ route('admin.expenses.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
+                <x-admin.icon name="plus" :size="16" /> Tambah Pengeluaran
+            </a>
+        @endcan
     </div>
 
-    <x-admin.table 
-        :headers="[
-            ['label' => 'Keterangan', 'width' => ''],
-            ['label' => 'Jumlah', 'width' => ''],
-            ['label' => 'Tanggal', 'width' => ''],
-            ['label' => 'Dicatat Oleh', 'width' => ''],
-            ['label' => 'Aksi', 'width' => 'w-24'],
-        ]"
-        :hasPages="$expenses->hasPages()"
-        :paginator="$expenses"
-    >
-        @forelse($expenses as $expense)
-            <tr class="hover:bg-red-50/30 transition-colors duration-200">
-                <td class="py-4 px-6">
-                    <div class="min-w-0">
-                        <p class="text-sm font-bold text-gray-900 truncate">{{ $expense->title }}</p>
-                        @if($expense->description)
-                            <p class="text-[11px] text-gray-400 line-clamp-1 mt-0.5">{{ $expense->description }}</p>
-                        @endif
-                    </div>
-                </td>
+    @if (session('success'))
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+    @endif
 
-                <td class="py-4 px-6">
-                    <span class="inline-flex items-center gap-1 text-sm font-bold text-red-600">
-                        <span class="text-[10px]">Rp</span>
-                        {{ number_format($expense->amount, 0, ',', '.') }}
-                    </span>
-                </td>
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="csa-panel p-5">
+            <p class="csa-stat-label">Total Pengeluaran</p>
+            <p class="text-[26px] font-bold text-red-600 dark:text-red-400 mt-2 tabular-nums">Rp {{ number_format($total, 0, ',', '.') }}</p>
+        </div>
+        <div class="csa-panel p-5">
+            <p class="csa-stat-label">Bulan Ini ({{ now()->translatedFormat('F Y') }})</p>
+            <p class="text-[26px] font-bold text-[var(--text-primary)] mt-2 tabular-nums">Rp {{ number_format($monthTotal, 0, ',', '.') }}</p>
+        </div>
+    </section>
 
-                <td class="py-4 px-6">
-                    <span class="text-xs text-gray-600">{{ $expense->transaction_date->format('d M Y') }}</span>
-                </td>
+    <x-admin.search-bar name="search" :value="request('search')" placeholder="Cari keterangan atau deskripsi..." class="max-w-md" />
 
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white shrink-0 shadow-sm">
-                            <img src="{{ $expense->user->avatar ? asset('storage/' . $expense->user->avatar) : asset('storage/profile/profile-placeholder.png') }}" alt="{{ $expense->user->name }}" class="w-full h-full object-cover">
+    @if ($expenses->isEmpty())
+        <div class="csa-panel p-16 text-center">
+            <div class="w-14 h-14 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto text-red-600 dark:text-red-400">
+                <x-admin.icon name="trending-down" :size="26" />
+            </div>
+            <p class="text-[15px] font-semibold text-[var(--text-secondary)] mt-4">Belum ada pengeluaran</p>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Catat pengeluaran pertama organisasi.</p>
+        </div>
+    @else
+        <div class="csa-panel overflow-hidden">
+            <div class="divide-y divide-[var(--border-soft)]">
+                @foreach ($expenses as $expense)
+                    <article class="p-4 flex items-center gap-4 hover:bg-[var(--bg-hover)] transition-colors">
+                        <span class="w-10 h-10 rounded-xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                            <x-admin.icon name="trending-down" :size="18" />
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                            <p class="text-[14px] font-medium text-[var(--text-primary)] truncate">{{ $expense->title }}</p>
+                            <p class="text-[12px] text-[var(--text-muted)] truncate">
+                                {{ $expense->transaction_date->translatedFormat('d M Y') }}
+                                · {{ $expense->user?->name ?? 'CSA' }}
+                                @if ($expense->description) · {{ \Illuminate\Support\Str::limit($expense->description, 60) }} @endif
+                            </p>
                         </div>
-                        <span class="text-xs text-gray-600">{{ $expense->user->name }}</span>
-                    </div>
-                </td>
 
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-1">
-                        <a href="{{ route('admin.expenses.edit', $expense) }}" 
-                           class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
-                           title="Edit">
-                            <i class="fas fa-pen text-[10px]"></i>
-                        </a>
-                        <button onclick="openDeleteModal('deleteModal', '{{ route('admin.expenses.destroy', $expense) }}')"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
-                                title="Hapus">
-                            <i class="fas fa-trash text-[10px]"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        @empty
-            <x-admin.empty-state 
-                icon="fa-arrow-trend-down"
-                title="Belum ada pengeluaran"
-                description="Tambahkan data pengeluaran pertama"
-                :createRoute="route('admin.expenses.create')"
-                createLabel="Tambah Pengeluaran"
-                :colspan="5"
-            />
-        @endforelse
-    </x-admin.table>
+                        <p class="text-[14px] font-semibold text-red-600 dark:text-red-400 whitespace-nowrap shrink-0 tabular-nums">
+                            -Rp {{ number_format($expense->amount, 0, ',', '.') }}
+                        </p>
+
+                        @can('manage-finance')
+                            <div class="flex items-center gap-1 shrink-0">
+                                <a href="{{ route('admin.expenses.edit', $expense) }}" class="csa-icon-btn" title="Edit" aria-label="Edit pengeluaran">
+                                    <x-admin.icon name="pen" :size="16" />
+                                </a>
+                                <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.expenses.destroy', $expense) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus pengeluaran">
+                                    <x-admin.icon name="trash-2" :size="16" />
+                                </button>
+                            </div>
+                        @endcan
+                    </article>
+                @endforeach
+            </div>
+        </div>
+
+        @if ($expenses->hasPages())
+            <div>{{ $expenses->links() }}</div>
+        @endif
+    @endif
 </div>
 @endsection

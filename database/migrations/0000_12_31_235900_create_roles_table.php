@@ -19,6 +19,8 @@ return new class extends Migration
 
             $table->text('description')->nullable();
 
+            $table->string('guard_name')->default('web');
+
             $table->timestamps();
         });
     }

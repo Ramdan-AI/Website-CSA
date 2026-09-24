@@ -10,6 +10,7 @@ use App\Models\Division;
 use App\Models\News;
 use App\Models\Setting;
 use App\Models\Gallery;
+use App\Models\Project;
 
 class HomeController extends Controller
 {
@@ -24,7 +25,17 @@ class HomeController extends Controller
         $news = News::with(['category', 'author'])
             ->where('status', 'published')
             ->orderBy('published_at', 'desc')
-            ->take(3)
+            ->take(5)
+            ->get();
+
+        // Showcase proyek untuk section "Karya anggota" di landing page.
+        $projects = Project::query()
+            ->select(['id', 'submitted_by', 'title', 'slug', 'summary', 'description', 'thumbnail', 'images', 'tech_stack', 'repo_url', 'demo_url', 'featured', 'created_at'])
+            ->with(['submitter:id,name', 'members:id,name'])
+            ->published()
+            ->orderByDesc('featured')
+            ->latest()
+            ->take(6)
             ->get();
 
         $setting = Setting::first();
@@ -59,6 +70,7 @@ class HomeController extends Controller
             'members',
             'divisions',
             'news',
+            'projects',
             'setting',
             'photos',
             'statAnggota',

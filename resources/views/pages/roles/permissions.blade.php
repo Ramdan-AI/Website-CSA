@@ -1,83 +1,92 @@
 @extends('layouts.admin')
 
 @section('content')
-    <div class="space-y-8">
-        {{-- Header --}}
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+<div class="space-y-6" x-data="{
+        selected: @js(array_map('strval', $rolePermissionIds)),
+        total: {{ $permissions->flatten()->count() }},
+        get count() { return this.selected.length; },
+        has(id) { return this.selected.includes(String(id)); },
+        toggle(id) {
+            id = String(id);
+            const i = this.selected.indexOf(id);
+            if (i === -1) this.selected.push(id); else this.selected.splice(i, 1);
+        },
+        allOf(ids) { return ids.every((id) => this.selected.includes(String(id))); },
+        setGroup(ids, on) {
+            ids.map(String).forEach((id) => {
+                const i = this.selected.indexOf(id);
+                if (on && i === -1) this.selected.push(id);
+                if (!on && i !== -1) this.selected.splice(i, 1);
+            });
+        },
+    }">
+    <div>
+        <a href="{{ route('admin.roles.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
+            <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Role
+        </a>
+        <div class="flex items-center gap-3 mt-3">
+            <span class="w-11 h-11 rounded-full bg-[var(--bg-muted)] text-[var(--text-secondary)] flex items-center justify-center shrink-0">
+                <x-admin.icon name="shield" :size="20" />
+            </span>
             <div>
-                <p class="text-xs font-semibold text-blue-500 uppercase tracking-wider">Sistem</p>
-                <h1 class="text-2xl font-bold text-gray-900 mt-1">Permission: {{ $role->name }}</h1>
-                <p class="text-sm text-gray-500 mt-1">
-                    Kelola hak akses untuk role <strong class="text-gray-700">{{ $role->name }}</strong>.
-                </p>
+                <h1 class="text-[22px] sm:text-[26px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">{{ $role->name }}</h1>
+                <p class="text-[13px] text-[var(--text-muted)] mt-0.5">Atur hak akses untuk role ini.</p>
             </div>
-            <a href="{{ route('admin.roles.index') }}"
-                class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors shadow-sm">
-                <i class="fas fa-arrow-left text-xs"></i>
-                Kembali
-            </a>
+        </div>
+    </div>
+
+    @if (session('success'))
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+    @endif
+
+    <form method="POST" action="{{ route('admin.roles.permissions.update', $role) }}" class="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-5 items-start">
+        @csrf
+        @method('PUT')
+
+        <div class="space-y-4">
+            @foreach ($permissions as $group => $groupPermissions)
+                @php $ids = $groupPermissions->pluck('id')->all(); @endphp
+                <section class="csa-panel overflow-hidden">
+                    <header class="px-5 py-3.5 border-b border-[var(--border-soft)] flex items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-[14px] font-semibold text-[var(--text-primary)] capitalize">{{ $group }}</h2>
+                            <p class="text-[12px] text-[var(--text-muted)] mt-0.5">{{ $groupPermissions->count() }} permission</p>
+                        </div>
+                        <button type="button" class="text-[12px] font-medium text-[var(--accent-bright)] hover:underline"
+                            x-text="allOf(@js($ids)) ? 'Kosongkan' : 'Pilih semua'"
+                            @click="setGroup(@js($ids), !allOf(@js($ids)))"></button>
+                    </header>
+
+                    <div class="divide-y divide-[var(--border-soft)]">
+                        @foreach ($groupPermissions as $permission)
+                            <label class="flex items-center gap-3.5 px-5 py-3 cursor-pointer hover:bg-[var(--bg-hover)] transition-colors">
+                                <input type="checkbox" name="permissions[]" value="{{ $permission->id }}" class="sr-only peer"
+                                    :checked="has({{ $permission->id }})" @change="toggle({{ $permission->id }})">
+                                <span class="relative w-9 h-5 rounded-full bg-[var(--border-strong)] transition-colors peer-checked:bg-[var(--accent)] after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:transition-all peer-checked:after:translate-x-4 shrink-0"></span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block text-[13px] font-medium text-[var(--text-primary)]">{{ $permission->name }}</span>
+                                    <span class="block text-[11px] text-[var(--text-muted)] font-mono mt-0.5 truncate">{{ $permission->slug }}</span>
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                </section>
+            @endforeach
         </div>
 
-        {{-- Form --}}
-        <form method="POST" action="{{ route('admin.roles.permissions.update', $role) }}">
-            @csrf
-            @method('PUT')
+        {{-- Ringkasan sticky --}}
+        <aside class="csa-panel p-5 lg:sticky lg:top-20">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--text-muted)]">Ringkasan</p>
+            <p class="text-[26px] font-bold text-[var(--text-primary)] mt-2 tabular-nums">
+                <span x-text="count"></span><span class="text-[16px] text-[var(--text-muted)] font-medium">/{{ $permissions->flatten()->count() }}</span>
+            </p>
+            <p class="text-[12px] text-[var(--text-muted)] mt-1">permission dipilih</p>
 
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="p-6">
-                    @foreach ($permissions as $group => $groupPermissions)
-                        <div class="mb-6 last:mb-0">
-                            <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
-                                {{ match($group) {
-                                    'manage' => 'Management',
-                                    'view' => 'View Only',
-                                    default => ucfirst($group)
-                                } }}
-                            </h4>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                @foreach ($groupPermissions as $permission)
-                                    @php
-                                        $checked = in_array($permission->id, $rolePermissionIds);
-                                    @endphp
-                                    <label
-                                        class="flex items-center gap-3 p-3 rounded-xl border transition-colors cursor-pointer
-                                        {{ $checked ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-100 hover:border-gray-200' }}">
-                                        <input type="checkbox" name="permissions[]" value="{{ $permission->id }}"
-                                            {{ $checked ? 'checked' : '' }}
-                                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                        <div class="min-w-0 flex-1">
-                                            <p class="text-sm font-medium text-gray-900">{{ $permission->name }}</p>
-                                            <p class="text-xs text-gray-400 font-mono mt-0.5">{{ $permission->slug }}</p>
-                                        </div>
-                                    </label>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-
-                <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                    <div class="text-xs text-gray-400">
-                        <span id="checkedCount">{{ count($rolePermissionIds) }}</span> dari {{ $permissions->flatten()->count() }} permission dipilih
-                    </div>
-                    <button type="submit"
-                        class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
-                        <i class="fas fa-save text-xs"></i>
-                        Simpan Permission
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
+            <button type="submit" class="csa-btn csa-btn-primary w-full mt-5">
+                <x-admin.icon name="save" :size="16" /> Simpan Permission
+            </button>
+            <a href="{{ route('admin.roles.index') }}" class="csa-btn csa-btn-ghost w-full mt-2">Batal</a>
+        </aside>
+    </form>
+</div>
 @endsection
-
-@push('scripts')
-<script>
-    document.querySelectorAll('input[name="permissions[]"]').forEach(cb => {
-        cb.addEventListener('change', function() {
-            const count = document.querySelectorAll('input[name="permissions[]"]:checked').length;
-            document.getElementById('checkedCount').textContent = count;
-        });
-    });
-</script>
-@endpush

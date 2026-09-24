@@ -1,123 +1,84 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="theme-color" content="#0b0d12">
     <title>CSA Admin Panel</title>
-    <link rel="icon" href="{{ asset('storage/system/logos/csa.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('storage/system/logos/csa-logo.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link
-        href="https://fonts.bunny.net/css?family=geist:300,400,500,600,700&family=jetbrains-mono:400,500,600&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
     @stack('styles')
+    <script>
+        (() => {
+            const stored = localStorage.getItem('theme');
+            if (stored === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+        document.addEventListener('DOMContentLoaded', () => window.lucide?.createIcons());
+    </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <style>
-        @keyframes contentFadeUp {
-            0% {
-                opacity: 0;
-                transform: translateY(32px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .page-content {
-            opacity: 0;
-            animation: contentFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        main {
-            min-height: calc(100vh - 64px);
-        }
-
-        html.sidebar-collapsed .csa-sidebar-root {
-            width: 80px !important;
-        }
-
-        html.sidebar-collapsed .main-content-container {
-            padding-left: 112px !important;
-        }
-
-        html.sidebar-collapsed .csa-sidebar-hideable {
-            opacity: 0 !important;
-            transform: translateX(-16px) !important;
-            pointer-events: none !important;
-            position: relative !important;
-        }
-
-        html.sidebar-collapsed .csa-sidebar-nav-header {
-            opacity: 0 !important;
-        }
-
-        .csa-sidebar-root {
-            width: 280px;
-        }
-
-        body.page-ready .csa-sidebar-root {
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.page-ready .main-content-container {
-            transition: padding-left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.page-ready .csa-sidebar-hideable {
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body.page-ready .csa-sidebar-nav-header {
-            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-    </style>
 </head>
 
-<body class="text-gray-900 font-sans antialiased overflow-x-hidden"
-    style="background: linear-gradient(135deg, #EEF2FF 0%, #F1F5F9 50%, #FAF5FF 100%); background-attachment: fixed;"
+<body class="antialiased overflow-x-hidden bg-[var(--bg-body)] text-[var(--text-primary)]"
     x-data="{
-        sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true')
-    }" @sidebar-toggled.window="sidebarExpanded = $event.detail.expanded">
-
-    <script>
-        (function() {
-            const isExpanded = JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true');
-            if (!isExpanded) {
-                document.documentElement.classList.add('sidebar-collapsed');
+        isDark: true,
+        sidebarExpanded: JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true'),
+        animateLayout: false,
+        applyTheme() {
+            const html = document.documentElement;
+            const stored = localStorage.getItem('theme');
+            if (stored === 'light') {
+                this.isDark = false;
+                html.classList.remove('dark');
+            } else {
+                this.isDark = true;
+                html.classList.add('dark');
             }
-            document.addEventListener('alpine:initialized', () => {
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => {
-                        document.body.classList.add('page-ready');
-                    });
-                });
+            const meta = document.querySelector('meta[name=theme-color]');
+            if (meta) meta.setAttribute('content', this.isDark ? '#0b0d12' : '#f4f6fb');
+        },
+        toggleTheme() {
+            const next = this.isDark ? 'light' : 'dark';
+            localStorage.setItem('theme', next);
+            this.applyTheme();
+            this.$nextTick(() => window.renderLucide?.());
+        },
+        init() {
+            this.applyTheme();
+            window.addEventListener('sidebar-toggled', (event) => {
+                this.sidebarExpanded = event.detail.expanded;
+                this.animateLayout = true;
             });
-        })();
-    </script>
+        }
+    }">
 
     <x-admin.sidebar />
 
+    {{-- Transisi padding hanya aktif setelah sidebar benar-benar ditoggle,
+         sehingga pindah halaman tidak memicu animasi geser. --}}
     <div class="main-content-container flex flex-col min-h-screen"
-        :class="sidebarExpanded ? 'pl-[312px]' : 'pl-[112px]'">
-
+        :class="[
+            animateLayout ? 'transition-[padding] duration-300' : '',
+            sidebarExpanded ? 'lg:pl-[240px]' : 'lg:pl-[72px]'
+        ]">
         <x-admin.topbar />
-
-        <main class="p-8">
-            <div class="page-content">
-                @yield('content')
-            </div>
+        <main class="p-4 sm:p-6 lg:p-8">
+            <div class="page-content max-w-[1600px] mx-auto">@yield('content')</div>
         </main>
     </div>
 
     <x-admin.modal.delete id="deleteModal" />
     <x-admin.modal.image-preview id="imagePreviewModal" />
     <x-admin.modal.docs-preview />
-
     <x-admin.toast id="globalToast" />
 
     <script>
@@ -125,88 +86,38 @@
             const modal = document.getElementById(modalId);
             const content = document.getElementById(modalId + 'Content');
             const form = document.getElementById(modalId + 'Form');
-
             if (form) form.action = url;
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-
-            requestAnimationFrame(() => {
-                modal.style.opacity = '1';
-                content.style.transform = 'scale(1)';
-            });
+            modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => { modal.style.opacity = '1'; content.style.transform = 'scale(1)'; });
         }
-
         function closeDeleteModal(modalId, event) {
             if (event && event.target !== document.getElementById(modalId)) return;
-
-            const modal = document.getElementById(modalId);
-            const content = document.getElementById(modalId + 'Content');
-
-            modal.style.opacity = '0';
-            content.style.transform = 'scale(0.9)';
-
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.style.overflow = '';
-            }, 300);
+            const modal = document.getElementById(modalId), content = document.getElementById(modalId + 'Content');
+            modal.style.opacity = '0'; content.style.transform = 'scale(0.9)';
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }, 300);
         }
-
         function openImagePreview(modalId, imageUrl, title) {
-            const modal = document.getElementById(modalId);
-            const content = document.getElementById(modalId + 'Content');
-            const img = document.getElementById(modalId + 'Image');
-            const titleEl = document.getElementById(modalId + 'Title');
-            const download = document.getElementById(modalId + 'Download');
-
-            if (img) img.src = imageUrl;
-            if (titleEl) titleEl.textContent = title;
-            if (download) download.href = imageUrl;
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.style.overflow = 'hidden';
-
-            requestAnimationFrame(() => {
-                modal.style.opacity = '1';
-                content.style.transform = 'scale(1)';
-            });
+            const modal = document.getElementById(modalId), content = document.getElementById(modalId + 'Content');
+            const img = document.getElementById(modalId + 'Image'), titleEl = document.getElementById(modalId + 'Title'), download = document.getElementById(modalId + 'Download');
+            if (img) img.src = imageUrl; if (titleEl) titleEl.textContent = title; if (download) download.href = imageUrl;
+            modal.classList.remove('hidden'); modal.classList.add('flex'); document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => { modal.style.opacity = '1'; content.style.transform = 'scale(1)'; });
         }
-
         function closeImagePreview(modalId, event) {
             if (event && event.target !== document.getElementById(modalId)) return;
-
-            const modal = document.getElementById(modalId);
-            const content = document.getElementById(modalId + 'Content');
-
-            modal.style.opacity = '0';
-            content.style.transform = 'scale(0.95)';
-
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                document.body.style.overflow = '';
-            }, 300);
+            const modal = document.getElementById(modalId), content = document.getElementById(modalId + 'Content');
+            modal.style.opacity = '0'; content.style.transform = 'scale(0.95)';
+            setTimeout(() => { modal.classList.add('hidden'); modal.classList.remove('flex'); document.body.style.overflow = ''; }, 300);
         }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('[id$="Modal"]').forEach(modal => {
-                    if (!modal.classList.contains('hidden')) {
-                        if (modal.id.includes('delete')) {
-                            closeDeleteModal(modal.id);
-                        } else {
-                            closeImagePreview(modal.id);
-                        }
-                    }
-                });
-            }
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Escape') return;
+            document.querySelectorAll('[id$="Modal"]').forEach((modal) => {
+                if (!modal.classList.contains('hidden')) {
+                    modal.id.includes('delete') ? closeDeleteModal(modal.id) : closeImagePreview(modal.id);
+                }
+            });
         });
     </script>
-
     @stack('scripts')
 </body>
-
 </html>

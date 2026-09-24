@@ -18,6 +18,8 @@ return new class extends Migration
 
             $table->text('description')->nullable();
 
+            $table->unsignedInteger('max_members')->default(1);
+
             $table->timestamps();
         });
     }

@@ -1,86 +1,135 @@
 @extends('layouts.admin')
 
-@section('content')
-<div class="space-y-6">
+@php
+    use Illuminate\Support\Str;
 
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    $statusFilter = request('status', '');
+    $categoryFilter = request('category_id', '');
+    $total = $news->total();
+@endphp
+
+@section('content')
+<div class="space-y-6" x-data="{ categoryModal: false }">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-teal-400 uppercase tracking-widest">Publikasi</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Berita</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola seluruh berita dan publikasi konten dalam sistem.</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Berita</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola berita dan artikel yang tampil di situs.</p>
         </div>
-        <a href="{{ route('admin.news.create') }}"
-           class="relative inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-teal-500 to-teal-600 text-white text-sm font-semibold rounded-2xl shadow-[0_4px_20px_rgba(20,184,166,0.3)] hover:shadow-[0_4px_25px_rgba(20,184,166,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
-            <div class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <span class="relative flex items-center gap-2">
-                <i class="fas fa-plus text-xs"></i>
-                Tambah Berita
-            </span>
-        </a>
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+            @can('manage-news')
+                <button type="button" @click="categoryModal = true" class="csa-btn csa-btn-ghost">
+                    <x-admin.icon name="tags" :size="16" /> Kategori
+                </button>
+                <a href="{{ route('admin.news.create') }}" class="csa-btn csa-btn-primary">
+                    <x-admin.icon name="plus" :size="16" /> Tulis Berita
+                </a>
+            @endcan
+        </div>
     </div>
 
-    <x-admin.table :headers="[
-        ['label' => 'Judul', 'width' => ''],
-        ['label' => 'Kategori', 'width' => ''],
-        ['label' => 'Author', 'width' => ''],
-        ['label' => 'Status', 'width' => ''],
-        ['label' => 'Aksi', 'width' => 'w-24'],
-    ]" :hasPages="$news->hasPages()" :paginator="$news">
-        @forelse($news as $item)
-            <tr class="hover:bg-teal-50/30 transition-colors duration-200">
-                <td class="py-4 px-6">
-                    <p class="text-sm font-bold text-gray-900 truncate max-w-[280px]">{{ $item->title }}</p>
-                </td>
-                <td class="py-4 px-6">
-                    @if($item->category)
-                        <span class="inline-flex px-2.5 py-1 rounded-lg bg-teal-50 text-[11px] font-semibold text-teal-700 border border-teal-100/50">
-                            {{ $item->category->name }}
-                        </span>
-                    @else
-                        <span class="text-xs text-gray-300">-</span>
-                    @endif
-                </td>
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-2">
-                        <div class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white shrink-0 shadow-sm">
-                            <img src="{{ $item->author?->avatar ? asset('storage/' . $item->author->avatar) : asset('storage/profile/profile-placeholder.png') }}" alt="{{ $item->author?->name }}" class="w-full h-full object-cover">
+    @if (session('success'))
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+    @endif
+
+    {{-- Toolbar: search Google + tab status + kategori --}}
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-center">
+        <x-admin.search-bar name="search" :value="request('search')" placeholder="Cari judul atau isi berita..."
+            class="lg:max-w-md flex-1" />
+
+        <div class="flex flex-wrap items-center gap-2 lg:ml-auto">
+            <div class="inline-flex items-center gap-1 p-1 rounded-full bg-[var(--bg-muted)]">
+                @foreach (['' => 'Semua', 'published' => 'Terbit', 'draft' => 'Draf'] as $value => $label)
+                    <a href="{{ route('admin.news.index', array_filter(['status' => $value, 'category_id' => $categoryFilter, 'search' => request('search')])) }}" data-ajax-link
+                        class="px-3.5 py-1.5 rounded-full text-[12px] font-medium transition-colors {{ $statusFilter === $value ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]' }}">
+                        {{ $label }}
+                    </a>
+                @endforeach
+            </div>
+
+            <form method="GET" class="w-48">
+                @if (request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+                @if ($statusFilter !== '')
+                    <input type="hidden" name="status" value="{{ $statusFilter }}">
+                @endif
+                <x-form.select name="category_id" :value="$categoryFilter" onchange="this.form.submit()"
+                    placeholder="Semua kategori"
+                    :options="collect($categories)->mapWithKeys(fn ($c) => [$c->id => $c->name])->all()" />
+            </form>
+        </div>
+    </div>
+
+    @if ($news->isEmpty())
+        <div class="csa-panel p-16 text-center">
+            <div class="w-14 h-14 rounded-2xl bg-[var(--bg-muted)] flex items-center justify-center mx-auto text-[var(--text-muted)]">
+                <x-admin.icon name="newspaper" :size="26" />
+            </div>
+            <p class="text-[15px] font-semibold text-[var(--text-secondary)] mt-4">Belum ada berita</p>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Tulis berita pertama untuk ditampilkan di situs.</p>
+            @can('manage-news')
+                <a href="{{ route('admin.news.create') }}" class="csa-btn csa-btn-primary mt-5 inline-flex">
+                    <x-admin.icon name="plus" :size="16" /> Tulis Berita
+                </a>
+            @endcan
+        </div>
+    @else
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+            @foreach ($news as $item)
+                <article class="csa-panel csa-panel-hover overflow-hidden flex flex-col group">
+                    <a href="{{ route('admin.news.show', $item) }}" class="block">
+                        <div class="aspect-[16/10] bg-[var(--bg-muted)] overflow-hidden">
+                            @if ($item->thumbnail_url)
+                                <img src="{{ $item->thumbnail_url }}" alt="{{ $item->title }}" loading="lazy"
+                                    class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]">
+                            @else
+                                <div class="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+                                    <x-admin.icon name="newspaper" :size="28" />
+                                </div>
+                            @endif
                         </div>
-                        <span class="text-xs text-gray-600">{{ $item->author?->name ?? '-' }}</span>
+                    </a>
+
+                    <div class="p-4 flex flex-col flex-1">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[11px] font-medium text-[var(--accent-bright)]">{{ $item->category?->name ?? 'Tanpa kategori' }}</span>
+                            <span class="csa-chip {{ $item->status === 'published' ? 'csa-chip-green' : 'csa-chip-amber' }}">
+                                {{ $item->status === 'published' ? 'Terbit' : 'Draf' }}
+                            </span>
+                        </div>
+
+                        <h2 class="text-[14px] font-semibold text-[var(--text-primary)] mt-2 leading-snug line-clamp-2">
+                            <a href="{{ route('admin.news.show', $item) }}" class="hover:text-[var(--accent-bright)] transition-colors">{{ $item->title }}</a>
+                        </h2>
+                        <p class="text-[12px] text-[var(--text-muted)] mt-1.5 line-clamp-2 leading-relaxed">{{ Str::limit(strip_tags($item->content), 110) }}</p>
+
+                        <div class="mt-auto pt-3.5 mt-3.5 border-t border-[var(--border-soft)] flex items-center justify-between text-[11px] text-[var(--text-muted)]">
+                            <span>{{ $item->author?->name ?? 'CSA' }}</span>
+                            <span>{{ $item->published_at?->translatedFormat('d M Y') ?? $item->created_at->translatedFormat('d M Y') }}</span>
+                        </div>
                     </div>
-                </td>
-                <td class="py-4 px-6">
-                    @if($item->status === 'published')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-[11px] font-semibold text-emerald-600 border border-emerald-100/50">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]"></span>
-                            Published
-                        </span>
-                    @else
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-[11px] font-semibold text-amber-600 border border-amber-100/50">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                            Draft
-                        </span>
-                    @endif
-                </td>
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-1">
-                        <a href="{{ route('admin.news.edit', $item) }}"
-                           class="w-8 h-8 rounded-lg flex items-center justify-center bg-teal-50 text-teal-600 hover:bg-teal-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(20,184,166,0.3)]"
-                           title="Edit">
-                            <i class="fas fa-pen text-[10px]"></i>
-                        </a>
-                        <button onclick="openDeleteModal('deleteModal', '{{ route('admin.news.destroy', $item) }}')"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
-                                title="Hapus">
-                            <i class="fas fa-trash text-[10px]"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        @empty
-            <x-admin.empty-state icon="fa-newspaper" title="Belum ada berita"
-                description="Belum ada berita yang dipublikasikan." :createRoute="route('admin.news.create')" createLabel="Tambah Berita"
-                :colspan="5" />
-        @endforelse
-    </x-admin.table>
+
+                    @can('manage-news')
+                        <div class="px-4 py-2.5 border-t border-[var(--border-soft)] flex items-center justify-end gap-1">
+                            <a href="{{ route('admin.news.edit', $item) }}" class="csa-icon-btn" title="Edit" aria-label="Edit berita">
+                                <x-admin.icon name="pen" :size="16" />
+                            </a>
+                            <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.news.destroy', $item) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus berita">
+                                <x-admin.icon name="trash-2" :size="16" />
+                            </button>
+                        </div>
+                    @endcan
+                </article>
+            @endforeach
+        </div>
+
+        @if ($news->hasPages())
+            <div>{{ $news->links() }}</div>
+        @endif
+    @endif
+
+    @can('manage-news')
+        <x-admin.modal.news-category :categories="$categories" />
+    @endcan
 </div>
 @endsection

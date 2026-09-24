@@ -1,91 +1,108 @@
 @extends('layouts.admin')
 
+@php
+    use Illuminate\Support\Str;
+
+    $statusChip = fn (?string $status) => match ($status) {
+        'published' => 'csa-chip-green',
+        'draft' => 'csa-chip-amber',
+        default => '',
+    };
+@endphp
+
 @section('content')
 <div class="space-y-6">
-
-    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <p class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Kegiatan</p>
-            <h1 class="text-3xl font-bold text-gray-900 mt-1">Acara</h1>
-            <p class="text-sm text-gray-400 mt-1.5 font-medium">Kelola seluruh event dan agenda kegiatan dalam sistem.</p>
+            <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Kegiatan</h1>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Acara terjadwal dan study club rutin UKM CSA.</p>
         </div>
-        <a href="{{ route('admin.events.create') }}"
-           class="relative inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-cyan-500 to-cyan-600 text-white text-sm font-semibold rounded-2xl shadow-[0_4px_20px_rgba(6,182,212,0.3)] hover:shadow-[0_4px_25px_rgba(6,182,212,0.45)] hover:scale-105 transition-all duration-300 overflow-hidden group">
-            <div class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            <span class="relative flex items-center gap-2">
-                <i class="fas fa-plus text-xs"></i>
-                Tambah Acara
-            </span>
-        </a>
+        @can('manage-events')
+            <a href="{{ route('admin.events.create') }}" class="csa-btn csa-btn-primary">
+                <x-admin.icon name="plus" :size="16" /> Tambah Kegiatan
+            </a>
+        @endcan
     </div>
 
-    <x-admin.table :headers="[
-        ['label' => 'Banner', 'width' => 'w-20'],
-        ['label' => 'Judul Event', 'width' => ''],
-        ['label' => 'Tanggal & Lokasi', 'width' => ''],
-        ['label' => 'Status', 'width' => ''],
-        ['label' => 'Aksi', 'width' => 'w-24'],
-    ]" :hasPages="$events->hasPages()" :paginator="$events">
+    <div class="inline-flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-muted)] w-fit">
+        @foreach (['' => 'Semua', 'acara' => 'Acara', 'study_club' => 'Study Club'] as $value => $label)
+            <a href="{{ route('admin.events.index', array_filter(['type' => $value])) }}" data-ajax-link
+                class="px-3.5 py-1.5 rounded-lg text-[12px] font-medium transition-colors {{ $type === $value ? 'bg-[var(--bg-card)] text-[var(--text-primary)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]' }}">
+                {{ $label }}
+            </a>
+        @endforeach
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse($events as $event)
-            <tr class="hover:bg-cyan-50/30 transition-colors duration-200">
-                <td class="py-4 px-6 text-center">
+            <article class="csa-panel overflow-hidden flex flex-col group">
+                <div class="relative h-44 w-full bg-[var(--bg-muted)] overflow-hidden">
                     @if($event->banner_url)
-                        <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-100/50 mx-auto cursor-pointer"
-                             onclick="openImagePreview('imagePreviewModal', '{{ $event->banner_url }}', '{{ $event->title }}')">
-                            <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-300">
-                        </div>
+                        <img src="{{ $event->banner_url }}" alt="{{ $event->title }}"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy">
                     @else
-                        <div class="w-12 h-12 rounded-xl bg-gray-50 border border-dashed border-gray-200 mx-auto flex items-center justify-center text-gray-300">
-                            <i class="fas fa-image text-sm"></i>
+                        <div class="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+                            <x-admin.icon name="calendar-days" :size="30" />
                         </div>
                     @endif
-                </td>
-                <td class="py-4 px-6">
-                    <p class="text-sm font-bold text-gray-900">{{ $event->title }}</p>
-                    <p class="text-[10px] font-mono text-gray-400 mt-0.5">/{{ $event->slug }}</p>
-                </td>
-                <td class="py-4 px-6">
-                    <p class="text-xs font-semibold text-gray-700">{{ $event->event_date?->format('d M Y') }}</p>
-                    @if($event->location)
-                        <p class="text-[11px] text-gray-400 mt-0.5 truncate max-w-[200px]">
-                            <i class="fas fa-map-marker-alt text-[9px] mr-1 text-cyan-400"></i>
-                            {{ $event->location }}
-                        </p>
-                    @endif
-                </td>
-                <td class="py-4 px-6">
-                    @php
-                        $statusStyles = [
-                            'published' => 'bg-emerald-50 text-emerald-600 border-emerald-100/50',
-                            'draft' => 'bg-amber-50 text-amber-600 border-amber-100/50',
-                            'closed' => 'bg-gray-100 text-gray-500 border-gray-200/50',
-                        ];
-                        $style = $statusStyles[$event->status] ?? 'bg-gray-50 text-gray-400 border-gray-100/50';
-                    @endphp
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-semibold border {{ $style }}">
-                        {{ ucfirst($event->status) }}
-                    </span>
-                </td>
-                <td class="py-4 px-6">
-                    <div class="flex items-center gap-1">
-                        <a href="{{ route('admin.events.edit', $event) }}"
-                           class="w-8 h-8 rounded-lg flex items-center justify-center bg-cyan-50 text-cyan-600 hover:bg-cyan-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(6,182,212,0.3)]"
-                           title="Edit">
-                            <i class="fas fa-pen text-[10px]"></i>
-                        </a>
-                        <button onclick="openDeleteModal('deleteModal', '{{ route('admin.events.destroy', $event) }}')"
-                                class="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 hover:shadow-[0_4px_12px_rgba(239,68,68,0.3)]"
-                                title="Hapus">
-                            <i class="fas fa-trash text-[10px]"></i>
-                        </button>
+
+                    <div class="absolute top-3 left-3 flex items-center gap-1.5">
+                        <span class="csa-chip {{ $event->type === 'study_club' ? 'csa-chip-violet' : 'csa-chip-blue' }} shadow-sm">
+                            {{ \App\Models\Event::TYPES[$event->type] ?? 'Acara' }}
+                        </span>
+                        <span class="csa-chip {{ $statusChip($event->status) }} shadow-sm">{{ ucfirst($event->status) }}</span>
                     </div>
-                </td>
-            </tr>
+
+                    <div class="absolute bottom-3 left-3 rounded-lg bg-black/55 backdrop-blur-sm text-white px-2.5 py-1.5 text-center leading-none">
+                        <span class="block text-[15px] font-bold">{{ $event->event_date?->format('d') }}</span>
+                        <span class="block text-[10px] font-medium uppercase mt-0.5">{{ $event->event_date?->translatedFormat('M') }}</span>
+                    </div>
+                </div>
+
+                <div class="p-4 flex-1 flex flex-col">
+                    <h3 class="text-[15px] font-semibold text-[var(--text-primary)] line-clamp-2 leading-snug">
+                        <a href="{{ route('admin.events.show', $event) }}" class="hover:text-[var(--accent-bright)] transition-colors">{{ $event->title }}</a>
+                    </h3>
+                    <p class="text-[12px] text-[var(--text-muted)] line-clamp-2 mt-2 leading-relaxed">{{ Str::limit(strip_tags($event->description), 110) }}</p>
+                    <div class="mt-auto pt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-[var(--text-muted)]">
+                        <span class="inline-flex items-center gap-1.5"><x-admin.icon name="calendar-days" :size="13" /> {{ $event->event_date?->translatedFormat('d M Y') }}</span>
+                        @if($event->location)
+                            <span class="inline-flex items-center gap-1.5"><x-admin.icon name="map-pin" :size="13" /> {{ $event->location }}</span>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="px-4 py-3 border-t border-[var(--border-soft)] flex items-center justify-between gap-2">
+                    @can('manage-attendances')
+                        <a href="{{ route('admin.attendances.event', $event) }}" class="csa-btn csa-btn-ghost !min-h-[36px] !px-3 !text-[12px]">
+                            <x-admin.icon name="clipboard-check" :size="15" /> Kelola Presensi
+                        </a>
+                    @else
+                        <a href="{{ route('admin.events.show', $event) }}" class="text-[12px] font-medium text-[var(--accent-bright)] hover:underline">Lihat Detail</a>
+                    @endcan
+
+                    @can('manage-events')
+                        <div class="flex items-center gap-1 shrink-0">
+                            <a href="{{ route('admin.events.edit', $event) }}" class="csa-icon-btn" title="Edit" aria-label="Edit acara">
+                                <x-admin.icon name="pen" :size="16" />
+                            </a>
+                            <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.events.destroy', $event) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus acara">
+                                <x-admin.icon name="trash-2" :size="16" />
+                            </button>
+                        </div>
+                    @endcan
+                </div>
+            </article>
         @empty
-            <x-admin.empty-state icon="fa-calendar-alt" title="Belum ada acara"
-                description="Sistem belum memiliki data event apapun." :createRoute="route('admin.events.create')" createLabel="Tambah Acara"
-                :colspan="5" />
+            <div class="col-span-full csa-panel p-12 text-center">
+                <x-admin.icon name="calendar-x" :size="32" class="mx-auto text-[var(--text-muted)]" />
+                <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada acara tercatat</p>
+            </div>
         @endforelse
-    </x-admin.table>
+    </div>
+
+    @if ($events->hasPages())
+        {{ $events->links() }}
+    @endif
 </div>
 @endsection

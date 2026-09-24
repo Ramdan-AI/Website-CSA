@@ -2,21 +2,39 @@
 
 namespace App\Models;
 
+use App\Support\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'user_id',
         'title',
         'slug',
+        'type',
         'description',
         'location',
         'event_date',
         'banner',
         'registration_link',
-        'status'
+        'status',
+        'attendance_enabled',
+        'self_attendance_enabled',
+        'attendance_code',
+        'qr_code',
+        'attendance_opened_at',
+        'attendance_closed_at',
+    ];
+
+    public const TYPE_ACARA = 'acara';
+
+    public const TYPE_STUDY_CLUB = 'study_club';
+
+    public const TYPES = [
+        self::TYPE_ACARA => 'Acara',
+        self::TYPE_STUDY_CLUB => 'Study Club',
     ];
 
     protected function casts(): array
@@ -24,17 +42,16 @@ class Event extends Model
         return [
             'event_date' => 'date',
             'status' => 'string',
+            'attendance_enabled' => 'boolean',
+            'self_attendance_enabled' => 'boolean',
+            'attendance_opened_at' => 'datetime',
+            'attendance_closed_at' => 'datetime',
         ];
     }
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function registrations()
-    {
-        return $this->hasMany(EventRegistration::class);
     }
 
     public function attendances()
@@ -44,6 +61,6 @@ class Event extends Model
 
     public function getBannerUrlAttribute()
     {
-        return $this->banner ? Storage::disk('public')->url($this->banner) : null;
+        return $this->banner ? asset('storage/'.$this->banner) : null;
     }
 }

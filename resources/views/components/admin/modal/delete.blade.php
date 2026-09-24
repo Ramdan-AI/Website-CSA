@@ -6,27 +6,22 @@
 
 <div id="{{ $id }}"
     class="fixed inset-0 z-[9999] hidden items-center justify-center p-6 transition-opacity duration-300"
-    style="backdrop-filter: blur(3px);" onclick="closeDeleteModal('{{ $id }}', event)">
+    style="background: rgba(0,0,0,.5); backdrop-filter: blur(3px);" onclick="closeDeleteModal('{{ $id }}', event)">
     <div id="{{ $id }}Content" class="relative w-full max-w-md transform scale-95 transition-all duration-300"
         onclick="event.stopPropagation()">
-        <div
-            class="relative bg-white/90 backdrop-blur-xl rounded-[32px] p-8 border border-white/60 shadow-[0_25px_60px_rgba(0,0,0,0.15)]">
-            <div
-                class="absolute inset-0 bg-gradient-to-br from-red-400/5 to-rose-400/5 rounded-[32px] pointer-events-none">
-            </div>
-            <div class="relative text-center">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-red-50 flex items-center justify-center">
-                    <i class="fas fa-exclamation-triangle text-2xl text-red-500"></i>
+        <div class="csa-panel p-6 border border-[var(--border-strong)] shadow-2xl">
+            <div class="text-center">
+                <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-red-500/10 flex items-center justify-center">
+                    <x-admin.icon name="triangle-alert" :size="24" class="text-red-500" />
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">{{ $title }}</h3>
-                <p class="text-sm text-gray-500 mb-6">{{ $message }}</p>
+                <h3 class="text-[16px] font-semibold text-[var(--text-primary)] mb-2">{{ $title }}</h3>
+                <p class="text-[13px] text-[var(--text-muted)] mb-6">{{ $message }}</p>
                 <div class="flex items-center justify-center gap-3">
-                    <button onclick="closeDeleteModal('{{ $id }}')"
-                        class="px-5 py-2.5 bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-200 transition-colors">
+                    <button type="button" onclick="closeDeleteModal('{{ $id }}')" class="csa-btn csa-btn-ghost">
                         Batal
                     </button>
-                    <button onclick="document.getElementById('{{ $id }}Form').submit()"
-                        class="px-5 py-2.5 bg-red-500 text-white text-sm font-semibold rounded-xl hover:bg-red-600 shadow-[0_4px_16px_rgba(239,68,68,0.3)] transition-all">
+                    <button type="button" onclick="document.getElementById('{{ $id }}Form').submit()"
+                        class="csa-btn csa-btn-danger">
                         Hapus
                     </button>
                 </div>
