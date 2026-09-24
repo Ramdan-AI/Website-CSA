@@ -1,14 +1,14 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="space-y-4 sm:space-y-5">
+<div class="space-y-6">
 
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Kegiatan & Presensi</h1>
-            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola presensi Anda untuk Study Club, Mubes, dan kegiatan lainnya.</p>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Presensi Study Club, Mubes, dan kegiatan lain CSA.</p>
         </div>
-        <div class="inline-flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-muted)]" role="tablist">
+        <div class="inline-flex items-center gap-1 p-1 rounded-full bg-[var(--bg-muted)]" role="tablist">
             <button id="viewListBtn" type="button" class="csa-seg is-active" aria-pressed="true">
                 <x-admin.icon name="list" :size="15" /> Daftar
             </button>
@@ -26,19 +26,22 @@
         ])->all()" />
     </div>
 
-    <div id="listView" class="space-y-3">
-        @forelse($events as $event)
+    <div id="listView" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        @forelse ($events as $event)
             @php
                 $attendance = $attendanceByEvent[$event->id] ?? null;
-                $hasAttended = $attendance !== null;
                 $status = $attendance?->status;
+                $isPresent = $status === 'present'; // hanya hadir yang memblokir presensi mandiri
+                $hasAttended = $isPresent;
                 $isClosed = (bool) $event->attendance_closed_at;
-                $isPassed = $event->event_date && $event->event_date->isBefore(now()->startOfDay());
-                $sessionOpen = $event->attendance_enabled && ! $isClosed && ! $isPassed;
 
-                // Presensi mandiri hanya bila admin mengaktifkannya.
-                $selfDisabled = ! $sessionOpen || ! $event->self_attendance_enabled || $hasAttended;
-                // Scan QR & sakit/izin hanya butuh sesi aktif.
+                // Sesi presensi ditentukan oleh admin (buka/tutup), bukan perbandingan
+                // tanggal, agar anggota bisa presensi selama sesi masih dibuka.
+                $sessionOpen = $event->attendance_enabled && ! $isClosed;
+
+                // Tombol mandiri aktif selama sesi dibuka, mandiri diaktifkan, dan
+                // anggota belum tercatat HADIR (alfa/izin/sakit tetap bisa presensi).
+                $selfDisabled = ! $sessionOpen || ! $event->self_attendance_enabled || $isPresent;
                 $scanDisabled = ! $sessionOpen;
                 $manualDisabled = ! $sessionOpen;
                 $statusMap = [
@@ -48,84 +51,98 @@
                     'absent' => ['Alfa', 'csa-chip-red'],
                 ];
             @endphp
-            <article class="csa-panel p-4 sm:p-5">
-                <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div class="flex items-start gap-3.5 min-w-0">
-                        <div class="w-11 h-11 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center shrink-0 text-[var(--text-secondary)]">
-                            <x-admin.icon name="calendar-days" :size="20" />
+            <article class="csa-panel rounded-2xl overflow-hidden flex flex-col">
+                {{-- Banner (klik ke detail) --}}
+                <a href="{{ route('admin.events.show', $event) }}" class="group relative block aspect-[16/9] bg-[var(--bg-muted)] overflow-hidden">
+                    @if ($event->banner_url)
+                        <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+                            <x-admin.icon name="calendar-days" :size="28" />
                         </div>
-                        <div class="min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <span class="text-[12px] font-medium text-[var(--text-secondary)]">{{ $event->event_date?->translatedFormat('d M Y') }}</span>
-                                @if ($attendance)
-                                    <span class="csa-chip {{ $statusMap[$status][1] ?? 'csa-chip-blue' }}">{{ $statusMap[$status][0] ?? 'Tercatat' }}</span>
-                                @elseif ($isClosed)
-                                    <span class="csa-chip">Selesai</span>
-                                @endif
-                            </div>
-                            <h2 class="mt-1.5 text-[15px] font-semibold text-[var(--text-primary)] truncate">{{ $event->title }}</h2>
-                            @if ($event->location)
-                                <p class="text-[12px] text-[var(--text-muted)] mt-1 inline-flex items-center gap-1.5">
-                                    <x-admin.icon name="map-pin" :size="13" /> {{ $event->location }}
-                                </p>
-                            @endif
-                        </div>
-                    </div>
+                    @endif
 
-                    <div class="shrink-0 text-[12px] text-[var(--text-muted)] sm:text-right">
-                        @if (! $event->attendance_enabled)
-                            Presensi belum dibuka
+                    <div class="absolute top-3 left-3 flex items-center gap-2">
+                        @if ($attendance)
+                            <span class="csa-chip {{ $statusMap[$status][1] ?? 'csa-chip-blue' }} shadow-sm">{{ $statusMap[$status][0] ?? 'Tercatat' }}</span>
                         @elseif ($isClosed)
-                            Sesi presensi ditutup
-                        @elseif ($hasAttended)
-                            Sudah tercatat
-                        @else
-                            Presensi dibuka
+                            <span class="csa-chip shadow-sm">Selesai</span>
+                        @elseif ($sessionOpen)
+                            <span class="csa-chip csa-chip-green shadow-sm">Presensi dibuka</span>
+                        @elseif ($event->attendance_enabled)
+                            <span class="csa-chip csa-chip-amber shadow-sm">Presensi ditutup</span>
                         @endif
                     </div>
-                </div>
 
-                <div class="mt-4 pt-4 border-t border-[var(--border-soft)]">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        <form action="{{ route('admin.member.attendance.self', $event) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="csa-btn csa-btn-primary w-full" @disabled($selfDisabled)
-                                title="{{ ! $event->self_attendance_enabled ? 'Presensi mandiri belum diaktifkan panitia' : '' }}">
-                                <x-admin.icon name="user-check" :size="16" />
-                                {{ $hasAttended && $status === 'present' ? 'Sudah Hadir' : 'Presensi Mandiri' }}
+                    <div class="absolute bottom-3 left-3 rounded-lg bg-black/55 backdrop-blur-sm text-white px-2.5 py-1.5 text-center leading-none">
+                        <span class="block text-[15px] font-bold">{{ $event->event_date?->format('d') }}</span>
+                        <span class="block text-[10px] font-medium uppercase mt-0.5">{{ $event->event_date?->translatedFormat('M') }}</span>
+                    </div>
+                </a>
+
+                {{-- Isi --}}
+                <div class="p-4 flex flex-col flex-1">
+                    <h2 class="text-[15px] font-semibold leading-snug line-clamp-2">
+                        <a href="{{ route('admin.events.show', $event) }}" class="text-[var(--text-primary)] hover:text-[var(--accent-bright)] transition-colors">{{ $event->title }}</a>
+                    </h2>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-2 text-[12px] text-[var(--text-muted)]">
+                        <span class="inline-flex items-center gap-1.5"><x-admin.icon name="calendar-days" :size="13" /> {{ $event->event_date?->translatedFormat('d M Y') }}</span>
+                        @if ($event->location)
+                            <span class="inline-flex items-center gap-1.5"><x-admin.icon name="map-pin" :size="13" /> {{ $event->location }}</span>
+                        @endif
+                    </div>
+
+                    @if ($attendance?->note)
+                        <p class="text-[12px] text-[var(--text-muted)] mt-2 italic">"{{ $attendance->note }}"</p>
+                    @endif
+
+                    <div class="mt-4 pt-3 border-t border-[var(--border-soft)]">
+                        @if ($sessionOpen && ! $event->self_attendance_enabled && ! $hasAttended)
+                            <p class="text-[11px] text-[var(--text-muted)] mb-2 inline-flex items-center gap-1.5">
+                                <x-admin.icon name="info" :size="12" /> Presensi mandiri belum diaktifkan panitia — silakan scan QR.
+                            </p>
+                        @endif
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <form action="{{ route('admin.member.attendance.self', $event) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="csa-btn csa-btn-primary w-full !min-h-[38px] !text-[12px] !px-3"
+                                    @disabled($selfDisabled)
+                                    @if ($selfDisabled && ! $hasAttended) title="Presensi mandiri belum diaktifkan panitia" @endif>
+                                    <x-admin.icon name="user-check" :size="14" />
+                                    {{ $isPresent ? 'Sudah Hadir' : 'Mandiri' }}
+                                </button>
+                            </form>
+
+                            <button type="button" class="csa-btn csa-btn-ghost w-full !min-h-[38px] !text-[12px] !px-3" data-qr-trigger data-event-id="{{ $event->id }}" @disabled($scanDisabled)>
+                                <x-admin.icon name="qr-code" :size="14" /> Scan QR
                             </button>
-                        </form>
 
-                        <button type="button" class="csa-btn csa-btn-ghost w-full" data-qr-trigger data-event-id="{{ $event->id }}" @disabled($scanDisabled)>
-                            <x-admin.icon name="qr-code" :size="16" /> Scan QR
-                        </button>
-
-                        <div class="grid grid-cols-2 gap-2.5">
-                            <button type="button" class="csa-btn csa-btn-ghost w-full" @disabled($manualDisabled)
+                            <button type="button" class="csa-btn csa-btn-ghost w-full !min-h-[38px] !text-[12px] !px-3" @disabled($manualDisabled)
                                 data-attendance-reason
                                 data-action="{{ route('admin.member.attendance.sick', $event) }}"
-                                data-type="sakit"
                                 data-title="Alasan Sakit"
                                 data-placeholder="Contoh: Demam, tidak bisa hadir.">
-                                <x-admin.icon name="thermometer" :size="16" /> Sakit
+                                <x-admin.icon name="thermometer" :size="14" /> Sakit
                             </button>
-                            <button type="button" class="csa-btn csa-btn-ghost w-full" @disabled($manualDisabled)
+                            <button type="button" class="csa-btn csa-btn-ghost w-full !min-h-[38px] !text-[12px] !px-3" @disabled($manualDisabled)
                                 data-attendance-reason
                                 data-action="{{ route('admin.member.attendance.permit', $event) }}"
-                                data-type="izin"
                                 data-title="Alasan Izin"
                                 data-placeholder="Contoh: Ada urusan keluarga.">
-                                <x-admin.icon name="file-signature" :size="16" /> Izin
+                                <x-admin.icon name="file-signature" :size="14" /> Izin
                             </button>
                         </div>
                     </div>
                 </div>
             </article>
         @empty
-            <div class="csa-panel p-12 text-center">
-                <x-admin.icon name="calendar-x" :size="36" class="mx-auto text-[var(--text-muted)]" />
-                <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada kegiatan</p>
-                <p class="text-[12px] text-[var(--text-muted)] mt-1">Kegiatan yang dipublikasikan akan muncul di sini.</p>
+            <div class="col-span-full csa-panel p-16 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-[var(--bg-muted)] flex items-center justify-center mx-auto text-[var(--text-muted)]">
+                    <x-admin.icon name="calendar-x" :size="26" />
+                </div>
+                <p class="text-[15px] font-semibold text-[var(--text-secondary)] mt-4">Belum ada kegiatan</p>
+                <p class="text-[13px] text-[var(--text-muted)] mt-1">Kegiatan yang dipublikasikan akan muncul di sini.</p>
             </div>
         @endforelse
     </div>
@@ -191,6 +208,18 @@
         let scannerStopping = null;
         let currentEventId = null;
         const modal = document.getElementById('qrScannerModal');
+
+        // Modal alasan sakit/izin
+        const reasonModal = document.getElementById('reasonModal');
+        const reasonForm = document.getElementById('reasonForm');
+        const reasonTitle = document.getElementById('reasonModalTitle');
+        const reasonInput = document.getElementById('reasonInput');
+
+        const closeReason = () => {
+            reasonModal.classList.add('hidden');
+            reasonModal.classList.remove('flex');
+            document.body.style.overflow = '';
+        };
 
         // Hentikan kamera & rendering pemindai, lalu bersihkan instance.
         const stopScanner = () => {
@@ -332,17 +361,6 @@
         });
 
         // Modal alasan sakit/izin
-        const reasonModal = document.getElementById('reasonModal');
-        const reasonForm = document.getElementById('reasonForm');
-        const reasonTitle = document.getElementById('reasonModalTitle');
-        const reasonInput = document.getElementById('reasonInput');
-
-        const closeReason = () => {
-            reasonModal.classList.add('hidden');
-            reasonModal.classList.remove('flex');
-            document.body.style.overflow = '';
-        };
-
         document.querySelectorAll('[data-attendance-reason]').forEach((button) => {
             button.addEventListener('click', () => {
                 reasonForm.setAttribute('action', button.dataset.action);

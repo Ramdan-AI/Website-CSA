@@ -77,10 +77,23 @@ class AttendanceManagerController extends Controller
 
         try {
             $enabled = ! $event->self_attendance_enabled;
-            $event->update(['self_attendance_enabled' => $enabled]);
+
+            if ($enabled) {
+                // Mengaktifkan presensi mandiri sekaligus membuka sesi, agar
+                // tombol presensi mandiri anggota langsung bisa diklik.
+                $event->update([
+                    'self_attendance_enabled' => true,
+                    'attendance_enabled' => true,
+                    'attendance_code' => $event->attendance_code ?: strtoupper(Str::random(6)),
+                    'attendance_opened_at' => $event->attendance_opened_at ?: now(),
+                    'attendance_closed_at' => null,
+                ]);
+            } else {
+                $event->update(['self_attendance_enabled' => false]);
+            }
 
             return redirect()->back()->with('success', $enabled
-                ? 'Presensi mandiri diaktifkan.'
+                ? 'Presensi mandiri diaktifkan dan sesi presensi telah dibuka.'
                 : 'Presensi mandiri dinonaktifkan. Anggota harus scan QR.');
         } catch (\Exception $e) {
             Log::error('Toggle self attendance failed', ['event_id' => $event->id, 'error' => $e->getMessage()]);

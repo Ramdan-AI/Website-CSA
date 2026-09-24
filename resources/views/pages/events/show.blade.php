@@ -60,13 +60,29 @@
                 <a href="{{ $event->registration_link }}" target="_blank" rel="noopener" class="csa-btn csa-btn-ghost w-full">
                     <x-admin.icon name="external-link" :size="16" /> Link Pendaftaran Eksternal
                 </a>
-            @elseif($event->attendance_enabled && !$event->attendance_closed_at && auth()->user()?->member)
-                <form action="{{ route('admin.member.attendance.self', $event) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="csa-btn csa-btn-primary w-full">
-                        <x-admin.icon name="user-check" :size="16" /> Check-In Sekarang
+            @endif
+
+            @if($event->attendance_enabled && !$event->attendance_closed_at && auth()->user()?->member)
+                @php
+                    $alreadyPresent = $event->attendances->contains(fn ($a) => $a->member_id === auth()->user()->member?->id && $a->status === 'present');
+                @endphp
+                @if($alreadyPresent)
+                    <span class="csa-chip csa-chip-green w-full justify-center">Anda sudah tercatat hadir</span>
+                @elseif($event->self_attendance_enabled)
+                    <form action="{{ route('admin.member.attendance.self', $event) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="csa-btn csa-btn-primary w-full">
+                            <x-admin.icon name="user-check" :size="16" /> Presensi Mandiri
+                        </button>
+                    </form>
+                @else
+                    <button type="button" class="csa-btn csa-btn-primary w-full" disabled title="Presensi mandiri belum diaktifkan panitia">
+                        <x-admin.icon name="user-check" :size="16" /> Presensi Mandiri
                     </button>
-                </form>
+                    <p class="text-[12px] text-[var(--text-muted)] flex items-center gap-1.5">
+                        <x-admin.icon name="info" :size="13" /> Presensi mandiri belum diaktifkan panitia — silakan scan QR.
+                    </p>
+                @endif
             @endif
 
             @can('manage-attendances')
@@ -78,3 +94,4 @@
     </div>
 </div>
 @endsection
+

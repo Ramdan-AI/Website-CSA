@@ -149,13 +149,16 @@ class MemberPageController extends Controller
         $member = $this->member();
 
         $events = Event::whereIn('status', ['published', 'closed'])
-            ->orderBy('event_date')
+            ->orderByDesc('event_date')
             ->get([
                 'id',
                 'title',
+                'slug',
+                'type',
                 'description',
                 'location',
                 'event_date',
+                'banner',
                 'status',
                 'attendance_enabled',
                 'self_attendance_enabled',

@@ -30,10 +30,13 @@
   --text-secondary: #475569;
   --text-muted: #94a3b8;
 
-  --accent: #3b82f6;
-  --accent-bright: #2563eb;
-  --accent-subtle: rgba(59, 130, 246, 0.12);
-  --accent-glow: rgba(59, 130, 246, 0.20);
+  --accent: #1a73e8;
+  --accent-solid: #1a73e8;
+  --accent-solid-hover: #1557b0;
+  --on-accent: #ffffff;
+  --accent-bright: #1557b0;
+  --accent-subtle: rgba(26, 115, 232, 0.12);
+  --accent-glow: rgba(26, 115, 232, 0.20);
 
   --green: #16a34a;
   --green-bright: #16a34a;
@@ -89,10 +92,13 @@
   --text-secondary: #8b92a8;
   --text-muted: #5a6072;
 
-  --accent: #3b82f6;
-  --accent-bright: #60a5fa;
-  --accent-subtle: rgba(59, 130, 246, 0.15);
-  --accent-glow: rgba(59, 130, 246, 0.25);
+  --accent: #8ab4f8;
+  --accent-solid: #8ab4f8;
+  --accent-solid-hover: #aecbfa;
+  --on-accent: #0a0a0b;
+  --accent-bright: #aecbfa;
+  --accent-subtle: rgba(138, 180, 248, 0.15);
+  --accent-glow: rgba(138, 180, 248, 0.25);
 
   --green: #22c55e;
   --green-bright: #4ade80;
@@ -407,12 +413,33 @@ textarea.csa-input { height: auto; padding: 12px 14px; resize: vertical; }
   user-select: none;
 }
 .csa-btn svg { width: 16px; height: 16px; }
+
+/* Tombol non-aktif: abu, kursor terlarang, tanpa hover/efek. */
+.csa-btn:disabled,
+.csa-btn[disabled] {
+  background: var(--bg-muted) !important;
+  color: var(--text-muted) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+.csa-btn:disabled:hover,
+.csa-btn[disabled]:hover {
+  background: var(--bg-muted) !important;
+  color: var(--text-muted) !important;
+  transform: none !important;
+}
+.csa-btn:disabled:active,
+.csa-btn[disabled]:active {
+  transform: none !important;
+}
 .csa-btn-primary {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-solid);
+  color: var(--on-accent);
   box-shadow: 0 1px 2px rgba(15,23,42,0.2), 0 4px 16px var(--accent-glow);
 }
-.csa-btn-primary:hover { background: var(--accent-bright); }
+.csa-btn-primary:hover { background: var(--accent-solid-hover); }
 .csa-btn-primary:active { transform: scale(0.98); }
 .csa-btn-ghost {
   background: transparent;

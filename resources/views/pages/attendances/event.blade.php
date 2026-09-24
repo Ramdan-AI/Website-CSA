@@ -13,9 +13,9 @@
         <div class="flex flex-wrap gap-2">
             <form method="POST" action="{{ route('admin.attendance.toggle', $event) }}">
                 @csrf
-                <button class="csa-btn {{ $event->self_attendance_enabled ? 'csa-btn-danger' : 'csa-btn-ghost' }} !min-h-[40px] !px-4 !text-[12px]"
-                    @disabled(! $event->attendance_enabled || $event->attendance_closed_at)>
-                    {{ $event->self_attendance_enabled ? 'Nonaktifkan Mandiri' : 'Aktifkan Mandiri' }}
+                <button class="csa-btn {{ $event->self_attendance_enabled ? 'csa-btn-danger' : 'csa-btn-primary' }} !min-h-[40px] !px-4 !text-[12px]">
+                    <x-admin.icon name="user-check" :size="15" />
+                    {{ $event->self_attendance_enabled ? 'Nonaktifkan Mandiri' : 'Aktifkan Presensi Mandiri' }}
                 </button>
             </form>
             @if($event->attendance_enabled && !$event->attendance_closed_at)
