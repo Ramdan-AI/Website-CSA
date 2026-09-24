@@ -25,22 +25,23 @@ class RegistrationController extends Controller
     public function update(Request $request)
     {
         $validated = $request->validate([
-            'registration_open' => ['nullable', 'boolean'],
+            'registration_mode' => ['required', 'in:open,schedule,closed'],
             'registration_opens_at' => ['nullable', 'date'],
             'registration_closes_at' => ['nullable', 'date', 'after_or_equal:registration_opens_at'],
             'whatsapp_group_link' => ['nullable', 'url', 'max:500'],
         ]);
 
         $setting = Setting::firstOrFail();
+        $mode = $validated['registration_mode'];
 
         $setting->update([
-            'registration_open' => $request->boolean('registration_open'),
-            'registration_opens_at' => $validated['registration_opens_at'] ?? null,
-            'registration_closes_at' => $validated['registration_closes_at'] ?? null,
+            'registration_open' => $mode === 'open',
+            'registration_use_schedule' => $mode === 'schedule',
+            'registration_opens_at' => $mode === 'schedule' ? ($validated['registration_opens_at'] ?? null) : null,
+            'registration_closes_at' => $mode === 'schedule' ? ($validated['registration_closes_at'] ?? null) : null,
             'whatsapp_group_link' => $validated['whatsapp_group_link'] ?? null,
         ]);
 
-        // Halaman publik membaca nilai ini dari cache.
         Cache::forget('setting.registration_open');
         Cache::forget('setting.footer');
 

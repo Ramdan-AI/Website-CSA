@@ -27,6 +27,26 @@
         return ['value' => (string) $key, 'label' => (string) $item];
     })->values()->all();
 
+    // Dukung pemakaian via slot <option>. Diekstrak menjadi array agar dapat
+    // ditampilkan oleh panel dropdown kustom.
+    if ($normalized === [] && isset($slot) && trim((string) $slot) !== '') {
+        preg_match_all('/<option\b([^>]*)>(.*?)<\/option>/is', (string) $slot, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $match) {
+            $attrs = $match[1];
+            $label = trim(preg_replace('/\s+/', ' ', html_entity_decode(strip_tags($match[2]))));
+
+            if (! preg_match('/value\s*=\s*"([^"]*)"/i', $attrs, $valueMatch)) {
+                continue;
+            }
+
+            $normalized[] = [
+                'value' => (string) $valueMatch[1],
+                'label' => $label,
+            ];
+        }
+    }
+
     $hasError = isset($errors) && $errors->has($name);
 @endphp
 

@@ -17,7 +17,7 @@
         ? asset('storage/pembina/jfod093842jfldswa.png')
         : null;
     $monogram = fn ($name) => strtoupper(collect(explode(' ', trim(strtok($name, ','))))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->join(''));
-    $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+    $regOpen = \App\Models\Setting::registrationOpen();
 
     $milestones = [
         ['2017', 'CSA lahir', 'UKM pemrograman HMJ IF dihidupkan kembali oleh sekelompok mahasiswa sebagai wadah pemrograman dan informatika.'],

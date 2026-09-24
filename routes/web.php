@@ -190,7 +190,7 @@ Route::prefix('{roleSlug}')
 
         // Members
         Route::middleware(['can:manage-members'])->group(function () {
-            Route::resource('members', MemberController::class)->except('show');
+            Route::resource('members', MemberController::class);
         });
 
         // Attendances

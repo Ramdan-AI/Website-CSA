@@ -154,6 +154,28 @@ class MemberController extends Controller
             ->with('success', 'Anggota dan akun berhasil dibuat.');
     }
 
+    public function show(Member $member)
+    {
+        $member->load(['user', 'division', 'position']);
+
+        $attendances = $member->attendances()
+            ->with('event:id,title,event_date')
+            ->latest()
+            ->take(10)
+            ->get();
+
+        $attendanceStats = [
+            'present' => $member->attendances()->where('status', 'present')->count(),
+            'permit' => $member->attendances()->where('status', 'permit')->count(),
+            'sick' => $member->attendances()->where('status', 'sick')->count(),
+            'absent' => $member->attendances()->where('status', 'absent')->count(),
+        ];
+
+        $projects = $member->projects()->latest()->take(6)->get();
+
+        return view('pages.members.show', compact('member', 'attendances', 'attendanceStats', 'projects'));
+    }
+
     public function edit(Member $member)
     {
         $member->load('user');

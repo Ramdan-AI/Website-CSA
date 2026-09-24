@@ -6,18 +6,27 @@
 @endphp
 
 @section('content')
-<div class="space-y-4 sm:space-y-5 max-w-2xl">
+<div class="space-y-6 max-w-2xl">
     <div>
         <a href="{{ route('admin.roles.index') }}" class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors">
             <x-admin.icon name="arrow-left" :size="14" /> Kembali ke Role
         </a>
         <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em] mt-2">{{ $title }}</h1>
-        <p class="text-[13px] text-[var(--text-muted)] mt-1">
-            {{ $isEdit ? 'Perbarui informasi role.' : 'Tambahkan role baru ke dalam sistem.' }}
-        </p>
+        <p class="text-[13px] text-[var(--text-muted)] mt-1">{{ $isEdit ? 'Perbarui informasi role.' : 'Tambahkan role baru ke dalam sistem.' }}</p>
     </div>
 
-    <form action="{{ $isEdit ? route('admin.roles.update', $role) : route('admin.roles.store') }}" method="POST" class="csa-panel p-5 sm:p-6 space-y-4">
+    @if ($errors->any())
+        <div class="csa-panel p-4 border-l-2 border-red-500 space-y-1.5">
+            <p class="text-[13px] font-medium text-red-500">Periksa kembali data berikut:</p>
+            <ul class="space-y-1">
+                @foreach ($errors->all() as $message)
+                    <li class="text-[12px] text-red-500">· {{ $message }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ $isEdit ? route('admin.roles.update', $role) : route('admin.roles.store') }}" method="POST" class="csa-panel p-5 sm:p-6 space-y-5">
         @csrf
         @if ($isEdit)
             @method('PUT')

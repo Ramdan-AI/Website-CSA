@@ -44,9 +44,9 @@ class Member extends Model
      * Tingkatan skill anggota. Hanya dipakai divisi bertingkat.
      */
     public const LEVELS = [
-        1 => ['label' => 'Tingkat 1', 'name' => 'Pemula', 'description' => 'Belum menguasai dasar'],
-        2 => ['label' => 'Tingkat 2', 'name' => 'Menengah', 'description' => 'Sudah paham dasar'],
-        3 => ['label' => 'Tingkat 3', 'name' => 'Mahir', 'description' => 'Sudah mahir'],
+        1 => ['label' => 'Tingkat 1', 'name' => 'Pemula', 'description' => 'Belum mengerti dasar atau baru sedikit mengerti dasar pemrograman.'],
+        2 => ['label' => 'Tingkat 2', 'name' => 'Menengah', 'description' => 'Sudah mengerti basic pemrograman dan mampu mengerjakan hal-hal dasar.'],
+        3 => ['label' => 'Tingkat 3', 'name' => 'Expert', 'description' => 'Sudah mahir (expert) dan mampu mengerjakan proyek secara mandiri.'],
     ];
 
     public function getLevelNameAttribute(): ?string

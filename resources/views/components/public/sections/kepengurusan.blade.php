@@ -18,11 +18,7 @@
             ->reject(fn ($m) => $m->is($ketua ?? null) || $m->is($wakil ?? null))
             ->values();
 
-        $regOpen = Cache::remember(
-            'setting.registration_open',
-            60,
-            fn () => \App\Models\Setting::first()?->registration_open ?? false
-        );
+        $regOpen = \App\Models\Setting::registrationOpen();
     @endphp
 
     <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-16 sm:py-24">

@@ -5,77 +5,97 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
             <h1 class="text-[26px] sm:text-[30px] font-bold text-[var(--text-primary)] tracking-[-0.03em]">Jabatan</h1>
-            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola jabatan dan atur anggota untuk setiap posisi.</p>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Kelola jabatan dan susunan pengurus organisasi.</p>
         </div>
-        <a href="{{ route('admin.positions.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
-            <x-admin.icon name="plus" :size="16" /> Tambah Jabatan
-        </a>
+        @can('manage-positions')
+            <a href="{{ route('admin.positions.create') }}" class="csa-btn csa-btn-primary self-start sm:self-auto">
+                <x-admin.icon name="plus" :size="16" /> Tambah Jabatan
+            </a>
+        @endcan
     </div>
 
-    <x-admin.search-bar name="search" :value="request('search')" placeholder="Cari nama atau deskripsi jabatan..." class="max-w-md" />
+    @if (session('success'))
+        <div class="csa-panel p-3.5 text-[13px] text-emerald-600 dark:text-emerald-400">{{ session('success') }}</div>
+    @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        @forelse($positions as $position)
-            @php
-                $firstMember = $position->members->first();
-                $isUnique = in_array(strtolower($position->name), ['ketua', 'wakil ketua', 'ketua divisi', 'wakil ketua divisi', 'sekretaris', 'bendahara']);
-            @endphp
-            <article class="csa-panel p-5 flex flex-col">
-                <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-center gap-3 min-w-0">
-                        @if($isUnique && $firstMember)
-                            <img src="{{ $firstMember->photo_url ?: asset('storage/profile/profile-placeholder.png') }}" alt="{{ $firstMember->name }}" class="w-10 h-10 rounded-full object-cover shrink-0">
-                        @else
-                            <div class="w-10 h-10 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-secondary)] shrink-0">
-                                <x-admin.icon name="briefcase" :size="18" />
+    <x-admin.search-bar name="search" :value="$search ?? request('search')" placeholder="Cari nama atau deskripsi jabatan..." class="max-w-md" />
+
+    @if ($positions->isEmpty())
+        <div class="csa-panel p-16 text-center">
+            <div class="w-14 h-14 rounded-2xl bg-[var(--bg-muted)] flex items-center justify-center mx-auto text-[var(--text-muted)]">
+                <x-admin.icon name="briefcase" :size="26" />
+            </div>
+            <p class="text-[15px] font-semibold text-[var(--text-secondary)] mt-4">Belum ada jabatan</p>
+            <p class="text-[13px] text-[var(--text-muted)] mt-1">Tambahkan jabatan pertama untuk menyusun kepengurusan.</p>
+        </div>
+    @else
+        <div class="csa-panel overflow-hidden">
+            <div class="divide-y divide-[var(--border-soft)]">
+                @foreach ($positions as $position)
+                    @php
+                        $leads = $position->members->take(4);
+                        $filled = $position->members_count;
+                    @endphp
+                    <article class="flex items-center gap-4 p-4 hover:bg-[var(--bg-hover)] transition-colors">
+                        <span class="w-11 h-11 rounded-xl bg-[var(--bg-muted)] flex items-center justify-center text-[var(--text-secondary)] shrink-0">
+                            <x-admin.icon name="briefcase" :size="20" />
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-[14px] font-semibold text-[var(--text-primary)] truncate">{{ $position->name }}</h2>
+                                <span class="csa-chip {{ $position->max_members > 1 ? 'csa-chip-blue' : '' }} shrink-0">
+                                    {{ $position->max_members > 1 ? 'Kolektif' : 'Tunggal' }}
+                                </span>
                             </div>
-                        @endif
-                        <div class="min-w-0">
-                            <h3 class="text-[14px] font-semibold text-[var(--text-primary)] truncate">{{ $position->name }}</h3>
-                            <p class="text-[12px] text-[var(--text-muted)] truncate">
-                                {{ $isUnique && $firstMember ? $firstMember->name : $position->members_count . ' anggota' }}
+                            <p class="text-[12px] text-[var(--text-muted)] truncate mt-0.5">
+                                {{ $position->description ?: 'Belum ada deskripsi.' }}
                             </p>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-0.5 shrink-0">
-                        <a href="{{ route('admin.positions.edit', $position) }}" class="csa-icon-btn" title="Edit" aria-label="Edit jabatan">
-                            <x-admin.icon name="pen" :size="16" />
-                        </a>
-                        <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.positions.destroy', $position) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus jabatan">
-                            <x-admin.icon name="trash-2" :size="16" />
-                        </button>
-                    </div>
-                </div>
 
-                <p class="text-[12px] text-[var(--text-secondary)] leading-relaxed line-clamp-2 mt-3.5 flex-1">{{ $position->description ?: 'Belum ada deskripsi.' }}</p>
+                        {{-- Anggota yang menjabat --}}
+                        <div class="hidden sm:flex items-center gap-2.5 shrink-0">
+                            <div class="flex -space-x-2">
+                                @forelse ($leads as $lead)
+                                    <img src="{{ $lead->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+                                        alt="{{ $lead->name }}" title="{{ $lead->name }}"
+                                        class="w-7 h-7 rounded-full object-cover ring-2 ring-[var(--bg-card)] bg-[var(--bg-muted)]">
+                                @empty
+                                    <span class="text-[12px] text-[var(--text-muted)]">Kosong</span>
+                                @endforelse
+                            </div>
+                            @if ($leads->isNotEmpty())
+                                <span class="text-[12px] text-[var(--text-muted)]">
+                                    {{ $filled > 4 ? '+' . ($filled - 4) : '' }}
+                                </span>
+                            @endif
+                        </div>
 
-                <div class="mt-4 pt-3.5 border-t border-[var(--border-soft)] flex items-center justify-between">
-                    @if($isUnique)
-                        <span class="inline-flex items-center gap-2 text-[12px] font-medium {{ $firstMember ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--text-muted)]' }}">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $firstMember ? 'bg-emerald-500' : 'bg-[var(--text-muted)]' }}"></span>
-                            {{ $firstMember ? 'Terisi' : 'Kosong' }}
+                        <span class="hidden md:inline-block text-[12px] text-[var(--text-muted)] shrink-0 w-16 text-right tabular-nums">
+                            {{ $filled }}/{{ $position->max_members }}
                         </span>
-                    @else
-                        <span class="inline-flex items-center gap-1.5 text-[12px] text-[var(--text-secondary)]">
-                            <x-admin.icon name="users" :size="14" /> {{ $position->members_count }} anggota
-                        </span>
-                    @endif
-                    <a href="{{ route('admin.positions.members', $position) }}" class="csa-btn csa-btn-ghost !min-h-[34px] !px-3 !text-[12px]">
-                        Atur <x-admin.icon name="chevron-right" :size="14" />
-                    </a>
-                </div>
-            </article>
-        @empty
-            <div class="col-span-full csa-panel p-12 text-center">
-                <x-admin.icon name="briefcase" :size="32" class="mx-auto text-[var(--text-muted)]" />
-                <p class="text-[13px] font-medium text-[var(--text-secondary)] mt-3">Belum ada jabatan</p>
-                <p class="text-[12px] text-[var(--text-muted)] mt-1">Tambahkan jabatan pertama untuk memulai.</p>
+
+                        <div class="flex items-center gap-1 shrink-0">
+                            <a href="{{ route('admin.positions.members', $position) }}" class="csa-icon-btn" title="Atur anggota" aria-label="Atur anggota">
+                                <x-admin.icon name="users" :size="16" />
+                            </a>
+                            @can('manage-positions')
+                                <a href="{{ route('admin.positions.edit', $position) }}" class="csa-icon-btn" title="Edit" aria-label="Edit jabatan">
+                                    <x-admin.icon name="pen" :size="16" />
+                                </a>
+                                <button type="button" onclick="openDeleteModal('deleteModal', '{{ route('admin.positions.destroy', $position) }}')" class="csa-icon-btn hover:!text-red-500" title="Hapus" aria-label="Hapus jabatan">
+                                    <x-admin.icon name="trash-2" :size="16" />
+                                </button>
+                            @endcan
+                        </div>
+                    </article>
+                @endforeach
             </div>
-        @endforelse
-    </div>
+        </div>
 
-    @if($positions->hasPages())
-        {{ $positions->links() }}
+        @if ($positions->hasPages())
+            <div>{{ $positions->links() }}</div>
+        @endif
     @endif
 </div>
 @endsection

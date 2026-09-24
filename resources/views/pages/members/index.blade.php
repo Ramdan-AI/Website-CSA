@@ -35,11 +35,11 @@
 
     <x-admin.table
         :headers="[
+            ['label' => 'NIM'],
             ['label' => 'Anggota'],
             ['label' => 'Kontak'],
             ['label' => 'Divisi'],
             ['label' => 'Jabatan'],
-            ['label' => 'Tingkat', 'width' => 'w-28'],
             ['label' => 'Status'],
             ['label' => 'Aksi', 'width' => 'w-24'],
         ]"
@@ -54,6 +54,9 @@
         @forelse($members as $member)
             <tr class="csa-table-row">
                 <td class="csa-table-td">
+                    <span class="text-[12px] font-mono text-[var(--text-secondary)]">{{ $member->nim ?? '—' }}</span>
+                </td>
+                <td class="csa-table-td">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-muted)] shrink-0 {{ $member->photo_url ? 'cursor-pointer' : '' }}"
                              @if($member->photo_url) onclick="openImagePreview('imagePreviewModal', '{{ $member->photo_url }}', '{{ $member->name }}')" @endif>
@@ -61,8 +64,8 @@
                         </div>
                         <div class="min-w-0">
                             <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $member->name }}</p>
-                            @if($member->nim)
-                                <p class="text-[11px] text-[var(--text-muted)] font-mono">{{ $member->nim }}</p>
+                            @if($member->email)
+                                <p class="text-[11px] text-[var(--text-muted)] truncate">{{ $member->email }}</p>
                             @endif
                         </div>
                     </div>
@@ -83,17 +86,13 @@
                 <td class="csa-table-td">{{ $member->division->name ?? '-' }}</td>
                 <td class="csa-table-td">{{ $member->position->name ?? 'Belum ada' }}</td>
                 <td class="csa-table-td">
-                    @if ($member->level)
-                        <span class="csa-chip csa-chip-blue">{{ \App\Models\Member::LEVELS[$member->level]['label'] ?? 'Tingkat ' . $member->level }}</span>
-                    @else
-                        <span class="text-[12px] text-[var(--text-muted)]">—</span>
-                    @endif
-                </td>
-                <td class="csa-table-td">
                     <span class="csa-chip {{ $member->is_active ? 'csa-chip-green' : '' }}">{{ $member->is_active ? 'Aktif' : 'Nonaktif' }}</span>
                 </td>
                 <td class="csa-table-td">
                     <div class="flex items-center gap-1">
+                        <a href="{{ route('admin.members.show', $member) }}" class="csa-icon-btn" title="Detail" aria-label="Detail anggota">
+                            <x-admin.icon name="eye" :size="16" />
+                        </a>
                         <a href="{{ route('admin.members.edit', $member) }}" class="csa-icon-btn" title="Edit" aria-label="Edit anggota">
                             <x-admin.icon name="pen" :size="16" />
                         </a>

@@ -54,7 +54,7 @@
             </p>
 
             @php
-                $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+                $regOpen = \App\Models\Setting::registrationOpen();
             @endphp
 
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 mt-8"
