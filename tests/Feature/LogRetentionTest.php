@@ -18,7 +18,7 @@ class LogRetentionTest extends TestCase
 
     private function setting(): Setting
     {
-        $setting = Setting::firstOrCreate(['id' => 1], ['site_name' => 'CSA']);
+        $setting = Setting::current();
 
         return $setting->wasRecentlyCreated ? $setting->refresh() : $setting;
     }

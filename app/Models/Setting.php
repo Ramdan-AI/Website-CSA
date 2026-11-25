@@ -82,7 +82,9 @@ class Setting extends Model
      */
     public static function current(): self
     {
-        return static::firstOrCreate(['id' => 1], ['site_name' => 'CSA']);
+        return static::unguarded(
+            fn () => static::firstOrCreate(['id' => 1], ['site_name' => 'CSA'])
+        );
     }
 
     /**

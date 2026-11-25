@@ -17,7 +17,7 @@ class RegistrationController extends Controller
      */
     public function edit()
     {
-        $setting = Setting::firstOrCreate(['id' => 1], ['site_name' => 'CSA']);
+        $setting = Setting::current();
 
         return view('pages.registration.edit', compact('setting'));
     }
