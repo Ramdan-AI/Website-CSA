@@ -97,7 +97,7 @@
                 <div class="p-6 sm:p-10 flex flex-col justify-center">
                     <div class="flex items-center gap-2.5">
                         @if ($featured->featured)
-                            <span class="px-2.5 py-1 rounded-md text-[12px] font-medium" style="background: var(--accent-soft); color: var(--accent);">Unggulan</span>
+                            <span class="px-2.5 py-1 rounded-md text-[12px] font-medium" style="background: var(--accent-soft); color: var(--accent-deep);">Unggulan</span>
                         @endif
                         <span class="text-[13px]" style="color: var(--ink-faint);">
                             {{ $featured->created_at->translatedFormat('M Y') }}

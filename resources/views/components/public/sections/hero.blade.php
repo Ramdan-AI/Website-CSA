@@ -1,5 +1,5 @@
 {{-- Hero: wordmark center + slogan rotator + strip foto bergerak --}}
-<section class="relative overflow-hidden" style="background: var(--paper);">
+<section class="relative overflow-hidden pb-16 sm:pb-20 lg:pb-24" style="background: var(--paper);">
 
     <div class="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 sm:pt-20 lg:pt-24">
         <div class="max-w-[1000px] mx-auto text-center">

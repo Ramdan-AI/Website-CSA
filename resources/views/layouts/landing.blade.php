@@ -29,10 +29,10 @@
             --paper-sunken: #f7f8fa;
             --ink: #0f1419;
             --ink-soft: #4b5563;
-            --ink-faint: #8b929e;
+            --ink-faint: #667085;
             --line: #e5e7eb;
             --line-strong: #d1d5db;
-            --accent: #1a73e8;
+            --accent: #1967d2;
             --accent-soft: #e8f0fe;
             --accent-deep: #1557b0;
             --accent-solid: #1a73e8;
@@ -44,7 +44,7 @@
             --paper-sunken: #111113;
             --ink: #f3f4f6;
             --ink-soft: #a1a5ad;
-            --ink-faint: #6b7078;
+            --ink-faint: #8b919b;
             --line: #232326;
             --line-strong: #34343a;
             --accent: #8ab4f8;
@@ -128,8 +128,8 @@
                     Admin belum membuka pendaftaran. Cek kembali nanti atau hubungi pengurus CSA.
                 </p>
                 <button @click="open = false"
-                    class="w-full py-3 text-white text-[14px] font-medium rounded-lg"
-                    style="background: var(--accent);">
+                    class="w-full py-3 text-[14px] font-medium rounded-lg"
+                    style="background: var(--accent-solid); color: var(--on-accent);">
                     Mengerti
                 </button>
             </div>

@@ -27,7 +27,7 @@
 
     $avatarSize = $compact ? 'w-9 h-9' : 'w-11 h-11';
     $padding = $bare ? 'p-2' : 'p-3.5';
-    $labelTone = $isDashed ? 'text-[var(--ink-faint)]' : 'text-[var(--accent)]';
+    $labelTone = $isDashed ? 'text-[var(--ink-soft)]' : 'text-[var(--accent-deep)]';
 @endphp
 
 <div {{ $attributes->merge([
