@@ -13,13 +13,10 @@ services:
     command: >
       sh -c "
       git config --global --add safe.directory /var/www/html &&
-      if [ ! -f .env ]; then
-        cp .env.example .env &&
-        NEED_KEY=1;
-      fi &&
+      if [ ! -f .env ]; then cp .env.example .env; fi &&
       mkdir -p database && touch database/database.sqlite &&
       composer install --no-interaction --prefer-dist &&
-      if [ \"$NEED_KEY\" = \"1\" ]; then php artisan key:generate --ansi; fi &&
+      grep -q '^APP_KEY=base64:' .env || php artisan key:generate --ansi &&
       php artisan migrate --force &&
       php artisan storage:link --force &&
       npm install --prefer-offline --fetch-retries=5 &&
