@@ -12,7 +12,7 @@
             {{-- Left: intro --}}
             <div class="hidden lg:block" data-reveal="left">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5 mb-10">
-                    <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-10 h-10 object-contain">
+                    <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="w-10 h-10 object-contain">
                     <span class="leading-tight">
                         <span class="block text-[15px] font-bold text-[var(--ink)] tracking-tight">CSA</span>
                         <span class="block text-[10px] text-[var(--ink-faint)] -mt-0.5">STMIK Mardira Indonesia</span>
@@ -42,7 +42,7 @@
             <div class="w-full max-w-md mx-auto lg:mx-0" data-reveal="up">
                 <div class="text-center lg:text-left mb-7">
                     <div class="w-12 h-12 rounded-2xl bg-[var(--paper)] border border-[var(--line)] shadow-sm flex items-center justify-center mx-auto lg:mx-0 mb-5 lg:hidden">
-                        <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-7 h-7 object-contain">
+                        <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="w-7 h-7 object-contain">
                     </div>
                     <h1 class="text-[22px] font-bold text-[var(--ink)] tracking-tight">Masuk ke akun</h1>
                     <p class="text-[14px] text-[var(--ink-faint)] mt-1.5">Lanjutkan aktivitasmu di CSA.</p>

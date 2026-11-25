@@ -15,7 +15,7 @@
         <div class="divide-y divide-[var(--border-soft)]">
             @foreach ($logs as $log)
                 <div class="flex items-start gap-3 p-4">
-                    <img src="{{ $log->user?->avatar ? asset('storage/' . $log->user->avatar) : asset('storage/profile/profile-placeholder.png') }}"
+                    <img src="{{ $log->user?->avatar ? asset('storage/' . $log->user->avatar) : asset('images/profile-placeholder.svg') }}"
                         alt="{{ $log->user?->name ?? 'Pengguna' }}" class="w-8 h-8 rounded-full object-cover bg-[var(--bg-muted)] shrink-0">
 
                     <div class="min-w-0 flex-1">

@@ -11,7 +11,7 @@
 
         // Pakai accessor Member agar URL mengikuti host request.
         $memberImageOf = fn ($member) => $member->photo_url
-            ?: asset('storage/profile/profile-placeholder.png');
+            ?: asset('images/profile-placeholder.svg');
 
         $pengurusSlider = $pengurusInti
             ->concat($koordinator)
@@ -191,7 +191,7 @@
                             @foreach ($pengurusSlider as $member)
                                 <article class="group shrink-0 w-[164px] sm:w-[220px] bg-[var(--paper)] rounded-xl sm:rounded-xl border border-[var(--line)] p-4 sm:p-5 text-center hover:border-[var(--line-strong)] transition-all duration-300">
                                     <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-[var(--accent-soft)] mx-auto">
-                                        <img src="{{ $memberImageOf($member) }}" alt="{{ $member->name }}" width="80" height="80" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('storage/profile/profile-placeholder.png') }}';">
+                                        <img src="{{ $memberImageOf($member) }}" alt="{{ $member->name }}" width="80" height="80" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/profile-placeholder.svg') }}';">
                                     </div>
                                     <h4 class="text-[13px] sm:text-[14px] font-bold text-[var(--ink)] mt-3 sm:mt-3.5 leading-snug">{{ $member->name }}</h4>
                                     <p class="text-[11px] text-[var(--ink-faint)] mt-0.5 truncate">{{ $rosterLabelOf($member) }}</p>
@@ -232,7 +232,7 @@
                             @foreach ($anggotaPreview as $member)
                                 <article class="group shrink-0 w-[164px] sm:w-[220px] bg-[var(--paper)] rounded-xl sm:rounded-xl border border-[var(--line)] p-4 sm:p-5 text-center hover:border-[var(--line-strong)] transition-all duration-300">
                                     <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden bg-[var(--accent-soft)] mx-auto">
-                                        <img src="{{ $memberImageOf($member) }}" alt="{{ $member->name }}" width="80" height="80" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('storage/profile/profile-placeholder.png') }}';">
+                                        <img src="{{ $memberImageOf($member) }}" alt="{{ $member->name }}" width="80" height="80" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null;this.src='{{ asset('images/profile-placeholder.svg') }}';">
                                     </div>
                                     <h4 class="text-[13px] sm:text-[14px] font-bold text-[var(--ink)] mt-3 sm:mt-3.5 leading-snug">{{ $member->name }}</h4>
                                     <p class="text-[11px] text-[var(--ink-faint)] mt-0.5 truncate">{{ $member->division?->name ?? 'Anggota' }}</p>

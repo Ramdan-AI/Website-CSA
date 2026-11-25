@@ -12,7 +12,7 @@
 @php
     $fieldId = $name . '-crop';
     $previewClass = $shape === 'circle' ? 'rounded-full' : 'rounded-xl';
-    $fallback = $current ?: asset('storage/profile/profile-placeholder.png');
+    $fallback = $current ?: asset('images/profile-placeholder.svg');
 @endphp
 
 <div x-data="photoCropper({ aspect: {{ (float) $aspect }}, initial: @js($fallback) })" x-init="init()">

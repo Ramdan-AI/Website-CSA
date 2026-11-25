@@ -36,7 +36,7 @@
                     style="background: var(--sidebar-logo-surface); border: 1px solid var(--sidebar-border);">
                     @php
                         $appSetting = \App\Models\Setting::cached();
-                        $logoPath = ($appSetting && $appSetting->logo) ? asset('storage/' . $appSetting->logo) : asset('storage/system/logos/csa-logo.png');
+                        $logoPath = ($appSetting && $appSetting->logo) ? asset('storage/' . $appSetting->logo) : asset('images/csa-logo.webp');
                     @endphp
                     <img src="{{ $logoPath }}" alt="CSA" class="w-5 h-5 object-contain">
                 </div>

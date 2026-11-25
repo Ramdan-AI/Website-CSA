@@ -50,7 +50,7 @@
                     @forelse ($rows as $row)
                         <div class="flex items-center justify-between gap-3 p-4">
                             <div class="flex items-center gap-3 min-w-0">
-                                <img src="{{ $row['member']->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+                                <img src="{{ $row['member']->photo_url ?: asset('images/profile-placeholder.svg') }}"
                                     alt="{{ $row['member']->name }}" class="w-9 h-9 rounded-full object-cover bg-[var(--bg-muted)] shrink-0">
                                 <div class="min-w-0">
                                     <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $row['member']->name }}</p>

@@ -15,9 +15,7 @@
         'M. Fauzi ramadhan, S.Kom',
         'Yanti mandasari, S.Kom',
     ];
-    $pembinaPhoto = \Illuminate\Support\Facades\Storage::disk('public')->exists('pembina/jfod093842jfldswa.png')
-        ? asset('storage/pembina/jfod093842jfldswa.png')
-        : null;
+    $pembinaPhoto = asset('images/pembina-adi-raharjo.webp');
     $monogram = fn($name) => strtoupper(collect(explode(' ', trim(strtok($name, ','))))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->join(''));
 @endphp
 <section id="pembina" class="relative py-20 md:py-32 bg-[#F7FAFF] scroll-mt-24 overflow-hidden">
@@ -79,7 +77,7 @@
                             @if ($pembinaPhoto)
                                 <img src="{{ $pembinaPhoto }}" alt="{{ $pembina['name'] }}" class="w-full h-[112%] object-cover" data-parallax="-40" loading="lazy" decoding="async">
                             @else
-                                <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
+                                <img src="{{ asset('images/profile-placeholder.svg') }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
                             @endif
                         </div>
 
@@ -118,7 +116,7 @@
                     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" data-reveal-stagger>
                         @foreach ($founders as $i => $founder)
                             <div class="group relative aspect-[4/5] rounded-[24px] sm:rounded-[28px] overflow-hidden bg-[#EEF3FB] border border-[#3664AF]/10 hover:border-[#3664AF]/30 hover:shadow-[0_28px_64px_-36px_rgba(54,100,175,0.45)] hover:-translate-y-1 transition-all duration-300">
-                                <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $founder }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <img src="{{ asset('images/profile-placeholder.svg') }}" alt="{{ $founder }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                                 <div class="absolute bottom-0 inset-x-0 p-6 sm:p-7 bg-gradient-to-t from-black/60 via-black/30 to-transparent">
                                     <p class="text-[10px] font-bold uppercase tracking-[0.24em] text-blue-200">{{ str_pad($i + 1, 2, '0', STR_PAD_LEFT) }} &middot; Founder</p>
                                     <h3 class="text-lg sm:text-xl font-bold text-white mt-1 leading-snug">{{ $founder }}</h3>

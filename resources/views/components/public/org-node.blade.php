@@ -10,7 +10,7 @@
 ])
 
 @php
-    $photo = $image ?: ($member->photo_url ?: asset('storage/profile/profile-placeholder.png'));
+    $photo = $image ?: ($member->photo_url ?: asset('images/profile-placeholder.svg'));
     $isDashed = $variant === 'dashed';
     $isPrimary = $emphasis === 'primary';
     $divisionName = $member->division?->name ?? null;
@@ -36,7 +36,7 @@
     <div class="{{ $avatarSize }} rounded-full overflow-hidden bg-[var(--accent-soft)] shrink-0">
         <img src="{{ $photo }}" alt="{{ $member->name }}" width="44" height="44"
             class="w-full h-full object-cover" loading="lazy"
-            onerror="this.onerror=null;this.src='{{ asset('storage/profile/profile-placeholder.png') }}';">
+            onerror="this.onerror=null;this.src='{{ asset('images/profile-placeholder.svg') }}';">
     </div>
     <div class="min-w-0 flex-1">
         <p class="text-[10px] font-bold uppercase tracking-[0.1em] {{ $labelTone }}">{{ $label }}</p>

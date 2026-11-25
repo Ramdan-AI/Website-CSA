@@ -75,7 +75,7 @@
                     @foreach ($members as $member)
                         <div class="flex items-center justify-between gap-3 p-4 hover:bg-[var(--bg-hover)] transition-colors">
                             <div class="flex items-center gap-3 min-w-0">
-                                <img src="{{ $member->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+                                <img src="{{ $member->photo_url ?: asset('images/profile-placeholder.svg') }}"
                                     alt="{{ $member->name }}" class="w-10 h-10 rounded-full object-cover bg-[var(--bg-muted)] shrink-0">
                                 <div class="min-w-0">
                                     <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $member->name }}</p>

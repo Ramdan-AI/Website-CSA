@@ -13,9 +13,7 @@
         'M. Fauzi Ramadhan, S.Kom',
         'Yanti Mandasari, S.Kom',
     ];
-    $pembinaPhoto = \Illuminate\Support\Facades\Storage::disk('public')->exists('pembina/jfod093842jfldswa.png')
-        ? asset('storage/pembina/jfod093842jfldswa.png')
-        : null;
+    $pembinaPhoto = asset('images/pembina-adi-raharjo.webp');
     $monogram = fn ($name) => strtoupper(collect(explode(' ', trim(strtok($name, ','))))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->join(''));
     $regOpen = \App\Models\Setting::registrationOpen();
 
@@ -65,7 +63,7 @@
                     @if ($pembinaPhoto)
                         <img src="{{ $pembinaPhoto }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
                     @else
-                        <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
+                        <img src="{{ asset('images/profile-placeholder.svg') }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
                     @endif
                 </div>
                 <div class="p-6 sm:p-8 flex flex-col justify-center">

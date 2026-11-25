@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)">
     <title>Creative Student Association | Komunitas Teknologi STMIK Mardira Indonesia</title>
     <meta name="description" content="CSA adalah organisasi mahasiswa IT di STMIK Mardira Indonesia. Anggotanya belajar pemrograman dan multimedia lewat proyek nyata.">
-    <link rel="icon" href="{{ asset('storage/system/logos/csa-logo.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|inter:400,500,600,700&family=jetbrains-mono:400,500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

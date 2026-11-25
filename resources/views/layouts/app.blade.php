@@ -8,7 +8,7 @@
     <title>@yield('title', config('app.name', 'CSA STMIKMI'))</title>
     <meta name="description" content="@yield('meta_description', 'Creative Student Association STMIKMI — Komunitas inovasi dan kreativitas mahasiswa.')">
 
-    <link rel="icon" href="{{ asset('storage/system/logos/csa.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
     <link rel="preconnect" href="https://fonts.bunny.net">
     {{-- Geist for UI, JetBrains Mono for data — anti-AI-slop typography --}}
     <link href="https://fonts.bunny.net/css?family=geist:300,400,500,600,700&family=jetbrains-mono:400,500,600&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
                 <div class="flex items-center gap-3 mb-4">
-                    <img src="{{ asset('storage/system/logos/csa.png') }}" alt="CSA" class="h-10 w-auto">
+                    <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="h-10 w-auto">
                     <div>
                         <h4 class="text-white font-bold text-lg">Creative Student Association</h4>
                         <p class="text-xs text-gray-500">STMIK Mardira Indonesia</p>

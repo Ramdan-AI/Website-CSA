@@ -6,7 +6,7 @@
 @php
     $user = $user ?? auth()->user();
     $path = $user?->avatar ?: $user?->member?->photo;
-    $src = $path ? asset('storage/' . $path) : asset('storage/profile/profile-placeholder.png');
+    $src = $path ? asset('storage/' . $path) : asset('images/profile-placeholder.svg');
     $dimension = (int) $size;
 @endphp
 

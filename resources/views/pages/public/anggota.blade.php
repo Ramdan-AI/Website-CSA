@@ -114,7 +114,7 @@
                             <article class="bg-[var(--paper)] rounded-xl border border-[var(--line)] p-5">
                                 <div class="flex items-center gap-4">
                                     <span class="w-12 h-12 rounded-full overflow-hidden bg-[var(--paper-sunken)] shrink-0">
-                                        <img src="{{ $member->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+                                        <img src="{{ $member->photo_url ?: asset('images/profile-placeholder.svg') }}"
                                             alt="{{ $member->name }}" width="48" height="48" class="w-full h-full object-cover" loading="lazy" decoding="async">
                                     </span>
                                     <div class="min-w-0">
