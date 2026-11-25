@@ -3,13 +3,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: website-csa-app
+    container_name: ${CONTAINER_NAME:-website-csa-app}
     working_dir: /var/www/html
+    env_file:
+      - .env.docker
+    environment:
+      - APP_ENV=${APP_ENV:-local}
+      - APP_DEBUG=${APP_DEBUG:-true}
     volumes:
       - .:/var/www/html
     ports:
-      - "8000:8000"
-      - "5173:5173"
+      - "${APP_PORT:-8000}:8000"
+      - "${VITE_PORT:-5173}:5173"
     command: >
       sh -c "
       git config --global --add safe.directory /var/www/html &&
