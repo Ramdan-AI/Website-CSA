@@ -74,7 +74,8 @@ Setiap pengguna diarahkan ke dashboard sesuai rolenya (`/{roleSlug}/dashboard`):
 |---|---|
 | Framework | Laravel 12 |
 | Bahasa | PHP 8.2+ |
-| Database | MySQL 8 (produksi), SQLite in-memory (testing) |
+| Database | MySQL 8 |
+| Cache | Redis (Docker, `CACHE_STORE=redis`); `database` bila dijalankan tanpa Docker |
 | Templating | Blade + komponen anonim |
 | Styling | Tailwind CSS 4 (via `@tailwindcss/vite`), dark mode |
 | Interaktivitas | Alpine.js + Chart.js |
@@ -118,7 +119,8 @@ Daftar permission lengkap ada di `database/seeders/PermissionSeeder.php`; pemeta
 - **PHP ≥ 8.2** dengan ekstensi: `pdo`, `mbstring`, `openssl`, `tokenizer`, `xml`, `ctype`, `json`, `bcmath`, **`gd`** (untuk thumbnail on-the-fly).
 - **Composer 2**
 - **Node.js ≥ 18** & **npm**
-- **MySQL 8** (atau SQLite untuk sekadar mencoba)
+- **MySQL 8**
+- Opsional: **Redis** untuk cache (sudah disertakan pada Docker)
 - Opsional: **Laragon** (Windows) / **Herd** / **Valet**
 
 ---
@@ -190,6 +192,25 @@ php artisan serve
 
 Buka `http://web-csa.test` (sesuai `APP_URL`) atau `http://127.0.0.1:8000`.
 
+### Menjalankan dengan Docker
+
+Stack terdiri dari `app` (PHP 8.4), `db` (MySQL 8), dan `redis` (cache).
+
+```bash
+docker compose up --watch                     # build, jalankan, dan sinkronkan setiap edit ke container
+docker compose watch                          # bila stack sudah berjalan lewat `up -d`
+docker compose exec app php artisan db:seed --force
+docker compose exec app php artisan test
+```
+
+Aplikasi tersedia di `http://localhost:8000`.
+
+- **Kode berada di disk container, bukan bind mount.** Bind mount dari Windows membuat setiap request sekitar 10 kali lebih lambat (satu `filemtime()` 4 ms berbanding 0,004 ms), sehingga halaman admin butuh sekitar 1 detik. Perubahan file disalin otomatis oleh `develop.watch`; tanpa `watch` yang berjalan, edit tidak muncul di container.
+- **Build ulang otomatis**: perubahan `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, atau `Dockerfile` membangun ulang image. Perubahan di `resources/js`, `resources/css`, `resources/sass`, dan `vite.config.js` menjalankan `npm run build`. Perubahan di `resources/views` hanya disalin: class Tailwind yang baru dipakai di view belum masuk CSS sampai `docker compose exec app npm run build` dijalankan.
+- **`storage` dan `.env`** tersimpan di volume `app_storage` (`.env` ada di `storage/.env.docker`), jadi kunci aplikasi stabil dan upload awet. Gambar yang ditaruh di `storage/app/public` pada host ikut tersalin; file yang diunggah lewat UI hanya ada di volume.
+- **Perintah yang menulis file** (`php artisan make:*`, `composer require`) sebaiknya dijalankan di host, karena yang dijalankan di container tidak menulis balik ke host.
+- Server PHP memakai 4 worker (`PHP_CLI_SERVER_WORKERS`). MySQL dev disetel `--innodb-flush-log-at-trx-commit=0 --skip-log-bin` untuk kecepatan dan hanya untuk development.
+
 ---
 
 ## Akun Bawaan
@@ -245,15 +266,20 @@ php artisan test                   # jalankan test suite
 
 ## Testing
 
-Test suite memakai **PHPUnit 11** dengan SQLite in-memory (`phpunit.xml`), terisolasi via `RefreshDatabase`.
+Test suite memakai **PHPUnit 11** dengan database MySQL terpisah `web_csa_spec` (di-pin di `phpunit.xml` lewat `<env>` dan `<server force="true">`, karena Laravel membaca `env()` dari `$_SERVER` sehingga `<env>` saja kalah oleh variabel environment Docker). `TestCase` menolak berjalan bila nama database tidak diawali `web_csa_spec`, sebab `RefreshDatabase` menjalankan `migrate:fresh` dan akan menghapus seluruh data.
+
+Pada Docker, database test dibuat otomatis oleh `docker/mysql/init-spec-database.sql`. Tanpa Docker, buat sekali: `CREATE DATABASE web_csa_spec;`.
 
 ```bash
 php artisan test                    # semua test
 php artisan test --filter=AttendanceFlowTest
 php artisan test --coverage         # butuh Xdebug/PCOV
+docker compose exec app php artisan test   # di Docker
 ```
 
-Cakupan test saat ini (**50+ test**):
+Catatan performa: ParaTest tidak dipasang. Suite 69 test selesai sekitar 8 detik, sedangkan `--parallel` terukur lebih lambat (sekitar 9,5 detik) karena tiap proses membuat database dan menjalankan 27 migrasi sendiri di satu server MySQL. `php artisan schema:dump` tidak dipakai: klien `mysql` pada image Alpine adalah MariaDB, yang tidak kompatibel dengan MySQL 8 (plugin `caching_sha2_password` dan opsi `mysqldump` yang dikirim Laravel). Waktu migrasi dipangkas dengan tuning server MySQL dev pada `docker-compose.yml` (`--innodb-flush-log-at-trx-commit=0 --skip-log-bin`, hanya untuk dev karena mengorbankan durabilitas).
+
+Cakupan test saat ini (**69 test**):
 - Alur kehadiran & siklus presensi (`AttendanceFlowTest`, `AttendanceLifecycleTest`)
 - Presensi mandiri & toggle (`SelfAttendanceButtonTest`, `SelfAttendanceToggleTest`)
 - Retensi log (`LogRetentionTest`)
@@ -261,6 +287,21 @@ Cakupan test saat ini (**50+ test**):
 - Jadwal pendaftaran (`RegistrationScheduleTest`)
 - RekreasI slug & email anggota setelah delete (`MemberRecreateTest`, `MemberSlugTest`)
 - Modal kategori berita, notifikasi topbar, komponen Alpine
+- Halaman error custom (`ErrorPagesTest`), akses `Setting` (`SettingCurrentTest`, `SettingCachedTest`)
+- Cache query dan invalidasinya (`QueryCacheTest`, `PublicPagesCacheTest`)
+- Setiap route menunjuk ke method controller yang ada (`RoutesTest`)
+
+---
+
+## Cache
+
+Hasil query yang jarang berubah disimpan lewat `App\Support\QueryCache` (Redis pada Docker) agar database tidak terbebani. Pengukuran pada beranda: **32 query menjadi 3 query** per request (sisanya session).
+
+- **Yang di-cache**: data beranda, daftar divisi dan jumlah anggota aktif, kategori berita, daftar teknologi proyek, detail berita dan proyek per slug, daftar permission untuk Gate, dan baris `Setting` (`Setting::cached()`). Daftar berpaginasi tidak di-cache karena memuat URL yang bergantung host.
+- **Invalidasi**: model yang memakai trait `FlushesQueryCache` (Setting, Permission, Member, Division, Position, News, NewsCategory, Project, Gallery) otomatis mengosongkan cache saat `saved`, `deleted`, atau `restored`. Pengosongan memakai nomor versi, sehingga bekerja pada semua driver cache. TTL pengaman 10 menit.
+- **Status pendaftaran** tetap dihitung ulang pada setiap pembacaan dari baris `Setting` yang di-cache, jadi jadwal otomatis tetap akurat.
+- **Operasi massal** (`Model::where(...)->update()/delete()/insert()`) tidak memicu event model dan tidak mengosongkan cache. Jalankan `QueryCache::flush()` atau `php artisan cache:clear`. `DatabaseSeeder` sudah melakukannya di akhir; seeder yang dijalankan sendiri (`--class`) tidak.
+- Nama penulis berita dan proyek berasal dari tabel `users` yang tidak memicu invalidasi, sehingga perubahan nama pengguna baru terlihat setelah TTL habis.
 
 ---
 
@@ -356,7 +397,6 @@ Relasi penting:
 - **Seeding**: `DatabaseSeeder` memakai `WithoutModelEvents` — jika menambah seeder yang bergantung pada hook model (slug, dll.), **set kolom tersebut secara eksplisit** di seeder.
 - **Blade**: gunakan komponen yang tersedia (`<x-admin.table>`, `<x-form.input>`, dst.); pastikan responsif (mobile-first, target sentuh ≥ 44px) dan mendukung dark mode.
 
-Detail konvensi desain responsif ada di [`AGENTS.md`](AGENTS.md).
 
 ---
 
