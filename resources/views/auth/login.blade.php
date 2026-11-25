@@ -56,7 +56,7 @@
                             <label for="email" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Alamat Email</label>
                             <input type="email" name="email" id="email" value="{{ old('email') }}"
                                 placeholder="kamu@stmikmi.ac.id" autocomplete="email" required autofocus
-                                class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('email') border-red-300 @enderror">
+                                class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('email') border-red-300 @enderror">
                             @error('email')
                                 <p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>
                             @enderror
@@ -72,7 +72,7 @@
                             <div class="relative">
                                 <input :type="show ? 'text' : 'password'" name="password" id="password"
                                     placeholder="Masukkan password" autocomplete="current-password" required
-                                    class="w-full h-12 pl-4 pr-12 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('password') border-red-300 @enderror">
+                                    class="w-full h-12 pl-4 pr-12 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('password') border-red-300 @enderror">
                                 <button type="button" @click="show = !show"
                                     class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg text-[var(--ink-faint)] hover:text-[var(--ink-soft)] transition-colors"
                                     :aria-label="show ? 'Sembunyikan password' : 'Tampilkan password'">

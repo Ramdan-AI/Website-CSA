@@ -80,7 +80,7 @@
                                 <label for="name" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Nama Lengkap</label>
                                 <input type="text" name="name" id="name" value="{{ old('name') }}"
                                     placeholder="Nama sesuai KTM" autocomplete="name" required
-                                    class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('name') border-red-300 @enderror">
+                                    class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('name') border-red-300 @enderror">
                                 @error('name')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                             </div>
 
@@ -90,13 +90,13 @@
                                     <input type="text" name="nim" id="nim" value="{{ old('nim') }}" placeholder="21130001"
                                         inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                         autocomplete="off" required
-                                        class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('nim') border-red-300 @enderror">
+                                        class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('nim') border-red-300 @enderror">
                                     @error('nim')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
                                     <label for="semester" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Semester</label>
                                     <select name="semester" id="semester" required
-                                        class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('semester') border-red-300 @enderror">
+                                        class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('semester') border-red-300 @enderror">
                                         <option value="" disabled @selected(old('semester') === null)>Pilih semester</option>
                                         @for ($i = 1; $i <= 8; $i++)
                                             <option value="{{ $i }}" @selected((int) old('semester') === $i)>Semester {{ $i }}</option>
@@ -108,7 +108,7 @@
                                     <label for="whatsapp" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Nomor WhatsApp</label>
                                     <input type="tel" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}" placeholder="081234567890"
                                         pattern="[0-9+\-\s]+" oninput="this.value = this.value.replace(/[^0-9+\-\s]/g, '')" required
-                                        class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('whatsapp') border-red-300 @enderror">
+                                        class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('whatsapp') border-red-300 @enderror">
                                     @error('whatsapp')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                                 </div>
                             </div>
@@ -116,7 +116,7 @@
                             <div>
                                 <label for="email" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Alamat Email</label>
                                 <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="kamu@stmikmi.ac.id" autocomplete="email" required
-                                    class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('email') border-red-300 @enderror">
+                                    class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('email') border-red-300 @enderror">
                                 @error('email')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                             </div>
                         </fieldset>
@@ -217,7 +217,7 @@
                                 <div class="relative">
                                     <input :type="showPassword ? 'text' : 'password'" name="password" id="password"
                                         placeholder="Minimal 8 karakter" autocomplete="new-password" required
-                                        class="w-full h-12 pl-4 pr-12 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('password') border-red-300 @enderror">
+                                        class="w-full h-12 pl-4 pr-12 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('password') border-red-300 @enderror">
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg text-[var(--ink-faint)] hover:text-[var(--ink-soft)] transition-colors"
                                         :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'">
@@ -232,7 +232,7 @@
                                 <label for="password-confirm" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Konfirmasi Password</label>
                                 <input :type="showPassword ? 'text' : 'password'" name="password_confirmation" id="password-confirm"
                                     placeholder="Ulangi password" autocomplete="new-password" required
-                                    class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors">
+                                    class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors">
                             </div>
 
                             <p class="text-[12px] text-[var(--ink-faint)] leading-relaxed bg-[var(--paper-sunken)] border border-[var(--line)] rounded-2xl px-4 py-3">
