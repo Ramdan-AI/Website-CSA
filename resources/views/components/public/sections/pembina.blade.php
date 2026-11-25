@@ -127,7 +127,7 @@
                         @endforeach
 
                         @php
-                            $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+                            $regOpen = \App\Models\Setting::registrationOpen();
                         @endphp
                         @if ($regOpen)
                             <a href="{{ route('register') }}"

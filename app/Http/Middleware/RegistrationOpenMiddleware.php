@@ -15,7 +15,7 @@ class RegistrationOpenMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $setting = Setting::firstOrCreate(['id' => 1], ['site_name' => 'CSA']);
+        $setting = Setting::cached();
 
         if (! $setting->isRegistrationOpen()) {
             return redirect()->route('home')

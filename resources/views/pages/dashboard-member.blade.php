@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @php
-    $waLink = \App\Models\Setting::first()?->whatsapp_group_link;
+    $waLink = \App\Models\Setting::cached()->whatsapp_group_link;
     $statItems = [
         ['label' => 'NIM', 'value' => $member?->nim ?? '-'],
         ['label' => 'Divisi', 'value' => $member?->division?->name ?? 'Belum ada'],

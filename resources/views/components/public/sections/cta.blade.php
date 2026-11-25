@@ -25,7 +25,7 @@
         </div>
 
         @php
-            $regOpen = Cache::remember('setting.registration_open', 60, fn () => \App\Models\Setting::first()?->registration_open ?? false);
+            $regOpen = \App\Models\Setting::registrationOpen();
         @endphp
 
         <div class="mt-10 sm:mt-12 flex flex-col sm:flex-row sm:items-center gap-4" data-reveal="up" data-reveal-delay="0.35">

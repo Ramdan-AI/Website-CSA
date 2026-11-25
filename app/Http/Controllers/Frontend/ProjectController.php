@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Support\QueryCache;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -33,7 +34,7 @@ class ProjectController extends Controller
             ->paginate(12)
             ->withQueryString();
 
-        $techList = $this->techList();
+        $techList = QueryCache::remember('projects.tech-list', fn () => $this->techList());
 
         return view('pages.public.projects', [
             'projects' => $projects,
@@ -44,6 +45,13 @@ class ProjectController extends Controller
     }
 
     public function show(string $slug)
+    {
+        [$project, $related] = QueryCache::remember("projects.show.{$slug}", fn () => $this->projectWithRelated($slug));
+
+        return view('pages.public.project-show', compact('project', 'related'));
+    }
+
+    private function projectWithRelated(string $slug): array
     {
         $project = Project::query()
             ->with(['submitter:id,name', 'members:id,name,division_id', 'members.division:id,name'])
@@ -60,7 +68,7 @@ class ProjectController extends Controller
             ->take(3)
             ->get();
 
-        return view('pages.public.project-show', compact('project', 'related'));
+        return [$project, $related];
     }
 
     /**

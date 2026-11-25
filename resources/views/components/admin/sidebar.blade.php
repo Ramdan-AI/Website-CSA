@@ -35,7 +35,7 @@
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                     style="background: var(--sidebar-logo-surface); border: 1px solid var(--sidebar-border);">
                     @php
-                        $appSetting = \App\Models\Setting::first();
+                        $appSetting = \App\Models\Setting::cached();
                         $logoPath = ($appSetting && $appSetting->logo) ? asset('storage/' . $appSetting->logo) : asset('storage/system/logos/csa-logo.png');
                     @endphp
                     <img src="{{ $logoPath }}" alt="CSA" class="w-5 h-5 object-contain">

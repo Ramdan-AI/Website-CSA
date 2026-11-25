@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
 @php
-    $setting = \App\Models\Setting::first();
+    $setting = \App\Models\Setting::cached();
     $regOpen = $setting?->isRegistrationOpen() ?? false;
     $levelDivisionIds = isset($divisions) ? $divisions->where('has_levels', true)->pluck('id')->map(fn ($id) => (string) $id)->all() : [];
 @endphp

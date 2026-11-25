@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\FlushesQueryCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class NewsCategory extends Model
 {
+    use FlushesQueryCache;
+
     protected $fillable = [
         'name',
         'description'

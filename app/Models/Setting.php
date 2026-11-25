@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
+use App\Support\FlushesQueryCache;
+use App\Support\QueryCache;
 use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
+    use FlushesQueryCache;
+
     /**
      * Pilihan periode retensi log (hari) yang boleh dipilih admin.
      * Satu sumber kebenaran untuk validasi, service, dan UI.
@@ -87,12 +91,13 @@ class Setting extends Model
         );
     }
 
-    /**
-     * Status pendaftaran saat ini untuk halaman publik. Tidak di-cache karena
-     * bergantung waktu (mode otomatis mengikuti rentang tanggal).
-     */
+    public static function cached(): self
+    {
+        return QueryCache::remember('setting', fn () => static::current());
+    }
+
     public static function registrationOpen(): bool
     {
-        return static::current()->isRegistrationOpen();
+        return static::cached()->isRegistrationOpen();
     }
 }

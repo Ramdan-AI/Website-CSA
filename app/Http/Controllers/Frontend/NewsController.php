@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use App\Models\NewsCategory;
+use App\Support\QueryCache;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
@@ -40,13 +41,13 @@ class NewsController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        $categories = NewsCategory::query()
+        $categories = QueryCache::remember('news.categories', fn () => NewsCategory::query()
             ->select(['id', 'name', 'slug'])
             ->withCount([
                 'news as published_news_count' => fn ($query) => $query->where('status', 'published'),
             ])
             ->orderBy('name')
-            ->get();
+            ->get());
 
         return view('pages.public.berita', [
             'news' => $news,
@@ -57,6 +58,13 @@ class NewsController extends Controller
     }
 
     public function show(string $slug)
+    {
+        [$article, $related] = QueryCache::remember("news.show.{$slug}", fn () => $this->articleWithRelated($slug));
+
+        return view('pages.public.berita-show', compact('article', 'related'));
+    }
+
+    private function articleWithRelated(string $slug): array
     {
         $article = News::with(['category:id,name,slug', 'author:id,name'])
             ->where('slug', $slug)
@@ -89,6 +97,6 @@ class NewsController extends Controller
             )->values();
         }
 
-        return view('pages.public.berita-show', compact('article', 'related'));
+        return [$article, $related];
     }
 }

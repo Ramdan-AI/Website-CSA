@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Permission;
+use App\Support\QueryCache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -66,7 +67,7 @@ class AppServiceProvider extends ServiceProvider
         ];
 
         try {
-            $permissionsFromDb = Permission::all()->keyBy('slug');
+            $permissionsFromDb = QueryCache::remember('permissions', fn () => Permission::all()->keyBy('slug'));
 
             foreach ($requiredPermissions as $slug) {
                 if ($permissionsFromDb->has($slug)) {

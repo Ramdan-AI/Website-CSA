@@ -1,5 +1,5 @@
 @php
-    $setting = Cache::remember('setting.footer', 60, fn () => \App\Models\Setting::first());
+    $setting = \App\Models\Setting::cached();
     $footerMenus = [
         ['label' => 'Beranda', 'url' => route('home')],
         ['label' => 'Tentang', 'url' => url('/') . '#tentang'],

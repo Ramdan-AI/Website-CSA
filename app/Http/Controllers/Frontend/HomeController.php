@@ -11,10 +11,18 @@ use App\Models\News;
 use App\Models\Setting;
 use App\Models\Gallery;
 use App\Models\Project;
+use App\Support\QueryCache;
 
 class HomeController extends Controller
 {
     public function index()
+    {
+        $landing = QueryCache::remember('landing', fn () => $this->landingData());
+
+        return view('pages.public.home', $landing + ['setting' => Setting::cached()]);
+    }
+
+    private function landingData(): array
     {
         $members = Member::with(['division', 'position'])
             ->where('is_active', true)
@@ -37,8 +45,6 @@ class HomeController extends Controller
             ->latest()
             ->take(6)
             ->get();
-
-        $setting = Setting::first();
 
         // Hero photos: admin-picked (is_hero). Fallback to latest galleries
         // so the landing page never renders an empty hero.
@@ -66,17 +72,16 @@ class HomeController extends Controller
         $statDivisi = $totalDivisi;
         $statPengurus = (int) floor($totalPengurus / 10) * 10;
 
-        return view('pages.public.home', compact(
+        return compact(
             'members',
             'divisions',
             'news',
             'projects',
-            'setting',
             'photos',
             'statAnggota',
             'statDivisi',
             'statPengurus',
-        ));
+        );
     }
 
     public function anggota(Request $request)
@@ -95,8 +100,8 @@ class HomeController extends Controller
             ->paginate(24)
             ->withQueryString();
 
-        $divisions = Division::active()->get();
-        $totalMembers = Member::active()->count();
+        $divisions = QueryCache::remember('divisions.active', fn () => Division::active()->get());
+        $totalMembers = QueryCache::remember('members.active-count', fn () => Member::active()->count());
 
         return view('pages.public.anggota', compact('members', 'divisions', 'q', 'divisionSlug', 'totalMembers'));
     }
