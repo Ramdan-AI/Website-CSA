@@ -1,5 +1,6 @@
 
 import {
+    createIcons,
     ArrowLeft,
     ArrowRight,
     AtSign,
@@ -16,6 +17,7 @@ import {
     ChevronDown,
     ChevronLeft,
     ChevronRight,
+    Circle,
     CircleCheck,
     CircleX,
     ClipboardCheck,
@@ -73,6 +75,7 @@ import {
     Upload,
     Users,
     Trash2,
+    X,
 } from "lucide";
 import Chart from "chart.js/auto";
 
@@ -93,6 +96,7 @@ const icons = {
     ChevronDown,
     ChevronLeft,
     ChevronRight,
+    Circle,
     CircleCheck,
     CircleX,
     ClipboardCheck,
@@ -228,13 +232,7 @@ const icons = {
 };
 
 window.Chart = Chart;
-window.renderLucide = () => {
-    if (window.lucide?.createIcons) {
-        window.lucide.createIcons();
-    } else {
-        createIcons({ icons });
-    }
-};
+window.renderLucide = () => createIcons({ icons });
 
 const bootIcons = () => window.renderLucide();
 if (document.readyState === "loading") {

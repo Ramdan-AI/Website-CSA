@@ -79,7 +79,7 @@
                         @foreach(['present' => 'Hadir', 'permit' => 'Izin', 'sick' => 'Sakit', 'absent' => 'Alfa'] as $value => $label)
                             <label class="cursor-pointer">
                                 <input type="radio" name="attendances[{{ $member->id }}][status]" value="{{ $value }}" class="peer sr-only" {{ $status === $value ? 'checked' : '' }}>
-                                <span class="block min-w-[62px] px-2 py-2 text-center rounded-lg border border-[var(--border-strong)] text-[12px] font-medium text-[var(--text-secondary)] peer-checked:bg-[var(--accent)] peer-checked:text-white peer-checked:border-[var(--accent)] transition-colors">{{ $label }}</span>
+                                <span class="block min-w-[62px] px-2 py-2 text-center rounded-lg border border-[var(--border-strong)] text-[12px] font-medium text-[var(--text-secondary)] peer-checked:bg-[var(--accent)] peer-checked:text-[var(--on-accent)] peer-checked:border-[var(--accent)] transition-colors">{{ $label }}</span>
                             </label>
                         @endforeach
                     </div>

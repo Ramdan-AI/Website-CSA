@@ -61,7 +61,7 @@
 
 @push('scripts')
 <script>
-    (() => {
+    document.addEventListener('DOMContentLoaded', () => {
         const canvas = document.getElementById('financeReportChart');
         if (!canvas || !window.Chart) return;
 
@@ -118,6 +118,6 @@
                 },
             },
         });
-    })();
+    });
 </script>
 @endpush

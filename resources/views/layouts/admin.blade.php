@@ -10,8 +10,6 @@
     <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/css/admin.css', 'resources/js/admin.js'])
     @stack('styles')
     <script>
@@ -22,8 +20,12 @@
             } else {
                 document.documentElement.classList.add('dark');
             }
+            const expanded = JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true');
+            document.documentElement.dataset.sidebar = expanded ? 'expanded' : 'collapsed';
         })();
-        document.addEventListener('DOMContentLoaded', () => window.lucide?.createIcons());
+        document.addEventListener('alpine:initialized', () => {
+            document.documentElement.dataset.alpine = 'ready';
+        });
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -56,6 +58,7 @@
             this.applyTheme();
             window.addEventListener('sidebar-toggled', (event) => {
                 this.sidebarExpanded = event.detail.expanded;
+                document.documentElement.dataset.sidebar = event.detail.expanded ? 'expanded' : 'collapsed';
                 this.animateLayout = true;
             });
         }
