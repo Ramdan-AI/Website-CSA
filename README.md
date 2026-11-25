@@ -205,6 +205,7 @@ docker compose exec app php artisan test
 
 Aplikasi tersedia di `http://localhost:8000`.
 
+- **Konfigurasi opsional**: salin `.env.docker.example` ke `.env.docker` untuk mengubah nama container, port, `APP_ENV`, dan `APP_DEBUG`, lalu jalankan `docker compose --env-file .env.docker up --watch`. Tanpa file itu, nilai bawaan dipakai.
 - **Kode berada di disk container, bukan bind mount.** Bind mount dari Windows membuat setiap request sekitar 10 kali lebih lambat (satu `filemtime()` 4 ms berbanding 0,004 ms), sehingga halaman admin butuh sekitar 1 detik. Perubahan file disalin otomatis oleh `develop.watch`; tanpa `watch` yang berjalan, edit tidak muncul di container.
 - **Build ulang otomatis**: perubahan `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, atau `Dockerfile` membangun ulang image. Perubahan di `resources/js`, `resources/css`, `resources/sass`, dan `vite.config.js` menjalankan `npm run build`. Perubahan di `resources/views` hanya disalin: class Tailwind yang baru dipakai di view belum masuk CSS sampai `docker compose exec app npm run build` dijalankan.
 - **`storage` dan `.env`** tersimpan di volume `app_storage` (`.env` ada di `storage/.env.docker`), jadi kunci aplikasi stabil dan upload awet. Gambar yang ditaruh di `storage/app/public` pada host ikut tersalin; file yang diunggah lewat UI hanya ada di volume.
