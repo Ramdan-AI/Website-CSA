@@ -1,0 +1,28 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: website-csa-app
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    command: >
+      sh -c "
+      git config --global --add safe.directory /var/www/html &&
+      if [ ! -f .env ]; then
+        cp .env.example .env &&
+        NEED_KEY=1;
+      fi &&
+      mkdir -p database && touch database/database.sqlite &&
+      composer install --no-interaction --prefer-dist &&
+      if [ \"$NEED_KEY\" = \"1\" ]; then php artisan key:generate --ansi; fi &&
+      php artisan migrate --force &&
+      php artisan storage:link --force &&
+      npm install --prefer-offline --fetch-retries=5 &&
+      npm run build &&
+      php artisan serve --host=0.0.0.0 --port=8000
+      "
