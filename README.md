@@ -197,15 +197,17 @@ Buka `http://web-csa.test` (sesuai `APP_URL`) atau `http://127.0.0.1:8000`.
 Stack terdiri dari `app` (PHP 8.4), `db` (MySQL 8), dan `redis` (cache).
 
 ```bash
-docker compose up --watch                     # build, jalankan, dan sinkronkan setiap edit ke container
-docker compose watch                          # bila stack sudah berjalan lewat `up -d`
+docker compose up --build --watch             # bangun image dari kode saat ini, jalankan, dan sinkronkan setiap edit
+docker compose watch                          # bila stack sudah berjalan lewat `up -d --build`
 docker compose exec app php artisan db:seed --force
 docker compose exec app php artisan test
 ```
 
 Aplikasi tersedia di `http://localhost:8000`.
 
-- **Konfigurasi opsional**: salin `.env.docker.example` ke `.env.docker` untuk mengubah nama container, port, `APP_ENV`, dan `APP_DEBUG`, lalu jalankan `docker compose --env-file .env.docker up --watch`. Tanpa file itu, nilai bawaan dipakai.
+- **Konfigurasi opsional**: salin `.env.docker.example` ke `.env.docker` untuk mengubah nama container, port, `APP_ENV`, dan `APP_DEBUG`, lalu jalankan `docker compose --env-file .env.docker up --build --watch`. Tanpa file itu, nilai bawaan dipakai.
+- **Terisolasi untuk proyek ini.** MySQL dan Redis tidak membuka port ke host; keduanya hanya terjangkau dari jaringan compose `website-csa_default`, dengan volume sendiri. Port aplikasi hanya dibuka di `127.0.0.1`, jadi tidak terlihat dari jaringan lokal. Untuk membukanya ke jaringan, ubah baris `ports` di `docker-compose.yml` menjadi `"${APP_PORT:-8000}:8000"`.
+- **Membuat ulang container mengembalikan kode ke isi image.** `docker compose down`, mengubah `docker-compose.yml`, atau `up -d` yang membuat ulang container membuang semua edit yang sudah tersinkron. Selalu jalankan dengan `--build` agar image berisi kode terbaru. Volume (`vendor`, `node_modules`, `storage`, database) tidak ikut hilang.
 - **Kode berada di disk container, bukan bind mount.** Bind mount dari Windows membuat setiap request sekitar 10 kali lebih lambat (satu `filemtime()` 4 ms berbanding 0,004 ms), sehingga halaman admin butuh sekitar 1 detik. Perubahan file disalin otomatis oleh `develop.watch`; tanpa `watch` yang berjalan, edit tidak muncul di container.
 - **Build ulang otomatis**: perubahan `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, atau `Dockerfile` membangun ulang image. Perubahan di `resources/js`, `resources/css`, `resources/sass`, dan `vite.config.js` menjalankan `npm run build`. Perubahan di `resources/views` hanya disalin: class Tailwind yang baru dipakai di view belum masuk CSS sampai `docker compose exec app npm run build` dijalankan.
 - **`storage` dan `.env`** tersimpan di volume `app_storage` (`.env` ada di `storage/.env.docker`), jadi kunci aplikasi stabil dan upload awet. Gambar yang ditaruh di `storage/app/public` pada host ikut tersalin; file yang diunggah lewat UI hanya ada di volume.
