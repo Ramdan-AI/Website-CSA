@@ -151,13 +151,19 @@ DB_PORT=3306
 DB_DATABASE=web_csa
 DB_USERNAME=root
 DB_PASSWORD=
+
+SEED_PASSWORD=
 ```
+
+`SEED_PASSWORD` wajib diisi sebelum seeding: nilainya menjadi password awal semua akun hasil seeder. Jangan menuliskannya di file yang ikut di-commit.
 
 ### 3. Migrasi & seed database
 ```bash
 php artisan migrate --seed
 ```
 Perintah ini membuat seluruh skema **dan** mengisi data awal (role, permission, divisi, jabatan, pengaturan, akun admin, anggota + akun login, berita, galeri).
+
+Foto dokumentasi kegiatan ada di `database/seeders/media/dokumentasi/<album>/`. `DocumentationSeeder` membuat albumnya, menyalin foto ke `storage/app/public/documentation/`, dan memasang delapan foto di hero beranda. Aman dijalankan ulang.
 
 Jika ingin mulai bersih:
 ```bash
@@ -205,13 +211,14 @@ docker compose exec app php artisan test
 
 Aplikasi tersedia di `http://localhost:8000`.
 
-- **Konfigurasi opsional**: salin `.env.docker.example` ke `.env.docker` untuk mengubah nama container, port, `APP_ENV`, dan `APP_DEBUG`, lalu jalankan `docker compose --env-file .env.docker up --build --watch`. Tanpa file itu, nilai bawaan dipakai.
+- **Konfigurasi**: salin `.env.docker.example` ke `.env.docker`, isi `SEED_PASSWORD` (wajib untuk seeding), ubah nama container, port, `APP_ENV`, atau `APP_DEBUG` bila perlu, lalu jalankan `docker compose --env-file .env.docker up --build --watch`. File `.env.docker` tidak ikut di-commit.
 - **Terisolasi untuk proyek ini.** MySQL dan Redis tidak membuka port ke host; keduanya hanya terjangkau dari jaringan compose `website-csa_default`, dengan volume sendiri. Port aplikasi hanya dibuka di `127.0.0.1`, jadi tidak terlihat dari jaringan lokal. Untuk membukanya ke jaringan, ubah baris `ports` di `docker-compose.yml` menjadi `"${APP_PORT:-8000}:8000"`.
 - **Membuat ulang container mengembalikan kode ke isi image.** `docker compose down`, mengubah `docker-compose.yml`, atau `up -d` yang membuat ulang container membuang semua edit yang sudah tersinkron. Selalu jalankan dengan `--build` agar image berisi kode terbaru. Volume (`vendor`, `node_modules`, `storage`, database) tidak ikut hilang.
 - **Kode berada di disk container, bukan bind mount.** Bind mount dari Windows membuat setiap request sekitar 10 kali lebih lambat (satu `filemtime()` 4 ms berbanding 0,004 ms), sehingga halaman admin butuh sekitar 1 detik. Perubahan file disalin otomatis oleh `develop.watch`; tanpa `watch` yang berjalan, edit tidak muncul di container.
 - **Build ulang otomatis**: perubahan `composer.json`, `composer.lock`, `package.json`, `package-lock.json`, atau `Dockerfile` membangun ulang image. Perubahan di `resources/js`, `resources/css`, `resources/sass`, dan `vite.config.js` menjalankan `npm run build`. Perubahan di `resources/views` hanya disalin: class Tailwind yang baru dipakai di view belum masuk CSS sampai `docker compose exec app npm run build` dijalankan.
 - **`storage` dan `.env`** tersimpan di volume `app_storage` (`.env` ada di `storage/.env.docker`), jadi kunci aplikasi stabil dan upload awet. Gambar yang ditaruh di `storage/app/public` pada host ikut tersalin; file yang diunggah lewat UI hanya ada di volume.
 - **Perintah yang menulis file** (`php artisan make:*`, `composer require`) sebaiknya dijalankan di host, karena yang dijalankan di container tidak menulis balik ke host.
+- **Cache file statis**: `server.php` di root dipakai Docker dan `php artisan serve`. File di `public/build/assets` di-cache browser selama setahun (namanya berubah tiap build); gambar, font, CSS, dan JS lain selama 1 jam lalu divalidasi ulang lewat `ETag`.
 - Server PHP memakai 4 worker (`PHP_CLI_SERVER_WORKERS`). MySQL dev disetel `--innodb-flush-log-at-trx-commit=0 --skip-log-bin` untuk kecepatan dan hanya untuk development.
 
 ---
@@ -222,13 +229,24 @@ Setelah `migrate --seed`:
 
 | Peran | Email | Password |
 |---|---|---|
-| Super Admin | `admin@csa.local` | `password` |
-| Ketua | `nidamutmainah@gmail.com` | `12345678` |
-| Seluruh pengurus & anggota | *(2 kata pertama nama + @gmail.com)* | `12345678` |
+| Super Admin | `admin@csa.local` | nilai `SEED_PASSWORD` |
+| Super Admin | `ahfifauka@gmail.com` | nilai `SEED_PASSWORD` |
+| Ketua | `nidamutmainah@gmail.com` | nilai `SEED_PASSWORD` |
+| Seluruh pengurus & anggota | *(2 kata pertama nama + @gmail.com)* | nilai `SEED_PASSWORD` |
 
-Akun anggota di-generate otomatis dari `MemberSeeder` (email = dua kata pertama nama, lowercase, tanpa spasi). Contoh: `muhammadramdan@gmail.com`, `fikrimaulana@gmail.com`.
+Setiap role punya satu seeder di `database/seeders/`:
 
-> ⚠️ **Ganti password default sebelum production.** Password default hanya untuk kemudahan onboarding anggota.
+| Seeder | Isi |
+|---|---|
+| `SuperAdminSeeder` | Dua akun super admin tanpa profil anggota; aman dijalankan ulang |
+| `KetuaSeeder`, `WakilKetuaSeeder` | Pimpinan |
+| `SekretarisSeeder`, `BendaharaSeeder` | Kesekretariatan dan keuangan |
+| `KetuaDivisiSeeder`, `WakilKetuaDivisiSeeder` | Pimpinan divisi |
+| `AnggotaSeeder` | Semua role `anggota`, termasuk jabatan Humas, Litbang, Koordinator Proyek, dan Tim Kreatif |
+
+Pembuatan akun dan profil anggota dipusatkan di `MemberAccountSeeder` (email = dua kata pertama nama, lowercase, tanpa spasi). Pelindung, Penasihat, dan Pembina pada bagan struktur tidak punya akun; datanya ada di `config/organization.php`.
+
+> ⚠️ **Semua akun berbagi satu password awal.** Minta setiap pengguna menggantinya setelah login pertama.
 
 **Pendaftaran publik** (`/register`) hanya aktif bila dibuka admin di **Pengaturan → Pendaftaran & Komunitas**. Akun baru otomatis mendapat role `anggota`.
 
@@ -241,7 +259,7 @@ Akun anggota di-generate otomatis dari `MemberSeeder` (email = dua kata pertama 
 php artisan migrate                # jalankan migrasi
 php artisan migrate:fresh --seed   # reset + seed
 php artisan db:seed                # seed ulang (idempotent sebagian)
-php artisan db:seed --class=MemberSeeder
+php artisan db:seed --class=AnggotaSeeder
 
 # Aplikasi
 php artisan serve                  # server development
@@ -280,9 +298,14 @@ php artisan test --coverage         # butuh Xdebug/PCOV
 docker compose exec app php artisan test   # di Docker
 ```
 
-Catatan performa: ParaTest tidak dipasang. Suite 69 test selesai sekitar 8 detik, sedangkan `--parallel` terukur lebih lambat (sekitar 9,5 detik) karena tiap proses membuat database dan menjalankan 27 migrasi sendiri di satu server MySQL. `php artisan schema:dump` tidak dipakai: klien `mysql` pada image Alpine adalah MariaDB, yang tidak kompatibel dengan MySQL 8 (plugin `caching_sha2_password` dan opsi `mysqldump` yang dikirim Laravel). Waktu migrasi dipangkas dengan tuning server MySQL dev pada `docker-compose.yml` (`--innodb-flush-log-at-trx-commit=0 --skip-log-bin`, hanya untuk dev karena mengorbankan durabilitas).
+Catatan performa: ParaTest tidak dipasang. Saat diukur pada 69 test, suite selesai sekitar 8 detik, sedangkan `--parallel` terukur lebih lambat (sekitar 9,5 detik) karena tiap proses membuat database dan menjalankan 27 migrasi sendiri di satu server MySQL. `php artisan schema:dump` tidak dipakai: klien `mysql` pada image Alpine adalah MariaDB, yang tidak kompatibel dengan MySQL 8 (plugin `caching_sha2_password` dan opsi `mysqldump` yang dikirim Laravel). Waktu migrasi dipangkas dengan tuning server MySQL dev pada `docker-compose.yml` (`--innodb-flush-log-at-trx-commit=0 --skip-log-bin`, hanya untuk dev karena mengorbankan durabilitas).
 
-Cakupan test saat ini (**69 test**):
+Cakupan test saat ini (**91 test**):
+- Foto dokumentasi kegiatan dari seeder (`DocumentationSeederTest`)
+- Formulir login yang kedaluwarsa atau terkirim dua kali (`ExpiredLoginFormTest`)
+- Aset dimuat dari server sendiri, tanpa CDN (`LocalAssetsTest`)
+- Seeder akun per role, berita, dan bagan struktur organisasi (`OrganizationSeederTest`, `NewsSeederTest`, `OrganizationChartTest`)
+- Cache thumbnail dan pengecekan permission tanpa query berulang (`ThumbnailCacheTest`, `RolePermissionQueryTest`)
 - Alur kehadiran & siklus presensi (`AttendanceFlowTest`, `AttendanceLifecycleTest`)
 - Presensi mandiri & toggle (`SelfAttendanceButtonTest`, `SelfAttendanceToggleTest`)
 - Retensi log (`LogRetentionTest`)
