@@ -9,7 +9,6 @@
     <div class="max-w-[1080px] mx-auto px-5 sm:px-8 pt-24 sm:pt-28 pb-16">
         <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
-            {{-- Left: intro --}}
             <div class="hidden lg:block" data-reveal="left">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5 mb-10">
                     <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="w-10 h-10 object-contain">
@@ -38,7 +37,6 @@
                 </ul>
             </div>
 
-            {{-- Right: form card --}}
             <div class="w-full max-w-md mx-auto lg:mx-0" data-reveal="up">
                 <div class="text-center lg:text-left mb-7">
                     <div class="w-12 h-12 rounded-2xl bg-[var(--paper)] border border-[var(--line)] shadow-sm flex items-center justify-center mx-auto lg:mx-0 mb-5 lg:hidden">
@@ -49,7 +47,8 @@
                 </div>
 
                 <div class="bg-[var(--paper)] rounded-xl border border-[var(--line)]/80 p-6 sm:p-8">
-                    <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ show: false }">
+                    <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ show: false, busy: false }"
+                        @submit="busy ? $event.preventDefault() : (busy = true)" @pageshow.window="busy = false">
                         @csrf
 
                         <div>
@@ -90,9 +89,9 @@
                             <span class="text-[13px] text-[var(--ink-soft)]">Ingat saya di perangkat ini</span>
                         </label>
 
-                        <button type="submit"
-                            class="w-full h-12 bg-[var(--accent-solid)] text-[var(--on-accent)] text-[14px] font-semibold rounded-xl hover:opacity-90 active:scale-[0.99] transition-all">
-                            Masuk
+                        <button type="submit" :disabled="busy"
+                            class="w-full h-12 bg-[var(--accent-solid)] text-[var(--on-accent)] text-[14px] font-semibold rounded-xl hover:opacity-90 active:scale-[0.99] transition-all disabled:opacity-70 disabled:cursor-wait">
+                            <span x-text="busy ? 'Memproses…' : 'Masuk'">Masuk</span>
                         </button>
 
                         <p class="text-center text-[13px] text-[var(--ink-faint)] pt-1">
