@@ -6,6 +6,8 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class NewsSeeder extends Seeder
@@ -72,18 +74,17 @@ class NewsSeeder extends Seeder
             ],
         ];
 
+        $thumbnails = $this->availableThumbnails();
         $created = 0;
 
         foreach ($items as $i => $item) {
-            $thumbnail = self::THUMBNAILS[$i % count(self::THUMBNAILS)];
-
             News::create([
                 'category_id' => $categories[$item['category']] ?? null,
                 'user_id' => $author?->id,
                 'title' => $item['title'],
                 'slug' => Str::slug($item['title']),
                 'content' => $item['content'],
-                'thumbnail' => $thumbnail,
+                'thumbnail' => $thumbnails->isEmpty() ? null : $thumbnails[$i % $thumbnails->count()],
                 'status' => 'published',
                 'published_at' => now()->subDays($item['daysAgo'])->startOfDay(),
             ]);
@@ -91,5 +92,17 @@ class NewsSeeder extends Seeder
         }
 
         $this->command->info("NewsSeeder berhasil: {$created} berita dibuat.");
+    }
+
+    private function availableThumbnails(): Collection
+    {
+        $stored = collect(Storage::disk('public')->files('galleries'))
+            ->filter(fn (string $file) => preg_match('/\.(jpe?g|png|webp)$/i', $file))
+            ->sort();
+
+        return collect(self::THUMBNAILS)
+            ->intersect($stored)
+            ->concat($stored->diff(self::THUMBNAILS))
+            ->values();
     }
 }
