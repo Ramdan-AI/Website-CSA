@@ -19,11 +19,8 @@ class ImageController extends Controller
         'webp' => 'image/webp',
     ];
 
-    /**
-     * On-the-fly resized copy of any file inside storage/app/public.
-     * Generated once, cached on disk, then served with long-lived headers
-     * so the browser treats every thumbnail as immutable.
-     */
+    private const THUMB_EXTS = ['webp', 'png', 'gif'];
+
     public function show(string $width, string $path)
     {
         $w = (int) $width;
@@ -47,23 +44,23 @@ class ImageController extends Controller
             return redirect()->to(asset('storage/'.$path));
         }
 
-        // Hard guard against directory traversal even after the checks above.
         $base = realpath($disk->path(''));
         $full = realpath($disk->path($path));
         if ($base === false || $full === false || ! str_starts_with(strtolower($full), strtolower($base.DIRECTORY_SEPARATOR))) {
             abort(404);
         }
 
-        $cachePath = 'cache/img/'.$w.'/'.sha1($full.$w);
+        $stem = 'cache/img/'.$w.'/'.sha1($full.$w.filemtime($full));
+        $cachePath = $this->findCached($stem);
 
-        if (! $disk->exists($cachePath)) {
+        if ($cachePath === null) {
             $thumb = $this->buildThumb($full, $w);
             if ($thumb === null) {
                 return redirect()->to(asset('storage/'.$path));
             }
 
             [$bytes, $outExt] = $thumb;
-            $cachePath .= '.'.$outExt;
+            $cachePath = $stem.'.'.$outExt;
             $disk->put($cachePath, $bytes);
         }
 
@@ -77,9 +74,17 @@ class ImageController extends Controller
         ]);
     }
 
-    /**
-     * @return array{0: string, 1: string}|null [bytes, output extension]
-     */
+    private function findCached(string $stem): ?string
+    {
+        foreach (self::THUMB_EXTS as $ext) {
+            if (Storage::disk('public')->exists($stem.'.'.$ext)) {
+                return $stem.'.'.$ext;
+            }
+        }
+
+        return null;
+    }
+
     private function buildThumb(string $full, int $width): ?array
     {
         $size = @getimagesize($full);
