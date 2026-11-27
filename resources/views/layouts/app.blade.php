@@ -9,22 +9,16 @@
     <meta name="description" content="@yield('meta_description', 'Creative Student Association STMIKMI — Komunitas inovasi dan kreativitas mahasiswa.')">
 
     <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    {{-- Geist for UI, JetBrains Mono for data — anti-AI-slop typography --}}
-    <link href="https://fonts.bunny.net/css?family=geist:300,400,500,600,700&family=jetbrains-mono:400,500,600&display=swap" rel="stylesheet">
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/vendor/auth-fonts.css', 'resources/css/app.css', 'resources/js/app.js', 'resources/js/vendor/alpine.js'])
     @stack('head')
 </head>
 <body class="min-h-screen bg-white text-gray-800 font-sans antialiased">
     <x-public.navigation.navbar />
 
-    {{-- Page content — offset for fixed header --}}
     <main class="pt-14">
         @yield('content')
     </main>
 
-    {{-- Footer --}}
     <footer class="bg-gray-900 border-t border-gray-800 pt-16 pb-8 mt-auto text-gray-400">
         <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
             <div>
@@ -88,8 +82,6 @@
         </div>
     </footer>
 
-    {{-- Alpine.js CDN — lightweight, no Vue/React overhead --}}
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @stack('scripts')
 </body>
 </html>

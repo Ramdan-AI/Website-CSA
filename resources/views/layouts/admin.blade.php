@@ -8,9 +8,7 @@
     <meta name="theme-color" content="#0b0d12">
     <title>CSA Admin Panel</title>
     <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
-    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
+    @vite(['resources/css/vendor/admin-fonts.css', 'resources/css/admin.css', 'resources/js/admin.js', 'resources/js/vendor/alpine.js'])
     @stack('styles')
     <script>
         (() => {
@@ -27,7 +25,6 @@
             document.documentElement.dataset.alpine = 'ready';
         });
     </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="antialiased overflow-x-hidden bg-[var(--bg-body)] text-[var(--text-primary)]"
@@ -66,8 +63,6 @@
 
     <x-admin.sidebar />
 
-    {{-- Transisi padding hanya aktif setelah sidebar benar-benar ditoggle,
-         sehingga pindah halaman tidak memicu animasi geser. --}}
     <div class="main-content-container flex flex-col min-h-screen"
         :class="[
             animateLayout ? 'transition-[padding] duration-300' : '',

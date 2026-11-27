@@ -18,8 +18,6 @@
     <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)">
     <title>{{ $code }} · {{ $title }} | CSA</title>
     <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:700,800|inter:400,500,600&display=swap" rel="stylesheet">
     <script>
         (() => {
             const stored = localStorage.getItem('theme');
@@ -28,6 +26,11 @@
         })();
     </script>
     <style>
+        @font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url('{{ asset('fonts/inter-400.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-weight: 500; font-display: swap; src: url('{{ asset('fonts/inter-500.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-weight: 600; font-display: swap; src: url('{{ asset('fonts/inter-600.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 700; font-display: swap; src: url('{{ asset('fonts/plus-jakarta-sans-700.woff2') }}') format('woff2'); }
+        @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-display: swap; src: url('{{ asset('fonts/plus-jakarta-sans-800.woff2') }}') format('woff2'); }
         :root {
             --paper: #ffffff;
             --ink: #0f1419;

@@ -31,16 +31,12 @@
             @php
                 $attendance = $attendanceByEvent[$event->id] ?? null;
                 $status = $attendance?->status;
-                $isPresent = $status === 'present'; // hanya hadir yang memblokir presensi mandiri
+                $isPresent = $status === 'present';
                 $hasAttended = $isPresent;
                 $isClosed = (bool) $event->attendance_closed_at;
 
-                // Sesi presensi ditentukan oleh admin (buka/tutup), bukan perbandingan
-                // tanggal, agar anggota bisa presensi selama sesi masih dibuka.
                 $sessionOpen = $event->attendance_enabled && ! $isClosed;
 
-                // Tombol mandiri aktif selama sesi dibuka, mandiri diaktifkan, dan
-                // anggota belum tercatat HADIR (alfa/izin/sakit tetap bisa presensi).
                 $selfDisabled = ! $sessionOpen || ! $event->self_attendance_enabled || $isPresent;
                 $scanDisabled = ! $sessionOpen;
                 $manualDisabled = ! $sessionOpen;
@@ -52,7 +48,6 @@
                 ];
             @endphp
             <article class="csa-panel rounded-2xl overflow-hidden flex flex-col">
-                {{-- Banner (klik ke detail) --}}
                 <a href="{{ route('admin.events.show', $event) }}" class="group relative block aspect-[16/9] bg-[var(--bg-muted)] overflow-hidden">
                     @if ($event->banner_url)
                         <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]">
@@ -80,7 +75,6 @@
                     </div>
                 </a>
 
-                {{-- Isi --}}
                 <div class="p-4 flex flex-col flex-1">
                     <h2 class="text-[15px] font-semibold leading-snug line-clamp-2">
                         <a href="{{ route('admin.events.show', $event) }}" class="text-[var(--text-primary)] hover:text-[var(--accent-bright)] transition-colors">{{ $event->title }}</a>
@@ -148,7 +142,6 @@
     </div>
 </div>
 
-{{-- QR Scanner Modal --}}
 <div id="qrScannerModal" class="hidden fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm items-center justify-center p-4" data-qr-overlay>
     <div class="csa-panel w-full max-w-sm" data-qr-panel>
         <div class="p-4 border-b border-[var(--border-soft)] flex items-center justify-between">
@@ -162,7 +155,6 @@
     </div>
 </div>
 
-{{-- Modal alasan sakit/izin --}}
 <div id="reasonModal" class="hidden fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm items-center justify-center p-4">
     <div class="csa-panel w-full max-w-sm">
         <div class="p-4 border-b border-[var(--border-soft)] flex items-center justify-between">
@@ -188,7 +180,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+@vite('resources/js/vendor/qr-scanner.js')
 <script>
     (() => {
         const scanUrlTemplate = @json(route('admin.member.attendance.scan', ['event' => '__EVENT__']));
@@ -209,7 +201,6 @@
         let currentEventId = null;
         const modal = document.getElementById('qrScannerModal');
 
-        // Modal alasan sakit/izin
         const reasonModal = document.getElementById('reasonModal');
         const reasonForm = document.getElementById('reasonForm');
         const reasonTitle = document.getElementById('reasonModalTitle');
@@ -221,7 +212,6 @@
             document.body.style.overflow = '';
         };
 
-        // Hentikan kamera & rendering pemindai, lalu bersihkan instance.
         const stopScanner = () => {
             const active = scanner;
             scanner = null;
@@ -244,20 +234,17 @@
             modal.classList.remove('flex');
             document.body.style.overflow = '';
 
-            // Hentikan kamera sungguhan (bukan sekadar menyembunyikan modal).
             stopScanner().then(() => {
                 const reader = document.getElementById('qrReader');
                 if (reader) reader.innerHTML = '';
             });
         };
 
-        // Pengaman: pastikan kamera mati saat halaman ditinggalkan/di-unload.
         window.addEventListener('pagehide', () => stopScanner());
         window.addEventListener('beforeunload', () => stopScanner());
 
         const submitCode = (code) => {
             const text = (code || '').trim();
-            // QR bisa berisi URL penuh (…/scan/ABC123 atau ?code=ABC123) atau kode 6 karakter.
             let value = text;
             const queryMatch = text.match(/[?&]code=([A-Za-z0-9]{4,8})/);
             const pathMatch = text.match(/\/scan\/([A-Za-z0-9]{4,8})/);
@@ -281,7 +268,6 @@
             form.submit();
         };
 
-        // Tunggu library pemindai termuat (CDN bisa lambat), lalu jalankan.
         const whenScannerReady = (cb, tries = 0) => {
             if (window.Html5Qrcode) return cb();
             if (tries > 25) return cb(new Error('library-missing'));
@@ -291,7 +277,6 @@
 
         const startScanner = (stage) => {
             whenScannerReady((err) => {
-                // Modal mungkin sudah ditutup sebelum library siap -> jangan nyalakan kamera.
                 if (modal.classList.contains('hidden')) return;
 
                 if (err || !window.Html5Qrcode) {
@@ -305,7 +290,6 @@
                 scanner = new window.Html5Qrcode('qrReaderStage');
                 scanner.start({ facingMode: 'environment' }, config, onScan, () => {})
                     .catch(() => {
-                        // Fallback kamera depan (umum di laptop), hentikan yang lama dulu.
                         return stopScanner().then(() => {
                             if (modal.classList.contains('hidden')) return;
 
@@ -328,11 +312,9 @@
 
                 const reader = document.getElementById('qrReader');
 
-                // Hentikan kamera yang mungkin masih aktif sebelum memulai ulang.
                 stopScanner().then(() => {
                     reader.innerHTML = '';
 
-                    // Kamera hanya tersedia pada konteks aman (HTTPS atau localhost).
                     const secure = window.isSecureContext
                         || location.hostname === 'localhost'
                         || location.hostname === '127.0.0.1';
@@ -360,7 +342,6 @@
             if (event.key === 'Escape' && !reasonModal.classList.contains('hidden')) closeReason();
         });
 
-        // Modal alasan sakit/izin
         document.querySelectorAll('[data-attendance-reason]').forEach((button) => {
             button.addEventListener('click', () => {
                 reasonForm.setAttribute('action', button.dataset.action);
