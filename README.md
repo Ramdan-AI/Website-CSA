@@ -289,7 +289,7 @@ php artisan test                   # jalankan test suite
 
 Test suite memakai **PHPUnit 11** dengan database MySQL terpisah `web_csa_spec` (di-pin di `phpunit.xml` lewat `<env>` dan `<server force="true">`, karena Laravel membaca `env()` dari `$_SERVER` sehingga `<env>` saja kalah oleh variabel environment Docker). `TestCase` menolak berjalan bila nama database tidak diawali `web_csa_spec`, sebab `RefreshDatabase` menjalankan `migrate:fresh` dan akan menghapus seluruh data.
 
-Pada Docker, database test dibuat otomatis oleh `docker/mysql/init-spec-database.sql`. Tanpa Docker, buat sekali: `CREATE DATABASE web_csa_spec;`.
+Pada Docker, database test dibuat otomatis saat volume MySQL pertama kali dibuat (bagian `configs` di `docker-compose.yml`). Tanpa Docker, buat sekali: `CREATE DATABASE web_csa_spec;`.
 
 ```bash
 php artisan test                    # semua test

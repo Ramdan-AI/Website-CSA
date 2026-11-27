@@ -3,7 +3,6 @@
 .env.docker
 node_modules
 vendor
-docker
 public/build
 public/storage
 bootstrap/cache/*.php
