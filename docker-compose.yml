@@ -44,7 +44,7 @@ services:
       npm ci --prefer-offline --fetch-retries=5 &&
       npm run build &&
       cd public &&
-      php -S 0.0.0.0:8000 ../vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php
+      php -S 0.0.0.0:8000 ../server.php
       "
     develop:
       watch:
@@ -65,6 +65,9 @@ services:
         - action: sync
           path: ./routes
           target: /var/www/html/routes
+        - action: sync
+          path: ./server.php
+          target: /var/www/html/server.php
         - action: sync
           path: ./tests
           target: /var/www/html/tests
