@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\FlushesQueryCache;
 use App\Support\LogsActivity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 
 class Division extends Model
 {
+    use FlushesQueryCache;
     use LogsActivity;
     use SoftDeletes;
 

@@ -1,11 +1,5 @@
-{{-- Cerita CSA: timeline, pembina, pendiri --}}
 @php
-    $pembina = [
-        'name' => 'Adi Raharjo, S.Kom., M.M',
-        'about' => 'Membimbing arah teknis dan akademik CSA sejak awal berdiri.',
-        'education' => 'S2 Magister Manajemen, Universitas Pendidikan Indonesia',
-        'experience' => '15+ tahun',
-    ];
+    $pembina = config('organization.advisor');
     $founders = [
         'Diansyah, S.Kom',
         'Febri Ridwansyah, S.Kom',
@@ -13,9 +7,6 @@
         'M. Fauzi Ramadhan, S.Kom',
         'Yanti Mandasari, S.Kom',
     ];
-    $pembinaPhoto = \Illuminate\Support\Facades\Storage::disk('public')->exists('pembina/jfod093842jfldswa.png')
-        ? asset('storage/pembina/jfod093842jfldswa.png')
-        : null;
     $monogram = fn ($name) => strtoupper(collect(explode(' ', trim(strtok($name, ','))))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->join(''));
     $regOpen = \App\Models\Setting::registrationOpen();
 
@@ -40,7 +31,6 @@
             </p>
         </div>
 
-        {{-- Timeline vertikal dengan garis yang tumbuh --}}
         <div class="relative pl-8 sm:pl-12" data-timeline>
             <div class="absolute left-[7px] sm:left-[11px] top-2 bottom-2 w-px" style="background: var(--line);"></div>
             <div data-timeline-fill class="absolute left-[7px] sm:left-[11px] top-2 w-px origin-top" style="height: calc(100% - 1rem); background: var(--accent); transform: scaleY(0);"></div>
@@ -58,20 +48,17 @@
             </div>
         </div>
 
-        {{-- Pembina --}}
         <div class="mt-20 rounded-xl border overflow-hidden" style="background: var(--paper-sunken); border-color: var(--line);" data-reveal="up">
-            <div class="grid sm:grid-cols-[200px_1fr]">
-                <div class="aspect-square sm:aspect-auto" style="background: var(--line);">
-                    @if ($pembinaPhoto)
-                        <img src="{{ $pembinaPhoto }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
-                    @else
-                        <img src="{{ asset('storage/profile/profile-placeholder.png') }}" alt="{{ $pembina['name'] }}" class="w-full h-full object-cover">
-                    @endif
+            <div class="grid sm:grid-cols-[240px_1fr]">
+                <div class="relative aspect-square sm:aspect-auto sm:min-h-[260px]" style="background: var(--line);">
+                    <img src="{{ asset($pembina['photo']) }}" alt="{{ $pembina['name'] }}" width="800" height="800" class="absolute inset-0 w-full h-full object-cover object-top" loading="lazy">
                 </div>
                 <div class="p-6 sm:p-8 flex flex-col justify-center">
                     <p class="text-[13px] font-medium mb-2" style="color: var(--accent);">Pembina</p>
                     <h3 class="text-[20px] font-bold tracking-[-0.015em]" style="color: var(--ink);">{{ $pembina['name'] }}</h3>
-                    <p class="text-[15px] leading-[1.8] mt-3" style="color: var(--ink-soft);">{{ $pembina['about'] }}</p>
+                    @foreach ($pembina['about'] as $paragraph)
+                        <p class="text-[15px] leading-[1.8] mt-3 max-w-[760px]" style="color: var(--ink-soft);">{{ $paragraph }}</p>
+                    @endforeach
                     <div class="flex flex-wrap gap-x-6 gap-y-2 mt-5 pt-5 border-t" style="border-color: var(--line);">
                         <div>
                             <p class="text-[12px]" style="color: var(--ink-faint);">Pendidikan</p>
@@ -79,14 +66,15 @@
                         </div>
                         <div>
                             <p class="text-[12px]" style="color: var(--ink-faint);">Pengalaman</p>
-                            <p class="text-[14px] font-medium mt-0.5" style="color: var(--ink);">{{ $pembina['experience'] }}</p>
+                            @foreach ($pembina['experiences'] as $field => $duration)
+                                <p class="text-[14px] font-medium mt-0.5" style="color: var(--ink);">{{ $field }} &middot; {{ $duration }}</p>
+                            @endforeach
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- Pendiri --}}
         <div class="mt-20">
             <div class="flex items-end justify-between gap-5 mb-8">
                 <div>

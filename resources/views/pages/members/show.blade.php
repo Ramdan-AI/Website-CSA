@@ -11,7 +11,7 @@
     {{-- Kartu profil --}}
     <section class="csa-panel p-6">
         <div class="flex flex-col sm:flex-row sm:items-center gap-5">
-            <img src="{{ $member->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+            <img src="{{ $member->photo_url ?: asset('images/profile-placeholder.svg') }}"
                 alt="{{ $member->name }}" class="w-20 h-20 rounded-2xl object-cover bg-[var(--bg-muted)] shrink-0">
 
             <div class="min-w-0 flex-1">

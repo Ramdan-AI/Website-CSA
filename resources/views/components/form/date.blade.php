@@ -73,7 +73,7 @@
                         :class="!cell.day
                             ? 'invisible'
                             : (cell.day === selectedDay
-                                ? 'bg-[var(--accent)] text-white font-semibold'
+                                ? 'bg-[var(--accent)] text-[var(--on-accent)] font-semibold'
                                 : (cell.today ? 'text-[var(--accent-bright)] font-semibold hover:bg-[var(--accent-subtle)]' : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'))"
                         x-text="cell.day"></button>
                 </template>

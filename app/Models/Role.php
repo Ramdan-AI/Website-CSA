@@ -24,9 +24,7 @@ class Role extends Model
             return true;
         }
 
-        return $this->permissions()
-            ->where('slug', $permission)
-            ->exists();
+        return $this->permissions->contains('slug', $permission);
     }
 
     public function users()

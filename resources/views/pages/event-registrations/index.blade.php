@@ -33,7 +33,7 @@
                 <td class="py-4 px-6">
                     <div class="flex items-center gap-2">
                         <div class="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center ring-2 ring-white shrink-0 shadow-sm">
-                            <img src="{{ $registration->member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $registration->member->name }}" class="w-full h-full object-cover">
+                            <img src="{{ $registration->member->photo_url ?? asset('images/profile-placeholder.svg') }}" alt="{{ $registration->member->name }}" class="w-full h-full object-cover">
                         </div>
                         <span class="text-xs text-gray-600">{{ $registration->member->name }}</span>
                     </div>

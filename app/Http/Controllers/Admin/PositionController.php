@@ -22,8 +22,8 @@ class PositionController extends Controller
         $name = strtolower($position->name);
 
         return match (true) {
-            str_contains($name, 'ketua divisi') => 'ketua-divisi',
             str_contains($name, 'wakil ketua divisi') => 'wakil-ketua-divisi',
+            str_contains($name, 'ketua divisi') => 'ketua-divisi',
             str_contains($name, 'wakil ketua') => 'wakil-ketua',
             str_contains($name, 'ketua') && !str_contains($name, 'wakil') => 'ketua',
             str_contains($name, 'sekretaris') => 'sekretaris',

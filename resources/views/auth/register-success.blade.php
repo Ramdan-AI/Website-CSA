@@ -44,7 +44,7 @@
                                 @if ($member->division->image)
                                     <img src="{{ asset('storage/' . $member->division->image) }}" alt="{{ $member->division->name }}" class="w-full h-full object-contain">
                                 @else
-                                    <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="{{ $member->division->name }}" class="w-full h-full object-contain">
+                                    <img src="{{ asset('images/csa-logo.webp') }}" alt="{{ $member->division->name }}" class="w-full h-full object-contain">
                                 @endif
                             </div>
                             <div class="min-w-0 flex-1">

@@ -45,7 +45,7 @@
                 <template x-if="cell.day">
                     <div class="flex items-center justify-between">
                         <span class="text-[12px] font-medium w-6 h-6 flex items-center justify-center rounded-full"
-                            :class="cell.isToday ? 'bg-[var(--accent)] text-white' : 'text-[var(--text-secondary)]'"
+                            :class="cell.isToday ? 'bg-[var(--accent)] text-[var(--on-accent)]' : 'text-[var(--text-secondary)]'"
                             x-text="cell.day"></span>
                     </div>
                 </template>

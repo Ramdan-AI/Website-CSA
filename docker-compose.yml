@@ -6,25 +6,153 @@ services:
     container_name: ${CONTAINER_NAME:-website-csa-app}
     working_dir: /var/www/html
     env_file:
-      - .env.docker
+      - path: .env.docker
+        required: false
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - APP_ENV=${APP_ENV:-local}
-      - APP_DEBUG=${APP_DEBUG:-true}
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: web_csa
+      DB_USERNAME: csa
+      DB_PASSWORD: secret
+      PHP_CLI_SERVER_WORKERS: 4
+      CACHE_STORE: redis
+      REDIS_CLIENT: phpredis
+      REDIS_HOST: redis
     volumes:
-      - .:/var/www/html
+      - app_vendor:/var/www/html/vendor
+      - app_node_modules:/var/www/html/node_modules
+      - app_storage:/var/www/html/storage
     ports:
-      - "${APP_PORT:-8000}:8000"
-      - "${VITE_PORT:-5173}:5173"
+      - "127.0.0.1:${APP_PORT:-8000}:8000"
     command: >
       sh -c "
-      git config --global --add safe.directory /var/www/html &&
-      if [ ! -f .env ]; then cp .env.example .env; fi &&
-      mkdir -p database && touch database/database.sqlite &&
+      mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs &&
+      if [ ! -f storage/.env.docker ]; then cp .env.example storage/.env.docker; fi &&
+      ln -sf storage/.env.docker .env &&
       composer install --no-interaction --prefer-dist &&
       grep -q '^APP_KEY=base64:' .env || php artisan key:generate --ansi &&
       php artisan migrate --force &&
       php artisan storage:link --force &&
-      npm install --prefer-offline --fetch-retries=5 &&
+      npm ci --prefer-offline --fetch-retries=5 &&
       npm run build &&
-      php artisan serve --host=0.0.0.0 --port=8000
+      cd public &&
+      php -S 0.0.0.0:8000 ../server.php
       "
+    develop:
+      watch:
+        - action: sync
+          path: ./app
+          target: /var/www/html/app
+        - action: sync
+          path: ./bootstrap
+          target: /var/www/html/bootstrap
+          ignore:
+            - cache/
+        - action: sync
+          path: ./config
+          target: /var/www/html/config
+        - action: sync
+          path: ./database
+          target: /var/www/html/database
+        - action: sync
+          path: ./routes
+          target: /var/www/html/routes
+        - action: sync
+          path: ./server.php
+          target: /var/www/html/server.php
+        - action: sync
+          path: ./tests
+          target: /var/www/html/tests
+        - action: sync
+          path: ./public
+          target: /var/www/html/public
+          ignore:
+            - build/
+            - storage
+        - action: sync
+          path: ./storage/app/public
+          target: /var/www/html/storage/app/public
+        - action: sync
+          path: ./resources/views
+          target: /var/www/html/resources/views
+        - action: sync+exec
+          path: ./resources/js
+          target: /var/www/html/resources/js
+          exec:
+            command: npm run build
+        - action: sync+exec
+          path: ./resources/css
+          target: /var/www/html/resources/css
+          exec:
+            command: npm run build
+        - action: sync+exec
+          path: ./resources/sass
+          target: /var/www/html/resources/sass
+          exec:
+            command: npm run build
+        - action: sync+exec
+          path: ./vite.config.js
+          target: /var/www/html/vite.config.js
+          exec:
+            command: npm run build
+        - action: rebuild
+          path: ./composer.json
+        - action: rebuild
+          path: ./composer.lock
+        - action: rebuild
+          path: ./package.json
+        - action: rebuild
+          path: ./package-lock.json
+        - action: rebuild
+          path: ./Dockerfile
+
+  db:
+    image: mysql:8.0
+    container_name: website-csa-db
+    command: ["--innodb-flush-log-at-trx-commit=0", "--skip-log-bin"]
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: web_csa
+      MYSQL_USER: csa
+      MYSQL_PASSWORD: secret
+    volumes:
+      - db_data:/var/lib/mysql
+    configs:
+      - source: spec-database
+        target: /docker-entrypoint-initdb.d/spec-database.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot", "--silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  redis:
+    image: redis:8-alpine
+    container_name: website-csa-redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  db_data:
+  app_vendor:
+  app_node_modules:
+  app_storage:
+
+configs:
+  spec-database:
+    content: |
+      CREATE DATABASE IF NOT EXISTS web_csa_spec;
+      GRANT ALL PRIVILEGES ON `web_csa_spec`.* TO 'csa'@'%';

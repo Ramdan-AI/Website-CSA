@@ -116,7 +116,7 @@
                             @foreach ($team as $member)
                                 <li class="flex items-center gap-3">
                                     <span class="w-9 h-9 rounded-full overflow-hidden shrink-0" style="background: var(--paper-sunken);">
-                                        <img src="{{ $member->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+                                        <img src="{{ $member->photo_url ?: asset('images/profile-placeholder.svg') }}"
                                             alt="{{ $member->name }}" width="36" height="36" class="w-full h-full object-cover" loading="lazy">
                                     </span>
                                     <span class="min-w-0">

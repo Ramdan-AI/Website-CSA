@@ -12,7 +12,7 @@
 @php
     $fieldId = $name . '-crop';
     $previewClass = $shape === 'circle' ? 'rounded-full' : 'rounded-xl';
-    $fallback = $current ?: asset('storage/profile/profile-placeholder.png');
+    $fallback = $current ?: asset('images/profile-placeholder.svg');
 @endphp
 
 <div x-data="photoCropper({ aspect: {{ (float) $aspect }}, initial: @js($fallback) })" x-init="init()">
@@ -76,16 +76,11 @@
 
 @once
     @push('styles')
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+        @vite('resources/js/vendor/cropper.js')
     @endpush
 
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
         <script>
-            /**
-             * Pemangkas gambar reusable. Pengguna memilih gambar, memangkasnya
-             * sesuai rasio, lalu hasilnya dikirim lewat input file asli.
-             */
             window.photoCropper = (config = {}) => ({
                 open: false,
                 preview: null,

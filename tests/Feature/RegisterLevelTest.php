@@ -18,8 +18,7 @@ class RegisterLevelTest extends TestCase
         parent::setUp();
 
         // Buka pendaftaran (mode manual) agar route /register dapat diakses.
-        Setting::create([
-            'site_name' => 'CSA',
+        Setting::current()->update([
             'registration_open' => true,
             'registration_use_schedule' => false,
         ]);

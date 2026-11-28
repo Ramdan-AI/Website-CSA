@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\FlushesQueryCache;
 use Illuminate\Database\Eloquent\Model;
 
 class Gallery extends Model
 {
+    use FlushesQueryCache;
+
     protected $fillable = [
         'album_id',
         'image',

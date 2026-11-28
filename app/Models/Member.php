@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\FlushesQueryCache;
 use App\Support\LogsActivity;
 use App\Support\ResolvesStorageUrl;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,7 @@ use Illuminate\Support\Str;
 
 class Member extends Model
 {
+    use FlushesQueryCache;
     use LogsActivity;
     use ResolvesStorageUrl;
     use SoftDeletes;

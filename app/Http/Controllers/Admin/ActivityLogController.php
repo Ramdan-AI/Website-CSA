@@ -47,7 +47,7 @@ class ActivityLogController extends Controller
             ->sort()
             ->values();
 
-        $setting = Setting::firstOrCreate(['id' => 1], ['site_name' => 'CSA']);
+        $setting = Setting::current();
         if ($setting->wasRecentlyCreated) {
             $setting->refresh();
         }
@@ -98,7 +98,7 @@ class ActivityLogController extends Controller
      */
     public function purge()
     {
-        $setting = Setting::firstOrCreate(['id' => 1], ['site_name' => 'CSA']);
+        $setting = Setting::current();
         $days = in_array((int) $setting->log_retention_days, Setting::LOG_RETENTION_DAYS, true)
             ? (int) $setting->log_retention_days
             : 14;

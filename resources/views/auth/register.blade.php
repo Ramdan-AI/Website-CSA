@@ -1,7 +1,7 @@
 @extends('layouts.landing')
 
 @php
-    $setting = \App\Models\Setting::first();
+    $setting = \App\Models\Setting::cached();
     $regOpen = $setting?->isRegistrationOpen() ?? false;
     $levelDivisionIds = isset($divisions) ? $divisions->where('has_levels', true)->pluck('id')->map(fn ($id) => (string) $id)->all() : [];
 @endphp
@@ -14,7 +14,7 @@
             {{-- Left: intro --}}
             <div class="hidden lg:block lg:sticky lg:top-28" data-reveal="left">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5 mb-10">
-                    <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-10 h-10 object-contain">
+                    <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="w-10 h-10 object-contain">
                     <span class="leading-tight">
                         <span class="block text-[15px] font-bold text-[var(--ink)] tracking-tight">CSA</span>
                         <span class="block text-[10px] text-[var(--ink-faint)] -mt-0.5">STMIK Mardira Indonesia</span>
@@ -49,7 +49,7 @@
             <div class="w-full max-w-xl mx-auto lg:mx-0" data-reveal="up">
                 <div class="text-center lg:text-left mb-7">
                     <div class="w-12 h-12 rounded-2xl bg-[var(--paper)] border border-[var(--line)] shadow-sm flex items-center justify-center mx-auto lg:mx-0 mb-5 lg:hidden">
-                        <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-7 h-7 object-contain">
+                        <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="w-7 h-7 object-contain">
                     </div>
                     <h1 class="text-[22px] font-bold text-[var(--ink)] tracking-tight">Pendaftaran anggota baru</h1>
                     <p class="text-[14px] text-[var(--ink-faint)] mt-1.5">Lengkapi data berikut untuk membuat akun.</p>
@@ -80,7 +80,7 @@
                                 <label for="name" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Nama Lengkap</label>
                                 <input type="text" name="name" id="name" value="{{ old('name') }}"
                                     placeholder="Nama sesuai KTM" autocomplete="name" required
-                                    class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('name') border-red-300 @enderror">
+                                    class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('name') border-red-300 @enderror">
                                 @error('name')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                             </div>
 
@@ -90,13 +90,13 @@
                                     <input type="text" name="nim" id="nim" value="{{ old('nim') }}" placeholder="21130001"
                                         inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                         autocomplete="off" required
-                                        class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('nim') border-red-300 @enderror">
+                                        class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('nim') border-red-300 @enderror">
                                     @error('nim')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                                 </div>
                                 <div>
                                     <label for="semester" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Semester</label>
                                     <select name="semester" id="semester" required
-                                        class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('semester') border-red-300 @enderror">
+                                        class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('semester') border-red-300 @enderror">
                                         <option value="" disabled @selected(old('semester') === null)>Pilih semester</option>
                                         @for ($i = 1; $i <= 8; $i++)
                                             <option value="{{ $i }}" @selected((int) old('semester') === $i)>Semester {{ $i }}</option>
@@ -108,7 +108,7 @@
                                     <label for="whatsapp" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Nomor WhatsApp</label>
                                     <input type="tel" name="whatsapp" id="whatsapp" value="{{ old('whatsapp') }}" placeholder="081234567890"
                                         pattern="[0-9+\-\s]+" oninput="this.value = this.value.replace(/[^0-9+\-\s]/g, '')" required
-                                        class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('whatsapp') border-red-300 @enderror">
+                                        class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('whatsapp') border-red-300 @enderror">
                                     @error('whatsapp')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                                 </div>
                             </div>
@@ -116,7 +116,7 @@
                             <div>
                                 <label for="email" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Alamat Email</label>
                                 <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="kamu@stmikmi.ac.id" autocomplete="email" required
-                                    class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('email') border-red-300 @enderror">
+                                    class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('email') border-red-300 @enderror">
                                 @error('email')<p class="text-[12px] text-red-500 mt-1.5">{{ $message }}</p>@enderror
                             </div>
                         </fieldset>
@@ -128,7 +128,7 @@
                             @if (isset($divisions) && $divisions->count() > 0)
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                     @foreach ($divisions as $division)
-                                        @php $divImg = $division->image ? asset('storage/' . $division->image) : asset('storage/system/logos/csa-logo.png'); @endphp
+                                        @php $divImg = $division->image ? asset('storage/' . $division->image) : asset('images/csa-logo.webp'); @endphp
                                         <label for="div_{{ $division->id }}" @click="selectedDivision = '{{ $division->id }}'"
                                             :class="selectedDivision == '{{ $division->id }}'
                                                 ? 'border-[var(--accent)] bg-[var(--accent-soft)] ring-2 ring-[var(--accent)]/15'
@@ -217,7 +217,7 @@
                                 <div class="relative">
                                     <input :type="showPassword ? 'text' : 'password'" name="password" id="password"
                                         placeholder="Minimal 8 karakter" autocomplete="new-password" required
-                                        class="w-full h-12 pl-4 pr-12 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('password') border-red-300 @enderror">
+                                        class="w-full h-12 pl-4 pr-12 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors @error('password') border-red-300 @enderror">
                                     <button type="button" @click="showPassword = !showPassword"
                                         class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg text-[var(--ink-faint)] hover:text-[var(--ink-soft)] transition-colors"
                                         :aria-label="showPassword ? 'Sembunyikan password' : 'Tampilkan password'">
@@ -232,7 +232,7 @@
                                 <label for="password-confirm" class="block text-[13px] font-medium text-[var(--ink)] mb-1.5">Konfirmasi Password</label>
                                 <input :type="showPassword ? 'text' : 'password'" name="password_confirmation" id="password-confirm"
                                     placeholder="Ulangi password" autocomplete="new-password" required
-                                    class="w-full h-12 px-4 rounded-xl bg-[#f1f3f4] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors">
+                                    class="w-full h-12 px-4 rounded-xl bg-[var(--paper-sunken)] text-[14px] text-[var(--ink)] placeholder:text-[var(--ink-faint)] border border-transparent focus:border-[var(--accent)] focus:bg-[var(--paper)] focus:outline-none transition-colors">
                             </div>
 
                             <p class="text-[12px] text-[var(--ink-faint)] leading-relaxed bg-[var(--paper-sunken)] border border-[var(--line)] rounded-2xl px-4 py-3">

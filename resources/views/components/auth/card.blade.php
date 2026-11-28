@@ -9,7 +9,7 @@
         {{-- Card header strip --}}
         <div class="px-8 pt-8 pb-6 border-b border-gray-100">
             <img
-                src="{{ asset('storage/system/logos/csa.png') }}"
+                src="{{ asset('images/csa-logo.webp') }}"
                 alt="CSA STMIKMI Logo"
                 class="h-9 w-auto mb-5 object-contain"
                 loading="eager"

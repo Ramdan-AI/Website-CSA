@@ -1,6 +1,12 @@
 .git
 .env
+.env.docker
 node_modules
 vendor
-database/*.sqlite
+public/build
+public/storage
+bootstrap/cache/*.php
 storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*

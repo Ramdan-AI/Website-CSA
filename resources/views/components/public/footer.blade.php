@@ -1,5 +1,5 @@
 @php
-    $setting = Cache::remember('setting.footer', 60, fn () => \App\Models\Setting::first());
+    $setting = \App\Models\Setting::cached();
     $footerMenus = [
         ['label' => 'Beranda', 'url' => route('home')],
         ['label' => 'Tentang', 'url' => url('/') . '#tentang'],
@@ -18,7 +18,7 @@
             {{-- Brand --}}
             <div class="max-w-[360px]">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-3">
-                    <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-9 h-9 object-contain">
+                    <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="w-9 h-9 object-contain">
                     <span class="text-[15px] font-semibold text-[var(--ink)]">Creative Student Association</span>
                 </a>
                 <p class="text-[14px] leading-[1.7] text-[var(--ink-soft)] mt-4">

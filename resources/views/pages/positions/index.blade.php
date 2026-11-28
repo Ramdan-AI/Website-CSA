@@ -57,7 +57,7 @@
                         <div class="hidden sm:flex items-center gap-2.5 shrink-0">
                             <div class="flex -space-x-2">
                                 @forelse ($leads as $lead)
-                                    <img src="{{ $lead->photo_url ?: asset('storage/profile/profile-placeholder.png') }}"
+                                    <img src="{{ $lead->photo_url ?: asset('images/profile-placeholder.svg') }}"
                                         alt="{{ $lead->name }}" title="{{ $lead->name }}"
                                         class="w-7 h-7 rounded-full object-cover ring-2 ring-[var(--bg-card)] bg-[var(--bg-muted)]">
                                 @empty

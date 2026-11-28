@@ -25,7 +25,7 @@
         <div class="flex items-center justify-between h-16">
 
             <a href="{{ route('home') }}" class="flex items-center gap-3 shrink-0">
-                <img src="{{ asset('storage/system/logos/csa-logo.png') }}" alt="CSA" class="w-8 h-8 object-contain">
+                <img src="{{ asset('images/csa-logo.webp') }}" alt="CSA" class="w-8 h-8 object-contain">
                 <span class="hidden sm:block text-[15px] font-semibold tracking-[-0.01em]" style="color: var(--ink);">CSA</span>
             </a>
 

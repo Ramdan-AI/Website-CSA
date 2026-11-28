@@ -16,7 +16,10 @@ class RegistrationScheduleTest extends TestCase
 
     private function setting(array $attrs = []): Setting
     {
-        return Setting::create(array_merge(['site_name' => 'CSA'], $attrs));
+        $setting = Setting::current();
+        $setting->update($attrs);
+
+        return $setting;
     }
 
     public function test_manual_mode_ignores_dates(): void

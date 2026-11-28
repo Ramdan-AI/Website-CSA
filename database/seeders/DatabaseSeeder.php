@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
+use App\Support\QueryCache;
+use Database\Seeders\Support\SeedPassword;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -10,12 +11,9 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // User::factory(10)->create();
+        SeedPassword::required();
 
         $this->call([
             RoleSeeder::class,
@@ -23,13 +21,22 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             DivisionSeeder::class,
             PositionSeeder::class,
-            AdminSeeder::class,
-            MemberSeeder::class,
+            SuperAdminSeeder::class,
+            KetuaSeeder::class,
+            WakilKetuaSeeder::class,
+            SekretarisSeeder::class,
+            BendaharaSeeder::class,
+            KetuaDivisiSeeder::class,
+            WakilKetuaDivisiSeeder::class,
+            AnggotaSeeder::class,
             NewsCategorySeeder::class,
             NewsSeeder::class,
             SettingSeeder::class,
             AlbumSeeder::class,
+            DocumentationSeeder::class,
             GallerySeeder::class,
         ]);
+
+        QueryCache::flush();
     }
 }

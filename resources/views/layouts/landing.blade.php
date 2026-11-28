@@ -7,21 +7,15 @@
     <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)">
     <title>Creative Student Association | Komunitas Teknologi STMIK Mardira Indonesia</title>
     <meta name="description" content="CSA adalah organisasi mahasiswa IT di STMIK Mardira Indonesia. Anggotanya belajar pemrograman dan multimedia lewat proyek nyata.">
-    <link rel="icon" href="{{ asset('storage/system/logos/csa-logo.png') }}" type="image/png">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|inter:400,500,600,700&family=jetbrains-mono:400,500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
     <script>
-        // Tema diset sebelum paint agar tidak ada kedipan warna.
         (() => {
             const stored = localStorage.getItem('theme');
             const dark = stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
             document.documentElement.classList.toggle('dark', dark);
         })();
     </script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/countup.js/2.8.0/countUp.umd.js"></script>
+    @vite(['resources/css/vendor/landing-fonts.css', 'resources/css/app.css', 'resources/js/app.js', 'resources/js/vendor/alpine.js'])
     @stack('styles')
     <style>
         :root {
@@ -29,10 +23,10 @@
             --paper-sunken: #f7f8fa;
             --ink: #0f1419;
             --ink-soft: #4b5563;
-            --ink-faint: #8b929e;
+            --ink-faint: #667085;
             --line: #e5e7eb;
             --line-strong: #d1d5db;
-            --accent: #1a73e8;
+            --accent: #1967d2;
             --accent-soft: #e8f0fe;
             --accent-deep: #1557b0;
             --accent-solid: #1a73e8;
@@ -44,7 +38,7 @@
             --paper-sunken: #111113;
             --ink: #f3f4f6;
             --ink-soft: #a1a5ad;
-            --ink-faint: #6b7078;
+            --ink-faint: #8b919b;
             --line: #232326;
             --line-strong: #34343a;
             --accent: #8ab4f8;
@@ -78,11 +72,9 @@
         [data-slider-track].is-dragging { cursor: grabbing; user-select: none; }
         [data-slider-track]:not(.is-dragging) { cursor: grab; }
 
-        /* Strip foto: dua baris bergerak berlawanan arah. */
         [data-marquee] { overflow: hidden; }
         [data-marquee-track] { will-change: transform; }
 
-        /* Judul hero: reveal per baris dengan clip-path, bukan fade. */
         .line-mask { display: block; overflow: hidden; }
         .line-mask > span {
             display: block;
@@ -107,7 +99,6 @@
 
     <x-public.footer />
 
-    {{-- Modal pendaftaran ditutup --}}
     <div x-data="{ open: {{ (session('registration_closed') || (session('error') && str_contains(session('error'), 'ditutup'))) ? 'true' : 'false' }} }"
         x-init="window.addEventListener('open-register-modal', () => open = true)">
         <div x-show="open" x-cloak
@@ -128,8 +119,8 @@
                     Admin belum membuka pendaftaran. Cek kembali nanti atau hubungi pengurus CSA.
                 </p>
                 <button @click="open = false"
-                    class="w-full py-3 text-white text-[14px] font-medium rounded-lg"
-                    style="background: var(--accent);">
+                    class="w-full py-3 text-[14px] font-medium rounded-lg"
+                    style="background: var(--accent-solid); color: var(--on-accent);">
                     Mengerti
                 </button>
             </div>

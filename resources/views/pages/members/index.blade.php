@@ -60,7 +60,7 @@
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-muted)] shrink-0 {{ $member->photo_url ? 'cursor-pointer' : '' }}"
                              @if($member->photo_url) onclick="openImagePreview('imagePreviewModal', '{{ $member->photo_url }}', '{{ $member->name }}')" @endif>
-                            <img src="{{ $member->photo_url ?? asset('storage/profile/profile-placeholder.png') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
+                            <img src="{{ $member->photo_url ?? asset('images/profile-placeholder.svg') }}" alt="{{ $member->name }}" class="w-full h-full object-cover">
                         </div>
                         <div class="min-w-0">
                             <p class="text-[13px] font-medium text-[var(--text-primary)] truncate">{{ $member->name }}</p>

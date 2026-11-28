@@ -2,19 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Setting;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SettingRequest;
-use Illuminate\Support\Facades\Cache;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
     public function edit()
     {
-        $setting = Setting::firstOrCreate(['id' => 1], [
-            'site_name' => 'CSA',
-        ]);
+        $setting = Setting::current();
 
         return view('pages.settings.edit', compact('setting'));
     }
@@ -32,7 +29,6 @@ class SettingController extends Controller
         }
 
         $setting->update($data);
-        Cache::forget('setting.registration_open');
 
         return redirect()
             ->route('admin.settings.edit')

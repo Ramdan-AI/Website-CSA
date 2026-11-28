@@ -162,7 +162,7 @@ class RegisterController extends Controller
     {
         $user = auth()->user();
         $member = Member::with('division')->where('user_id', $user->id)->first();
-        $setting = Setting::first();
+        $setting = Setting::cached();
         $whatsappGroupLink = $setting?->whatsapp_group_link;
 
         return view('auth.register-success', compact('user', 'member', 'whatsappGroupLink'));

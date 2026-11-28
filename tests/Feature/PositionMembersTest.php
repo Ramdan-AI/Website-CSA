@@ -57,6 +57,23 @@ class PositionMembersTest extends TestCase
         $response->assertSee('Budi Santoso', false);
     }
 
+    public function test_assigning_deputy_division_head_grants_the_deputy_role(): void
+    {
+        $admin = $this->admin();
+        $deputyRole = Role::create(['name' => 'Wakil Ketua Divisi', 'slug' => 'wakil-ketua-divisi']);
+        Role::create(['name' => 'Ketua Divisi', 'slug' => 'ketua-divisi']);
+        $position = Position::create(['name' => 'Wakil Ketua Divisi', 'max_members' => 1]);
+        $account = User::create(['name' => 'Rina', 'email' => 'rina@example.test', 'password' => 'password']);
+        $member = Member::create(['user_id' => $account->id, 'name' => 'Rina', 'nim' => '20240003']);
+
+        $this->actingAs($admin)->post(
+            route('admin.positions.assign', ['roleSlug' => 'super-admin', 'position' => $position->id]),
+            ['member_id' => $member->id]
+        )->assertSessionHas('success');
+
+        $this->assertSame($deputyRole->id, $account->fresh()->role_id);
+    }
+
     public function test_members_show_page_displays_level(): void
     {
         $admin = $this->admin();

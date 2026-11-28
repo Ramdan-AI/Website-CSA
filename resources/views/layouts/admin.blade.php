@@ -7,12 +7,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0b0d12">
     <title>CSA Admin Panel</title>
-    <link rel="icon" href="{{ asset('storage/system/logos/csa-logo.png') }}" type="image/png">
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/css/admin.css', 'resources/js/admin.js'])
+    <link rel="icon" href="{{ asset('images/csa-logo.webp') }}" type="image/webp">
+    @vite(['resources/css/vendor/admin-fonts.css', 'resources/css/admin.css', 'resources/js/admin.js', 'resources/js/vendor/alpine.js'])
     @stack('styles')
     <script>
         (() => {
@@ -22,10 +18,13 @@
             } else {
                 document.documentElement.classList.add('dark');
             }
+            const expanded = JSON.parse(localStorage.getItem('sidebar-expanded') ?? 'true');
+            document.documentElement.dataset.sidebar = expanded ? 'expanded' : 'collapsed';
         })();
-        document.addEventListener('DOMContentLoaded', () => window.lucide?.createIcons());
+        document.addEventListener('alpine:initialized', () => {
+            document.documentElement.dataset.alpine = 'ready';
+        });
     </script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body class="antialiased overflow-x-hidden bg-[var(--bg-body)] text-[var(--text-primary)]"
@@ -56,6 +55,7 @@
             this.applyTheme();
             window.addEventListener('sidebar-toggled', (event) => {
                 this.sidebarExpanded = event.detail.expanded;
+                document.documentElement.dataset.sidebar = event.detail.expanded ? 'expanded' : 'collapsed';
                 this.animateLayout = true;
             });
         }
@@ -63,8 +63,6 @@
 
     <x-admin.sidebar />
 
-    {{-- Transisi padding hanya aktif setelah sidebar benar-benar ditoggle,
-         sehingga pindah halaman tidak memicu animasi geser. --}}
     <div class="main-content-container flex flex-col min-h-screen"
         :class="[
             animateLayout ? 'transition-[padding] duration-300' : '',

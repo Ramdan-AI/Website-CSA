@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\FlushesQueryCache;
 use Illuminate\Database\Eloquent\Model;
 
 class Position extends Model
 {
+    use FlushesQueryCache;
+
     protected $fillable = [
         'name',
         'description',

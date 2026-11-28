@@ -40,7 +40,6 @@ class GallerySeeder extends Seeder
             $gallery->album_id = $album->id;
             $gallery->caption = $this->caption($file);
 
-            // Hanya tandai hero saat pertama dibuat, jangan timpa pilihan admin.
             if (! $gallery->exists) {
                 $gallery->is_hero = true;
             }
@@ -49,8 +48,7 @@ class GallerySeeder extends Seeder
             $created++;
         }
 
-        // Hapus record yang gambarnya sudah tidak ada di storage.
-        $removed = Gallery::whereNotIn('image', $files)->delete();
+        $removed = Gallery::where('image', 'like', 'galleries/%')->whereNotIn('image', $files)->delete();
 
         $this->command->info("GallerySeeder selesai: {$created} gambar disinkronkan dari storage, {$removed} record usang dihapus.");
     }

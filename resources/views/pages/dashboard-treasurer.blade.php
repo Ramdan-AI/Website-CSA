@@ -75,7 +75,7 @@
 
 @push('scripts')
 <script>
-    (() => {
+    document.addEventListener('DOMContentLoaded', () => {
         const canvas = document.getElementById('treasurerChart');
         if (!canvas || !window.Chart) return;
 
@@ -123,6 +123,6 @@
                 },
             },
         });
-    })();
+    });
 </script>
 @endpush

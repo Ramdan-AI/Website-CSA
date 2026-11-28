@@ -252,8 +252,8 @@ Route::prefix('{roleSlug}')
 
         // Media
         Route::middleware(['can:manage-media'])->group(function () {
-            Route::resource('albums', AlbumController::class);
-            Route::resource('galleries', GalleryController::class);
+            Route::resource('albums', AlbumController::class)->except(['show']);
+            Route::resource('galleries', GalleryController::class)->except(['show']);
             Route::put('galleries/{gallery}/toggle-hero', [GalleryController::class, 'toggleHero'])->name('galleries.toggle-hero');
         });
     });
